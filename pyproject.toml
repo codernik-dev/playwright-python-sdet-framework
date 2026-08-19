@@ -52,6 +52,7 @@ dev = [
 # never depend on the app, and this makes that boundary visible in the manifest.
 app = [
     "fastapi>=0.115,<1",
+    "email-validator>=2.2,<3",   # EmailStr validation for request models
     "uvicorn[standard]>=0.32,<1",
     "sqlalchemy>=2.0,<3",
     "jinja2>=3.1,<4",
@@ -159,6 +160,15 @@ ignore = [
 # Tests: magic numbers and long argument lists are normal and readable there.
 "tests/**" = ["PLR2004", "ARG001", "ARG002"]
 
+# B008 flags function calls in argument defaults - the mutable-default bug. FastAPI's
+# dependency injection is built on exactly that syntax, and these calls are immutable
+# markers, not shared state. Listing them keeps B008 useful everywhere else.
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = [
+    "fastapi.Depends", "fastapi.Query", "fastapi.Form",
+    "fastapi.Path", "fastapi.Body", "fastapi.Header",
+]
+
 [tool.ruff.lint.isort]
 known-first-party = ["claimdesk_qa"]
 
@@ -172,8 +182,13 @@ indent-style = "space"
 # ---------------------------------------------------------------------------
 [tool.mypy]
 python_version = "3.11"
-# "app" is added to this list in Phase 3, when the application under test exists.
-files = ["src", "tests"]
+# app/claimdesk rather than app: two conftest.py files with no package __init__
+# are ambiguous to mypy, and the application's own tests are verified by running
+# them, not by type-checking them.
+files = ["src", "tests", "app/claimdesk"]
+# The application is not an installed package, so mypy needs to be told where its
+# root is - the same reason app/tests/conftest.py adjusts sys.path.
+mypy_path = ["app"]
 plugins = ["pydantic.mypy"]
 strict = true
 warn_unreachable = true
@@ -183,6 +198,15 @@ pretty = true
 module = "tests.*"
 disallow_untyped_defs = false
 disallow_untyped_decorators = false
+
+# The application under test is a fixture, not shared framework code. Full strict
+# mode fights FastAPI's decorator style for no benefit; the checks that catch real
+# defects (undefined names, wrong types, unreachable code) stay on.
+[[tool.mypy.overrides]]
+module = "claimdesk.*"
+disallow_untyped_defs = false
+disallow_any_generics = false
+warn_return_any = false
 
 [[tool.mypy.overrides]]
 module = ["allure.*", "allure_commons.*"]
