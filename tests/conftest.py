@@ -32,6 +32,15 @@ if TYPE_CHECKING:
 
 logger = get_logger(__name__)
 
+#: Fixtures shared by more than one layer, registered here rather than duplicated
+#: into each layer's conftest. `pytest_plugins` is only honoured in the rootdir
+#: conftest, which is why it lives here.
+pytest_plugins = [
+    "tests._fixtures.identities",
+    "tests._fixtures.database",
+    "tests._fixtures.browser",
+]
+
 #: Directory under tests/ -> the layer marker every test in it carries.
 #: Auto-applied so the taxonomy cannot rot: a test's location decides its layer,
 #: and nobody has to remember to add the marker.

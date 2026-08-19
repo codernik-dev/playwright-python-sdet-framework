@@ -1,4 +1,4 @@
-"""Guard for the ui suite.
+"""Guard for the db suite.
 
 All shared fixtures live in `tests/_fixtures/` and are registered as plugins from
 the root conftest. What remains here is the one thing specific to this layer: it
