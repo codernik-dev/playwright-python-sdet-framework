@@ -176,3 +176,48 @@ def test_pruning_an_absent_run_directory_is_harmless(tmp_path: Path) -> None:
     manager = ArtifactManager.create(root=tmp_path / "never-created", run_id="r1")
 
     assert manager.prune_empty_dirs() == 0
+
+
+def test_pruning_survives_another_worker_removing_a_directory_first(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Regression test for an intermittent failure seen in a `-n 4` run.
+
+    Every xdist worker prunes the same shared run directory at session end, so two
+    will interleave: A lists a directory, B removes it, A's rmdir raises
+    FileNotFoundError. Cleanup must never fail a run - reporting a passing suite
+    as broken because two processes tidied up simultaneously is far worse than
+    leaving an empty folder behind.
+    """
+    manager = ArtifactManager.create(root=tmp_path, run_id="r1")
+    manager.ensure_run_dirs()
+    manager.dir_for("tests/api/test_a.py::test_one")
+    manager.dir_for("tests/api/test_b.py::test_two")
+
+    original_rmdir = Path.rmdir
+    calls = {"count": 0}
+
+    def flaky_rmdir(self: Path) -> None:
+        calls["count"] += 1
+        if calls["count"] == 1:
+            raise FileNotFoundError(self)  # another worker got there first
+        original_rmdir(self)
+
+    monkeypatch.setattr(Path, "rmdir", flaky_rmdir)
+
+    removed = manager.prune_empty_dirs()
+
+    assert removed == 1  # the one that was not already gone
+    assert calls["count"] == 2  # and it kept going after the failure
+
+
+def test_pruning_keeps_a_directory_that_gained_evidence_mid_sweep(tmp_path: Path) -> None:
+    """The other side of the race: never delete a directory that has evidence."""
+    manager = ArtifactManager.create(root=tmp_path, run_id="r1")
+    manager.ensure_run_dirs()
+    kept = manager.dir_for("tests/ui/test_login.py::test_fails")
+    (kept / "trace.zip").write_bytes(b"evidence")
+
+    manager.prune_empty_dirs()
+
+    assert (kept / "trace.zip").exists()

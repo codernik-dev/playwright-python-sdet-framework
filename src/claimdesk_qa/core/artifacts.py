@@ -152,12 +152,37 @@ class ArtifactManager:
         Returns the number removed. Keeps ``artifacts/<run>/`` containing only the
         tests that actually have something to look at — which is the difference
         between a useful evidence folder and a haystack.
+
+        **Concurrency-tolerant by necessity.** Under xdist every worker runs its
+        own session and therefore every worker prunes the same shared run
+        directory at the end. Two workers will inevitably interleave: A lists a
+        directory, B removes it, and A's ``rmdir`` then fails with
+        ``FileNotFoundError``. A worker can equally write evidence into a
+        directory between another worker's emptiness check and its removal, giving
+        ``OSError: directory not empty``.
+
+        Both outcomes are correct — the directory is gone, or it has evidence and
+        should stay — so each one is skipped rather than raised. Cleanup must
+        never be able to fail a run: an error here would report a *passing* suite
+        as broken, purely because two processes tidied up at once.
+
+        This was a real intermittent failure, seen once in a ``-n 4`` run and not
+        reproduced in the three runs afterwards. Races do not wait to be
+        convenient.
         """
-        if not self.run_dir.exists():
+        try:
+            children = list(self.run_dir.iterdir())
+        except OSError:
             return 0
+
         removed = 0
-        for child in self.run_dir.iterdir():
-            if child.is_dir() and child.name != "logs" and not any(child.iterdir()):
-                child.rmdir()
-                removed += 1
+        for child in children:
+            if child.name == "logs":
+                continue
+            try:
+                if child.is_dir() and not any(child.iterdir()):
+                    child.rmdir()
+                    removed += 1
+            except OSError:
+                continue
         return removed
