@@ -26,8 +26,8 @@ Recorded because "works on my machine" is only useful if the machine is written 
 | PostgreSQL | **18.1, running as a service on :5432** (scram-sha-256) | Local DB work possible immediately, before Docker |
 | Java | OpenJDK 25.0.1 | Allure CLI can render reports locally |
 | Node | 24.13.0 | Not required; an alternative route to the Allure CLI |
-| Docker | **not installed** | Phases 10–12 blocked until installed; WSL2 + Ubuntu already present, so installation is straightforward |
-| Free disk (C:) | ~9.1 GB | Rules out the 2.5 GB official Playwright image; we build a lean image instead |
+| Docker | **Engine 29.7.2 inside WSL2** (Compose v5.5.0, buildx v0.36.1) | Installed without elevation; see [ADR 0008](adr/0008-docker-engine-in-wsl2.md). Phases 10–12 unblocked |
+| Free disk (C:) | ~32 GB (was 9.1 GB) | Still building a lean test image rather than pulling the 2.5 GB official Playwright one — faster CI pulls |
 
 ---
 
@@ -316,8 +316,8 @@ All three silent failures now have regression tests named after the failure mode
 
 | # | Item | Blocks | Owner action |
 |---|---|---|---|
-| 1 | Install Docker Desktop (WSL2 backend is already present) | Phases 10–12 | Yours |
+| 1 | ~~Install Docker~~ | — | ✅ Done — Docker Engine 29.7.2 installed inside WSL2 with Compose and buildx, daemon enabled under systemd. `postgres:18-alpine` and `python:3.12-slim` pre-pulled and verified |
 | 2 | ~~Create the local database + roles~~ | — | ✅ Done — `scripts/local_db.ps1` builds a disposable cluster; your existing PostgreSQL service was never touched and no superuser password was needed |
-| 3 | `playwright install chromium` (~200 MB) | Phase 6 | Runs during Phase 6 |
-| 4 | Free disk space on C: (~9 GB left) | Phase 10 image builds | Monitor |
+| 3 | ~~`playwright install chromium`~~ | — | ✅ Done — Chromium 114.5 MiB installed, Playwright 1.62.0 |
+| 4 | ~~Free disk space on C:~~ | — | ✅ Resolved — ~32 GB free |
 | 5 | ~~Add `app` to the mypy `files` list~~ | — | ✅ Done — mypy now checks `src`, `tests` and `app/claimdesk` |
