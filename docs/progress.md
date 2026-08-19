@@ -351,6 +351,36 @@ All three silent failures now have regression tests named after the failure mode
 
 ---
 
+## Clean-clone verification ✅
+
+The original brief asked whether the project is *"reproducible from a clean machine"*. Answered by
+cloning the **published** repository into a fresh directory — not by re-running the working tree —
+and building it from nothing.
+
+| Step | Result |
+|---|---|
+| `git clone` the public repo | ✅ **VERIFIED** — 124 files, no `.env` present |
+| `py -3.11 -m venv` + `pip install -e ".[dev,app]"` | ✅ **VERIFIED** |
+| `cp .env.example .env`, set two passwords | ✅ **VERIFIED** — the documented first step works |
+| `pytest -m framework` | ✅ **VERIFIED** — `72 passed`, no application required |
+| `pytest -m "api or db or e2e"` | ✅ **VERIFIED** — `189 passed` |
+| `pytest -m ui` | ✅ **VERIFIED** — `32 passed` |
+| `pytest` (everything) | ✅ **VERIFIED** — **`293 passed in 26.21s`** |
+| `ruff check` · `ruff format --check` · `mypy` | ✅ **VERIFIED** — clean, 103 files formatted, 83 typed |
+
+### Two findings, and the first was serious
+
+| # | Finding | Outcome |
+|---|---|---|
+| 1 | **The published repository could not run its own browser suite.** The Phase 7 refactor renamed three fixtures; the conftest changes were committed but `tests/ui/*.py` were never staged. My working tree passed 293 tests because it had the renames — the commit did not | Fixed and pushed. The lesson is procedural: **staging selectively across several commits means a green local run proves nothing about what was committed.** Verification now happens against a clean clone of the pushed commit, which is the only check that would have caught it |
+| 2 | `pip install` failed with `Could not find a suitable TLS CA certificate bundle` | `CURL_CA_BUNDLE` was set to a PostgreSQL path that does not exist. An environment problem, not a project one — but it fails at the first documented step, so it is now in the README's troubleshooting section |
+
+Also worth noting: my own verification script printed `install ok` after the install had **failed**,
+because `set -e` does not trigger on a command whose output is piped to `tail`. The same shape of
+mistake as an earlier `&&`-after-`head`. Exit codes are now checked explicitly.
+
+---
+
 ## Open items carried forward
 
 | # | Item | Blocks | Owner action |

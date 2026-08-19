@@ -195,6 +195,21 @@ pytest -q -n 4             # everything, in parallel
 Sign in at <http://127.0.0.1:8000/login> as `customer@example.com` / `Passw0rd!seed`.
 Interactive API docs: <http://127.0.0.1:8000/docs>.
 
+### If `pip install` fails with a TLS certificate error
+
+```
+Could not find a suitable TLS CA certificate bundle, invalid path:
+C:\Program Files\PostgreSQL8\ssl\certs\ca-bundle.crt
+```
+
+Some PostgreSQL installers set `CURL_CA_BUNDLE` to a path that does not exist.
+It is an environment problem rather than a project one, but it fails at the very
+first step, so it looks like the project is broken. Clear it for the session:
+
+```powershell
+Remove-Item Env:CURL_CA_BUNDLE -ErrorAction SilentlyContinue
+```
+
 Useful commands:
 
 ```powershell
