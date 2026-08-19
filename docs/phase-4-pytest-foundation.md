@@ -53,7 +53,7 @@ artifacts/
 `pytest_configure` *before* xdist spawns workers, so they inherit it:
 
 ```python
-if not hasattr(config, "workerinput"):        # controller, or no xdist
+if not hasattr(config, "workerinput"):  # controller, or no xdist
     os.environ.setdefault(RUN_ID_ENV_VAR, new_run_id())
 ```
 
@@ -137,7 +137,7 @@ runs first: they all compute the same answer.
 The obvious next move was to attach the filter once, to the logger:
 
 ```python
-logger.addFilter(RequestIdFilter())   # looks tidier. It is wrong.
+logger.addFilter(RequestIdFilter())  # looks tidier. It is wrong.
 ```
 
 A logger's filters are applied **only to records logged through that logger
@@ -162,7 +162,7 @@ of origin. Both bugs now have named regression tests.
 ## Decision 4 — Log levels are per destination
 
 ```python
-logger.setLevel(logging.DEBUG)      # nothing is dropped before the handlers
+logger.setLevel(logging.DEBUG)  # nothing is dropped before the handlers
 console.setLevel(settings.log_level)  # a local run stays readable
 file_handler.setLevel(logging.DEBUG)  # files exist for the moment it failed
 ```
@@ -180,7 +180,7 @@ The rule: filter late, at the destination, not early at the source.
 
 ```python
 subprocess.run(["docker", "compose", "up", "-d"])
-time.sleep(10)          # "should be enough"
+time.sleep(10)  # "should be enough"
 ```
 
 Wrong in both directions: ten wasted seconds on every fast run, and not enough on

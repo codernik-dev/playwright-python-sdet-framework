@@ -39,8 +39,8 @@ Recorded because "works on my machine" is only useful if the machine is written 
 | 2 | Repository structure + configuration | ✅ Complete — [phase-2-repository-and-configuration.md](phase-2-repository-and-configuration.md) |
 | 3 | Application under test + database | ✅ Complete — [phase-3-application-under-test.md](phase-3-application-under-test.md) |
 | 4 | pytest foundation (logging, artefacts, fixtures) | ✅ Complete — [phase-4-pytest-foundation.md](phase-4-pytest-foundation.md) |
-| 5 | API automation layer | ⬜ Next |
-| 6 | Playwright UI layer | ⬜ |
+| 5 | API automation layer | ✅ Complete — [phase-5-api-automation.md](phase-5-api-automation.md) |
+| 6 | Playwright UI layer | ⬜ Next |
 | 7 | Database validation layer | ⬜ |
 | 8 | Reporting + failure artefacts | ⬜ |
 | 9 | Parallel execution + markers | ⬜ |
@@ -231,6 +231,46 @@ Three silent failures — none of which made a test fail, all of which destroyed
 | 5 | A dead environment blocked for a hard-coded 60s | `READINESS_TIMEOUT_SECONDS` is now configurable — CI needs a cold-start minute, a developer wants three seconds |
 
 All three silent failures now have regression tests named after the failure mode.
+
+---
+
+## Phase 5 — API automation layer ✅
+
+### What was built
+
+| Area | Detail |
+|---|---|
+| `domain.py` | The framework's own copy of statuses, roles, limits and the transition table (duplicated deliberately — ADR 0002) |
+| `api/client.py` | `ApiClient`: one per identity, cookies discarded, mandatory timeouts, correlation header, rolling record of the last 25 exchanges |
+| `api/models.py` | Strict contracts — `extra="forbid"`, `Decimal` money |
+| `api/services/` | `AuthApi`, `ClaimsApi`, `UsersApi`, `PoliciesApi` |
+| `data/` | `ClaimFactory`, `UserFactory`, seeded-account constants |
+| `tests/api/` | **157 tests**: auth, CRUD, validation/boundary, authorisation, state machine |
+
+### Verification — commands run, output observed
+
+| Check | Result |
+|---|---|
+| Full suite, serial | ✅ **VERIFIED** — `229 passed in 11.42s` (72 framework + 157 API) |
+| Full suite, `-n 4`, three consecutive runs | ✅ **VERIFIED** — `229 passed` in 6.89s / 6.84s / 7.18s, no flakes |
+| Linting / formatting | ✅ **VERIFIED** — `All checks passed!`, `68 files already formatted` |
+| Static typing (strict) | ✅ **VERIFIED** — `Success: no issues found in 52 source files` |
+| Generated negative matrix | ✅ **VERIFIED** — 30 illegal `(action, status)` pairs, each returning 409 with no state change |
+| Approval-limit boundary | ✅ **VERIFIED** — 4999.99 and 5000.00 approved by an adjuster; 5000.01 refused (403) and escalated to admin successfully |
+| Cross-tenant access | ✅ **VERIFIED** — 404 (not 403), and the body does not leak the reference |
+
+⚠️ **NOT VERIFIED in Phase 5:** no browser has been driven, and nothing has run in Docker or CI.
+
+### Findings
+
+| # | Finding | Outcome |
+|---|---|---|
+| 1 | **The suite was ~35× slower than necessary.** 21 auth tests took 48.17s; every request cost ~2.1s *uniformly*, which rules out the application. Measured: `localhost` 2034 ms vs `127.0.0.1` 10 ms — `localhost` resolves to `::1` first and the app binds IPv4 only | One configuration value changed. **48.17s → 1.36s, measured.** A framework problem that looked exactly like an application problem |
+| 2 | **Spec/implementation mismatch on withdrawal.** The matrix said `GET` → 404 after DELETE; the app returns 200 with `status=WITHDRAWN` | The **specification** was wrong: `WITHDRAWN` is a published, filterable status, so a 404 on the detail endpoint contradicts the list endpoint. Matrix corrected, test asserts the coherent behaviour |
+| 3 | Non-ASCII digits (full-width, Arabic-Indic) are accepted and normalised to the same value | Assessed **low severity** — unambiguous, no rule bypassed. Kept as a characterisation test proving the stored value is exactly right |
+| 4 | `Authorization: "Bearer "` is untestable — httpx refuses to send a header with trailing whitespace (RFC 9110) | Case removed with the reason recorded |
+| 5 | My own bug: `zip(a, a[1:], strict=True)` always raises — offset slices differ in length by one | Replaced with `itertools.pairwise`, which ruff had already suggested |
+| 6 | **A race under `-n 4`**: all workers prune the same run directory, so one's `rmdir` hits a directory another already removed. Seen once, not reproduced in three further runs | Pruning is now concurrency-tolerant, with two regression tests. Cleanup must never fail a run |
 
 ---
 

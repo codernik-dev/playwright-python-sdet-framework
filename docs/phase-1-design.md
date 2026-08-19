@@ -340,7 +340,7 @@ Automation status is `Planned` for everything — nothing is built yet.
 | API-CLM-006 | functional | Filter by amount range | P2 | Only in-range amounts | Planned |
 | API-CLM-007 | functional | Sort by amount desc / asc (parametrised) | P2 | Order verified in Python, not trusted | Planned |
 | API-CLM-008 | functional | Update draft claim description (PATCH) | P1 | `200`, changed field only | Planned |
-| API-CLM-009 | functional | Withdraw a draft claim (DELETE) | P2 | `204`, then `GET` → `404` | Planned |
+| API-CLM-009 | functional | Withdraw a draft claim (DELETE) | P2 | `204`, then `GET` → `200` with `status=WITHDRAWN` (**corrected in Phase 5** — the original `404` contradicted the list endpoint, which returns withdrawn claims and filters on that status) | Implemented |
 | API-CLM-010 | negative | amount = 0 | P1 | `422` | Planned |
 | API-CLM-011 | negative | amount negative | P1 | `422` | Planned |
 | API-CLM-012 | boundary | amount = coverage_limit | P1 | `201` (inclusive upper bound) | Planned |
