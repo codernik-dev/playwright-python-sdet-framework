@@ -103,7 +103,7 @@ jobs:
 
       - name: Application log
         if: failure()
-        run: tail -n 200 app.log
+        run: tail -n 200 app.log || echo "(the application never started)"
 
       - name: Upload failure artefacts
         if: failure()
