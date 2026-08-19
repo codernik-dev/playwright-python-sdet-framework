@@ -10,6 +10,13 @@ Verification vocabulary, used strictly:
 | ⚠️ **NOT VERIFIED** | Written and reviewed, but not executed — the reason is always given |
 | ⬜ **NOT STARTED** | Planned, no code yet |
 
+**A ⚠️ inside a phase is a snapshot of that phase, not a statement about the project
+today.** "Nothing has run in Docker yet" was true when Phase 4 was written and stopped being
+true in Phase 10. Those notes are left exactly as written — rewriting history to look better
+in hindsight is precisely the habit this log exists to prevent — and every superseded one now
+says what superseded it. The **live** gaps are the ⚠️ entries in Phases 8–11 and the open
+items at the end.
+
 No timing, coverage, pass-rate or "improvement" figure appears anywhere in this repository until it
 comes from a real measured run (Phase 15 — [phase-15-measurement.md](phase-15-measurement.md)).
 
@@ -129,7 +136,7 @@ Nothing to verify — it is a design document.
 ⚠️ **NOT VERIFIED in Phase 2:** the ruff black-box import ban (`TID251`) has no code to catch yet —
 it is exercised for real in Phase 3 when `app/claimdesk/` exists. The `pre-commit` hooks are
 configured but `pre-commit install` has not been run (it requires a git repository, created at the
-end of this phase).
+end of this phase). *(Superseded: the ban fired for real in Phase 3, and pre-commit was finally run in Phase 13.)*
 
 ### Problems found and fixed during the phase
 
@@ -186,7 +193,7 @@ Recorded because the fixes are more instructive than the final state.
 | Passwords stored hashed | ✅ **VERIFIED** — bcrypt hash, plaintext absent |
 
 ⚠️ **NOT VERIFIED in Phase 3:** nothing has been run in Docker, in Jenkins or in GitHub Actions; no
-browser has been driven yet (Phase 6). The `.pgdata` cluster has only been exercised on this machine.
+browser has been driven yet (Phase 6). The `.pgdata` cluster has only been exercised on this machine. *(Superseded: GitHub Actions in Phase 12, Jenkins in Phase 11, Docker in Phase 10, browsers in Phase 6.)*
 
 ### Problems found and fixed
 
@@ -242,7 +249,7 @@ project's own rule about unjustified technology.
 | Database disabled | ✅ **VERIFIED** — skip with reason + shouted header line |
 | Readiness against a dead port | ✅ **VERIFIED** — `ServiceNotReadyError` naming the service, attempts, OS error, and blaming the environment |
 
-⚠️ **NOT VERIFIED in Phase 4:** nothing here has run in Docker or CI, and no browser has been driven.
+⚠️ **NOT VERIFIED in Phase 4:** nothing here has run in Docker or CI, and no browser has been driven. *(Superseded: Docker in Phase 10, CI in Phase 12, browsers in Phase 6.)*
 
 ### Problems found and fixed
 
@@ -285,7 +292,7 @@ All three silent failures now have regression tests named after the failure mode
 | Approval-limit boundary | ✅ **VERIFIED** — 4999.99 and 5000.00 approved by an adjuster; 5000.01 refused (403) and escalated to admin successfully |
 | Cross-tenant access | ✅ **VERIFIED** — 404 (not 403), and the body does not leak the reference |
 
-⚠️ **NOT VERIFIED in Phase 5:** no browser has been driven, and nothing has run in Docker or CI.
+⚠️ **NOT VERIFIED in Phase 5:** no browser has been driven, and nothing has run in Docker or CI. *(Superseded: browsers in Phase 6, Docker in Phase 10, CI in Phase 12.)*
 
 ### Findings
 
@@ -326,7 +333,7 @@ All three silent failures now have regression tests named after the failure mode
 | Artefact path truncation | ✅ **VERIFIED** — long node id truncated with hash suffix `_12a9d708`, as Phase 4 specified |
 | Passing tests leave no trace | ✅ **VERIFIED** — traces stopped without a path are discarded |
 
-⚠️ **NOT VERIFIED in Phase 6:** only Chromium is installed — Firefox and WebKit are Phase 9. Nothing has run in Docker or CI.
+⚠️ **NOT VERIFIED in Phase 6:** only Chromium is installed — Firefox and WebKit are Phase 9. Nothing has run in Docker or CI. *(Superseded: Firefox and WebKit ran green in the Phase 12 nightly; Docker in Phase 10.)*
 
 ### Findings
 
@@ -364,7 +371,7 @@ All three silent failures now have regression tests named after the failure mode
 | Payout uniqueness exists as a constraint | ✅ **VERIFIED** — read from `pg_catalog` |
 | Passwords hashed, never plaintext | ✅ **VERIFIED** — bcrypt prefix, zero plaintext matches |
 
-⚠️ **NOT VERIFIED in Phase 7:** nothing has run in Docker or CI; no Allure report has been generated yet.
+⚠️ **NOT VERIFIED in Phase 7:** nothing has run in Docker or CI; no Allure report has been generated yet. *(Superseded: Docker in Phase 10, CI in Phase 12, Allure reports in Phase 8.)*
 
 ### Findings
 
