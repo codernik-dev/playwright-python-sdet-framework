@@ -136,18 +136,28 @@ pipeline {
 
         stage('Install') {
             steps {
+                // [dev,app], not [dev]. The quality gate runs mypy, and mypy is
+                // configured to check app/claimdesk as well as the framework -
+                // so without the application's own dependencies installed it
+                // reports 40 "cannot find implementation or library stub"
+                // errors that say nothing about this repository's code.
+                //
+                // Found by this pipeline failing on its first real run. The
+                // coupling is invisible locally, where everyone has both extras
+                // installed, and only an environment that installed the minimum
+                // can reveal it.
                 script {
                     onAgent(
                         unix: '''
                             python3 -m venv .venv
                             . .venv/bin/activate
                             pip install --quiet --upgrade pip
-                            pip install --quiet -e ".[dev]"
+                            pip install --quiet -e ".[dev,app]"
                         ''',
                         windows: '''
                             py -3.12 -m venv .venv
                             .\\.venv\\Scripts\\python.exe -m pip install --quiet --upgrade pip
-                            .\\.venv\\Scripts\\python.exe -m pip install --quiet -e ".[dev]"
+                            .\\.venv\\Scripts\\python.exe -m pip install --quiet -e ".[dev,app]"
                         '''
                     )
                 }
