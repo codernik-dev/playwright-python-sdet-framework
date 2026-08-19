@@ -372,18 +372,31 @@ that makes the repository's state independently checkable rather than something 
 Artefacts published: `test-results` (1.5 MB — JUnit XML + Allure results), `junit-quality`. On
 failure, `failure-artefacts` carries traces, screenshots, page HTML and logs.
 
-⚠️ **NOT VERIFIED:** `nightly.yml` has not yet run — it is scheduled at 02:30 UTC and has not been
-dispatched manually. Firefox and WebKit are therefore **untested**; only Chromium has run in CI.
+**Nightly, dispatched manually and watched to completion — all three engines green:**
+
+| Browser | Result |
+|---|---|
+| Chromium | ✅ **VERIFIED** — `293 passed in 17.98s` |
+| Firefox | ✅ **VERIFIED** — `293 passed in 21.62s` |
+| WebKit | ✅ **VERIFIED** — `293 passed in 26.60s` |
+
+The suite is genuinely cross-browser: the same 293 tests pass on all three engines with no
+browser-specific branching anywhere in the framework.
 
 ### CI measurements
 
-| Step | Before split | After split |
-|---|---|---|
-| Browser install (combined) | **684 s** | — |
-| ├ apt system libraries | — | **249 s** |
-| └ browser download | — | **11 s** |
-| Test execution | 21 s | 19 s |
-| **Job total** | **752 s** | **343 s** |
+| Step | Run 2 (cold) | Run 3 (split) | Run 4 (warm cache) |
+|---|---|---|---|
+| Browser install (combined) | **684 s** | — | — |
+| apt system libraries | — | **249 s** | **13 s** |
+| browser download | — | **11 s** | ~0 s |
+| Test execution | 21 s | 19 s | 21 s |
+| **Job total** | **752 s** | **343 s** | **78 s** |
+
+⚠️ **Do not read that as a 10x win from caching.** The cache explains only the 11 s download. The
+apt step fell from 249 s to 13 s with *identical* configuration — runner variance, not a change I
+made. A single before/after pair in CI is not a measurement when the dominant cost varies
+nineteen-fold between identical runs.
 
 ### Findings
 
@@ -391,7 +404,8 @@ dispatched manually. Firefox and WebKit are therefore **untested**; only Chromiu
 |---|---|---|
 | 1 | **`chmod +x` locally changed nothing in the commit.** Git on Windows does not record the executable bit, so the runner checked out a non-executable script | `git update-index --chmod=+x`. A Windows-to-Linux crossing bug that local testing cannot surface — the script runs fine via `bash script.sh` |
 | 2 | A failing diagnostic step added a second red X that obscured the real failure | `tail ... \|\| echo` — a step whose job is to explain a failure must never be able to cause one |
-| 3 | **The cache I added may cost more than it saves.** Browser download is 11 s; writing the cache is 28 s | Recorded rather than quietly deleted. I cached before measuring, which was the wrong order — being willing to remove your own optimisation is part of the job |
+| 3 | **The cache I added costs more than it saves.** Browser download is 11 s; writing the cache is 28 s | Recorded rather than quietly deleted. I cached before measuring, which was the wrong order |
+| 4 | **CI timings are noisy enough to fake a result.** The same apt step took 249 s and then 13 s with no configuration change | The honest claim is narrow: splitting the step revealed *where* the cost is. Attributing the drop to my cache would have been taking credit for the weather |
 
 ---
 

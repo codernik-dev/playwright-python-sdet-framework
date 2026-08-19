@@ -140,23 +140,38 @@ Splitting them into separate steps made each cost visible:
 the download was never the problem. It is 11 seconds. The 249 seconds is `apt`,
 and `apt` cannot be cached because the runner image does not persist.
 
-### The cache I added is probably not worth keeping
+### The cache question, answered - and a caution about CI measurement
 
-I added `actions/cache` for `~/.cache/ms-playwright` before measuring — which was
-the wrong order, and the numbers say so:
+A fourth run, with a warm cache, came in at **78 s** against the previous **343 s**.
 
-| | Cost |
-|---|---|
-| Browser download without cache | **11 s** |
-| Saving the cache (`Post Cache` step) | **28 s** |
+It would be easy - and wrong - to report "752 s to 78 s, a 10x CI speedup from
+caching". The step timings do not support that:
 
-The cache costs more to write than the download costs to do. It can only pay for
-itself if a restore is much cheaper than 11 seconds, and even then the ceiling on
-the saving *is* 11 seconds.
+| Step | Run 2 (cold) | Run 3 (split) | Run 4 (warm cache) |
+|---|---|---|---|
+| Browser install (combined) | 684 s | - | - |
+| apt system libraries | - | **249 s** | **13 s** |
+| browser download | - | 11 s | ~0 s (cache hit) |
+| Test execution | 21 s | 19 s | 21 s |
+| **Job total** | **752 s** | **343 s** | **78 s** |
 
-This is recorded rather than quietly deleted because the lesson is the point:
-**an optimisation you did not measure is a guess, and being willing to remove your
-own optimisation is part of the job.** The next run's cache-hit timing decides it.
+The cache can only explain the **11 s** download. The apt step fell from 249 s to
+13 s **with identical YAML** - that is variance in the runner's package mirrors,
+not something I changed.
+
+Two conclusions, and the second matters more:
+
+1. **The cache saves ~11 s and costs 28 s to write.** Marginal at best. Kept for
+   now because it is already written and harmless, but it is not the reason the
+   job got faster, and claiming otherwise would be inventing a result.
+2. **A single before/after comparison in CI is not a measurement.** The dominant
+   cost varied nineteen-fold between two runs of the same configuration. Anyone
+   reporting a speedup from one pair of runs is at serious risk of taking credit
+   for the weather.
+
+The defensible claim from this exercise is narrow and useful: **splitting the step
+revealed that the browser download is 11 s and the system libraries are the real
+cost** - which is what tells you where to look next.
 
 The real remaining lever is the 249-second `apt` step, which would need either the
 official Playwright container image (removing apt entirely, at the cost of
@@ -175,6 +190,8 @@ Not "the YAML looks right" — actual runs, watched to completion.
 | First attempt | ❌ `Permission denied` (exit 126) — executable bit not in the commit |
 | Second attempt | ✅ `quality` 43 s, `suite` 12 m 32 s — **`293 passed in 18.55s`** |
 | Third attempt | ✅ **343 s** job after splitting the browser install |
+| Fourth attempt | ✅ **78 s** job — but see the variance caveat above |
+| Nightly (dispatched) | ✅ **all three engines green**: Chromium `293 passed in 17.98s`, Firefox `293 passed in 21.62s`, WebKit `293 passed in 26.60s` |
 
 Artefacts published by the green run: `test-results` (1.5 MB — JUnit XML plus
 Allure results) and `junit-quality`. On failure, `failure-artefacts` carries the
