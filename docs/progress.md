@@ -38,8 +38,8 @@ Recorded because "works on my machine" is only useful if the machine is written 
 | 1 | Design & architecture | ✅ Complete — [phase-1-design.md](phase-1-design.md) |
 | 2 | Repository structure + configuration | ✅ Complete — [phase-2-repository-and-configuration.md](phase-2-repository-and-configuration.md) |
 | 3 | Application under test + database | ✅ Complete — [phase-3-application-under-test.md](phase-3-application-under-test.md) |
-| 4 | pytest foundation (logging, artefacts, fixtures) | ⬜ Next |
-| 5 | API automation layer | ⬜ |
+| 4 | pytest foundation (logging, artefacts, fixtures) | ✅ Complete — [phase-4-pytest-foundation.md](phase-4-pytest-foundation.md) |
+| 5 | API automation layer | ⬜ Next |
 | 6 | Playwright UI layer | ⬜ |
 | 7 | Database validation layer | ⬜ |
 | 8 | Reporting + failure artefacts | ⬜ |
@@ -183,6 +183,54 @@ plain JavaScript instead. Same outcome — a real asynchronous partial refresh f
 on, with `aria-busy` toggled around the request — with no vendored library, no CDN dependency and no
 build step. Adding a dependency that a few lines of code replace would have contradicted the
 project's own rule about unjustified technology.
+
+---
+
+## Phase 4 — pytest foundation ✅
+
+### What was built
+
+| File | Responsibility |
+|---|---|
+| `src/claimdesk_qa/core/artifacts.py` | Run/test artefact paths, worker-aware, Windows-path-safe |
+| `src/claimdesk_qa/core/correlation.py` | Stable per-test `X-Request-Id`, held in a `ContextVar` |
+| `src/claimdesk_qa/core/logging.py` | Console + per-worker + per-test logging |
+| `src/claimdesk_qa/core/readiness.py` | Readiness polling with an injectable probe and clock |
+| `src/claimdesk_qa/core/exceptions.py` | `FrameworkError` separated from `AssertionError` |
+| `tests/conftest.py` | Session fixtures, marker enforcement, artefact retention policy |
+| `tests/framework/test_artifacts.py` etc. | 38 new unit tests |
+
+### Verification — commands run, output observed
+
+| Check | Result |
+|---|---|
+| Framework unit tests | ✅ **VERIFIED** — `70 passed in 0.67s` |
+| Application unit tests | ✅ **VERIFIED** — `58 passed in 0.16s` |
+| Linting / formatting | ✅ **VERIFIED** — `All checks passed!`, `49 files already formatted` |
+| Static typing (strict) | ✅ **VERIFIED** — `Success: no issues found in 34 source files` |
+| **One run directory under `-n 4`** | ✅ **VERIFIED** — 1 directory, 4 worker logs (`worker-gw0..gw3.log`) |
+| **Passing test's artefacts pruned** | ✅ **VERIFIED** |
+| **Failing test's artefacts kept** | ✅ **VERIFIED** — `test.log` retained with correlation id `[qa-933749c975]` |
+| Report header shows environment | ✅ **VERIFIED** — DB password rendered as `***masked***` |
+| Test outside a layer directory | ✅ **VERIFIED** — collection error naming the offender |
+| Database disabled | ✅ **VERIFIED** — skip with reason + shouted header line |
+| Readiness against a dead port | ✅ **VERIFIED** — `ServiceNotReadyError` naming the service, attempts, OS error, and blaming the environment |
+
+⚠️ **NOT VERIFIED in Phase 4:** nothing here has run in Docker or CI, and no browser has been driven.
+
+### Problems found and fixed
+
+Three silent failures — none of which made a test fail, all of which destroyed evidence.
+
+| # | Problem | Lesson |
+|---|---|---|
+| 1 | **The correlation id never reached the log file.** Each handler had its own filter with its own default; filters mutate the *shared* `LogRecord`, so whichever handler ran first stamped its default and later filters left it alone. Logs showed `[-]` | Don't order the handlers — remove the ordering dependency. All filters now read one `ContextVar` |
+| 2 | **Moving the filter to the logger deleted log lines entirely.** Logger filters apply only to records logged through that logger *directly*; records from a child logger reach the parent's handlers via `callHandlers`, skipping the parent's filters. `request_id` went missing, the formatter raised `KeyError`, and `logging` swallowed the line | The tidier-looking fix was worse. Filters belong on handlers, where they see every record |
+| 3 | **Every per-test log file was empty.** The logger was set to `INFO`, so `DEBUG` records were dropped before any handler saw them | Filter late, at the destination — logger at DEBUG, console at the configured level, files at DEBUG |
+| 4 | Artefact paths were relative, so a test that called `chdir` would scatter evidence | Anchored to `pytestconfig.rootpath` |
+| 5 | A dead environment blocked for a hard-coded 60s | `READINESS_TIMEOUT_SECONDS` is now configurable — CI needs a cold-start minute, a developer wants three seconds |
+
+All three silent failures now have regression tests named after the failure mode.
 
 ---
 
