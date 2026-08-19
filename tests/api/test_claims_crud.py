@@ -187,11 +187,20 @@ def test_the_default_page_size_matches_the_published_contract(
 def test_paging_returns_different_claims_on_each_page(customer_claims: ClaimsApi) -> None:
     """API-CLM-003.
 
-    Sorted by a stable key, because a sort with ties and no tiebreaker can repeat
-    or drop rows across pages — a real defect that only shows up under paging.
+    Scoped to the seeded corpus, which no test mutates and no worker adds to.
+
+    Sorting by a stable key is necessary but **not sufficient**: references are
+    random, so a claim another worker creates can insert anywhere in the ordering
+    and shift the page boundary. Only an isolated data set makes page contents
+    deterministic under parallel execution. The browser version of this test
+    failed ~50% of the time at `-n 4` before this was understood.
     """
-    first = customer_claims.list(size=5, page=1, sort="reference").expect_status(200)
-    second = customer_claims.list(size=5, page=2, sort="reference").expect_status(200)
+    first = customer_claims.list(
+        size=5, page=1, sort="reference", q=SEED_CLAIM_PREFIX
+    ).expect_status(200)
+    second = customer_claims.list(
+        size=5, page=2, sort="reference", q=SEED_CLAIM_PREFIX
+    ).expect_status(200)
 
     first_ids = {item["id"] for item in first.json()["items"]}
     second_ids = {item["id"] for item in second.json()["items"]}
