@@ -23,19 +23,25 @@
 /**
  * Run a step on whichever platform the agent is.
  *
- * Declarative pipelines allow plain Groovy methods outside the pipeline block.
- * Using one here keeps each stage a single readable line instead of an
+ * Declarative pipelines allow plain Groovy methods outside the pipeline block,
+ * and using one here keeps each stage a single readable line instead of an
  * `if (isUnix())` ladder repeated six times.
+ *
+ * The Map signature is not a style choice. A declarative `steps` block is NOT
+ * free-form Groovy: the parser treats a bare method call inside it as a *step*,
+ * and steps must use named arguments. `run('a', 'b')` fails validation before
+ * the build starts, with `Arguments to "run" must be explicitly named` - so the
+ * parameters are named, and the call sites read better for it.
  */
-def run(String unix, String windows) {
+def run(Map cfg) {
     if (isUnix()) {
-        sh unix
+        sh cfg.unix
     } else {
         // `powershell` rather than `bat`: the .ps1 scripts set
         // $ErrorActionPreference and return real exit codes, and bat would
         // swallow a non-zero exit from PowerShell unless every call were
         // wrapped by hand.
-        powershell label: 'powershell', script: windows
+        powershell label: 'powershell', script: cfg.windows
     }
 }
 
@@ -108,13 +114,13 @@ pipeline {
                 // Printed at the top of every build, because the first question
                 // asked about a surprising result is always "against what?".
                 run(
-                    '''
+                    unix: '''
                         echo "build    : ${JOB_NAME} #${BUILD_NUMBER}"
                         echo "suite    : ${SUITE}   workers: ${WORKERS}   docker: ${USE_DOCKER}"
                         echo "base url : ${BASE_URL}"
                         python3 --version
                     ''',
-                    '''
+                    windows: '''
                         Write-Host "build    : $env:JOB_NAME #$env:BUILD_NUMBER"
                         Write-Host "suite    : $env:SUITE   workers: $env:WORKERS   docker: $env:USE_DOCKER"
                         Write-Host "base url : $env:BASE_URL"
@@ -127,13 +133,13 @@ pipeline {
         stage('Install') {
             steps {
                 run(
-                    '''
+                    unix: '''
                         python3 -m venv .venv
                         . .venv/bin/activate
                         pip install --quiet --upgrade pip
                         pip install --quiet -e ".[dev]"
                     ''',
-                    '''
+                    windows: '''
                         py -3.12 -m venv .venv
                         .\\.venv\\Scripts\\python.exe -m pip install --quiet --upgrade pip
                         .\\.venv\\Scripts\\python.exe -m pip install --quiet -e ".[dev]"
@@ -147,7 +153,10 @@ pipeline {
             // database, no browser - so it fails in under a minute when it fails,
             // before anything expensive has been started.
             steps {
-                run('. .venv/bin/activate && ./scripts/quality.sh', '.\\scripts\\quality.ps1')
+                run(
+                    unix: '. .venv/bin/activate && ./scripts/quality.sh',
+                    windows: '.\\scripts\\quality.ps1'
+                )
             }
         }
 
@@ -160,8 +169,8 @@ pipeline {
             }
             steps {
                 run(
-                    'docker compose -f docker/docker-compose.yml up -d db app',
-                    'docker compose -f docker/docker-compose.yml up -d db app'
+                    unix: 'docker compose -f docker/docker-compose.yml up -d db app',
+                    windows: 'docker compose -f docker/docker-compose.yml up -d db app'
                 )
             }
         }
@@ -173,14 +182,14 @@ pipeline {
                 // the script, so Jenkins and a developer's terminal cannot disagree
                 // about what "run the suite" means.
                 run(
-                    '''
+                    unix: '''
                         . .venv/bin/activate
                         export MARKERS="$( [ "${SUITE}" = "all" ] && echo "" || echo "${SUITE}" )"
                         export WORKERS="${WORKERS}"
                         export ALLURE=1
                         ./scripts/run_suite.sh
                     ''',
-                    '''
+                    windows: '''
                         $markers = if ($env:SUITE -eq "all") { "" } else { $env:SUITE }
                         .\\scripts\\run_suite.ps1 -Workers $env:WORKERS -Markers $markers -Allure
                     '''
@@ -191,8 +200,8 @@ pipeline {
         stage('Report') {
             steps {
                 run(
-                    './scripts/report.sh --no-open || echo "(allure CLI unavailable - raw results still published)"',
-                    '.\\scripts\\report.ps1 -NoOpen'
+                    unix: './scripts/report.sh --no-open || echo "(allure CLI unavailable - raw results still published)"',
+                    windows: '.\\scripts\\report.ps1 -NoOpen'
                 )
             }
         }
@@ -231,8 +240,8 @@ pipeline {
             script {
                 if (params.USE_DOCKER) {
                     run(
-                        'docker compose -f docker/docker-compose.yml down -v || true',
-                        'docker compose -f docker/docker-compose.yml down -v'
+                        unix: 'docker compose -f docker/docker-compose.yml down -v || true',
+                        windows: 'docker compose -f docker/docker-compose.yml down -v'
                     )
                 }
             }
