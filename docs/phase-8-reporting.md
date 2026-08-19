@@ -159,6 +159,7 @@ The fix is `(?s)`. The lesson is in the *test*, which had passed:
 # before - passed, and proved nothing
 ("claimdesk_qa.core.exceptions.ServiceNotReadyError: ...", True)
 
+
 # after - a realistic multi-line traceback
 def _as_traceback(exception_line: str) -> str: ...
 ```

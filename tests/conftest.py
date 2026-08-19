@@ -27,6 +27,7 @@ import pytest
 from claimdesk_qa.config import Settings, load_settings
 from claimdesk_qa.core.artifacts import RUN_ID_ENV_VAR, ArtifactManager, new_run_id
 from claimdesk_qa.core.correlation import request_id_for
+from claimdesk_qa.core.flakiness import effective_seed, reruns_for
 from claimdesk_qa.core.logging import configure_logging, get_logger, per_test_log
 from claimdesk_qa.core.readiness import http_probe, wait_until_ready
 from claimdesk_qa.core.recording import recording
@@ -106,6 +107,12 @@ def _write_allure_metadata(config: pytest.Config) -> None:
             "browser": ", ".join(config.getoption("browser", default=None) or ["chromium"]),
             "workers": config.getoption("numprocesses", default=None) or "1 (serial)",
             "commit": os.environ.get("GITHUB_SHA", os.environ.get("GIT_COMMIT", "unknown")),
+            # The seed actually used, so the report can be turned back into a
+            # reproduction. `faker_seed` above records what was *configured*,
+            # which is usually nothing.
+            "faker_seed_effective": effective_seed(
+                settings.faker_seed, os.environ.get(RUN_ID_ENV_VAR, "unknown")
+            ),
         }
     )
 
@@ -125,11 +132,18 @@ def pytest_report_header(config: pytest.Config) -> list[str]:
     """
     settings = load_settings()
     block = settings.masked()
+    run_id = os.environ.get(RUN_ID_ENV_VAR, "unknown")
     lines = [
         f"claimdesk-qa: env={block['environment']}  base_url={block['base_url']}  "
         f"api={block['api_url']}",
         f"claimdesk-qa: database={block['database']}  headless={block['headless']}  "
-        f"run_id={os.environ.get(RUN_ID_ENV_VAR, 'unknown')}",
+        f"run_id={run_id}",
+        # The seed that was ACTUALLY used, not the one that was configured. When
+        # nothing is configured a seed is still chosen, and printing "None" tells
+        # a reader trying to reproduce a data-dependent failure exactly nothing.
+        # Pass this number back as FAKER_SEED to reproduce this run's data.
+        f"claimdesk-qa: faker_seed={effective_seed(settings.faker_seed, run_id)}"
+        f"  (set FAKER_SEED to reproduce)",
     ]
     if not settings.db_enabled:
         # Deliberately shouted. A green run that never touched the database must
@@ -174,12 +188,61 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
                 )
             )
 
+        # The retry policy, applied from one place rather than typed onto
+        # individual tests. A decorator on a test is a decision made once, by
+        # whoever was annoyed that day; a policy applied here is a decision the
+        # whole suite obeys and a reviewer can read in full. See
+        # claimdesk_qa.core.flakiness and ADR 0009.
+        reruns = reruns_for(present, is_ci=settings.is_ci)
+        if reruns:
+            item.add_marker(pytest.mark.flaky(reruns=reruns, reruns_delay=1))
+
     if unmarked:
         listing = "\n  ".join(unmarked)
         raise pytest.UsageError(
             "Every test must sit in exactly one layer directory under tests/ "
             f"({', '.join(sorted(_LAYER_BY_DIRECTORY))}). Offenders:\n  {listing}"
         )
+
+
+def pytest_terminal_summary(
+    terminalreporter: pytest.TerminalReporter,
+    exitstatus: int,
+    config: pytest.Config,
+) -> None:
+    """Say out loud when a test only passed because it was retried.
+
+    Without this the retry policy is a lie. pytest-rerunfailures reports a test
+    that failed once and passed once as **passed**, the suite is green, and the
+    single most valuable signal in the run — "this is not deterministic" — is
+    discarded silently.
+
+    A flake that nobody sees is a flake that nobody fixes, and six months later
+    it is "just that test, it does that sometimes", which is how a suite stops
+    being believed.
+    """
+    rerun_reports = terminalreporter.stats.get("rerun", [])
+    if not rerun_reports:
+        return
+
+    retried = sorted({report.nodeid for report in rerun_reports})
+    passed = {report.nodeid for report in terminalreporter.stats.get("passed", [])}
+    flaky = [node_id for node_id in retried if node_id in passed]
+
+    terminalreporter.write_sep("=", "FLAKY", yellow=True, bold=True)
+    terminalreporter.write_line(
+        f"{len(retried)} test(s) were retried; {len(flaky)} passed only on a retry.",
+        yellow=True,
+    )
+    for node_id in flaky:
+        terminalreporter.write_line(f"  FLAKY  {node_id}", yellow=True)
+    settings = load_settings()
+    seed = effective_seed(settings.faker_seed, os.environ.get(RUN_ID_ENV_VAR, "unknown"))
+    terminalreporter.write_line(
+        "A test that passes on retry is NOT green. Reproduce this run's data with:",
+        yellow=True,
+    )
+    terminalreporter.write_line(f"  FAKER_SEED={seed} pytest <nodeid>", yellow=True)
 
 
 @pytest.hookimpl(wrapper=True)
@@ -255,11 +318,13 @@ def session_seed(settings: Settings) -> int:
     Configurable via ``FAKER_SEED`` so a data-dependent failure can be reproduced
     exactly; otherwise derived from the run id, which is itself recorded in the
     report. Either way the run is reproducible from something a reader can see.
+
+    The derivation lives in ``core.flakiness`` rather than here, because the run
+    header prints it too — and a seed that the header and the fixture computed
+    separately is a seed that can disagree with itself, which is worse than not
+    printing one at all.
     """
-    if settings.faker_seed is not None:
-        return settings.faker_seed
-    run_id = os.environ.get(RUN_ID_ENV_VAR, "unseeded")
-    return int(hashlib.sha256(run_id.encode()).hexdigest()[:8], 16)
+    return effective_seed(settings.faker_seed, os.environ.get(RUN_ID_ENV_VAR, "unseeded"))
 
 
 @pytest.fixture(scope="session")

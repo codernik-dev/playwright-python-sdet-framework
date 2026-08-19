@@ -97,8 +97,11 @@ markers = [
     "e2e: crosses layers (UI -> API -> DB) in a single business journey",
     "framework: unit test of the framework itself; needs no running application",
     # --- suite selection ----------------------------------------------------
+    # There is deliberately no "regression" marker. It was registered in Phase 2
+    # and never applied, because it would have to mean "every test" - and a
+    # marker that selects everything is not a filter, it is a second name for the
+    # suite. The nightly job runs the whole suite; that IS the regression run.
     "smoke: minimal high-value set; runs on every push and pull request",
-    "regression: full functional coverage; runs nightly",
     # --- intent -------------------------------------------------------------
     "negative: invalid input, wrong credentials, or forbidden operations",
     "boundary: values at, just inside, and just outside an accepted range",

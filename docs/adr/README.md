@@ -20,3 +20,4 @@ They exist for two reasons:
 | [0006](0006-opt-in-database-validation.md) | Database validation is opt-in and skips loudly |
 | [0007](0007-no-shared-cookie-jar.md) | The API client never shares a cookie jar between identities |
 | [0008](0008-docker-engine-in-wsl2.md) | Docker Engine inside WSL2 rather than Docker Desktop |
+| [0009](0009-retries-are-diagnostics.md) | Retries are diagnostics, not a cure — UI only, CI only, one, and reported |
