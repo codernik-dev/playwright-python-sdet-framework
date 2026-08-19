@@ -1,0 +1,47 @@
+# The test runner.
+#
+# Built FROM the official Playwright Python image rather than from python:slim.
+#
+# That is a deliberate reversal of this project's usual preference for the
+# smaller base. Browsers do not depend on Python packages, they depend on a long
+# and version-specific list of system libraries - libnss3, libatk, libdrm,
+# libgbm, a font stack - and `playwright install-deps` reproducing that list
+# correctly on a slim image is a maintenance job with no upside. The official
+# image is large (~2 GB) and it is *right*, which for a browser runtime is worth
+# more than being small.
+#
+# The tag MUST match the Playwright version in pyproject.toml. A mismatched pair
+# fails at runtime with "Executable doesn't exist", which reads like a broken
+# installation rather than a version skew.
+FROM mcr.microsoft.com/playwright/python:v1.62.0-jammy
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+WORKDIR /work
+
+# Dependency metadata first so a source edit does not reinstall the world.
+COPY pyproject.toml README.md ./
+COPY src/claimdesk_qa/__init__.py src/claimdesk_qa/__init__.py
+RUN pip install --no-cache-dir -e ".[dev]"
+
+# The framework and the tests. The application is NOT copied in: this container
+# reaches ClaimDesk over HTTP and read-only SQL, exactly as it does everywhere
+# else. If the app were present, an import of it would be one autocomplete away.
+COPY src/ ./src/
+COPY tests/ ./tests/
+COPY scripts/ ./scripts/
+
+# Re-run after the real package is in place. The first install ran against a
+# package directory containing only __init__.py, which builds an editable
+# install of almost nothing - the same trap recorded in Phase 2, where an
+# editable install of an empty package produced no import hook at all.
+RUN pip install --no-cache-dir -e ".[dev]"
+
+# Results land on a mounted volume, so they outlive the container that produced
+# them. A test run whose evidence dies with the container is a test run nobody
+# can debug.
+CMD ["pytest", "-q", "-n", "auto", "--junitxml=/work/artifacts/junit.xml", \
+     "--alluredir=/work/allure-results"]

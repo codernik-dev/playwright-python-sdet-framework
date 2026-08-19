@@ -1,0 +1,107 @@
+name: docker
+
+# Proves the "one command from a clean machine" claim, on a machine that has
+# never seen this project.
+#
+# This workflow exists because the development machine cannot run it. Docker
+# Engine needs a Linux kernel, WSL2 needs an elevated install, and neither was
+# available - so rather than ship compose files labelled "should work", the
+# verification is delegated to the one environment that can actually perform it.
+# A GitHub runner is also a better witness than a developer laptop: it is
+# genuinely clean every time.
+#
+# Deliberately NOT part of the pull-request gate. Building a ~2 GB Playwright
+# image and a Postgres stack takes minutes, and a gate people wait minutes for is
+# a gate people learn to route around.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docker/**"
+      - ".dockerignore"
+      - "pyproject.toml"
+      - ".github/workflows/docker.yml"
+  workflow_dispatch:
+  schedule:
+    # Weekly. The base images move underneath us - a new Playwright tag, a new
+    # postgres:18-alpine - and finding that out on a Monday is better than
+    # finding it out the day somebody clones the repo.
+    - cron: "15 3 * * 1"
+
+jobs:
+  compose:
+    name: docker compose up, then run the suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show the toolchain
+        run: |
+          docker --version
+          docker compose version
+
+      - name: Build the images
+        # Built explicitly rather than implicitly by `up`, so a build failure is
+        # its own red step instead of being buried in service startup output.
+        run: docker compose -f docker/docker-compose.yml build
+
+      - name: Start the database and the application
+        run: docker compose -f docker/docker-compose.yml up -d db app
+
+      - name: Wait for the application to report ready
+        # compose's `depends_on: service_healthy` already gates the tests
+        # container. This step exists so that a stack which never becomes healthy
+        # fails HERE, with the logs, rather than 120 seconds later inside a
+        # readiness fixture that can only say "the environment is broken".
+        run: |
+          for attempt in $(seq 1 60); do
+            state=$(docker inspect -f '{{.State.Health.Status}}' claimdesk-app-1 2>/dev/null || echo missing)
+            echo "attempt $attempt: app health=$state"
+            [ "$state" = "healthy" ] && exit 0
+            sleep 2
+          done
+          echo "::error::The application never became healthy"
+          docker compose -f docker/docker-compose.yml logs
+          exit 1
+
+      - name: Run the suite inside the runner container
+        # --rm: a job, not a service. The exit code is what gates the build.
+        run: docker compose -f docker/docker-compose.yml run --rm tests
+
+      - name: Prove the black-box boundary holds inside the image
+        # The lint rule enforces it in source; this asserts it in the artefact
+        # that actually ships. If the application ever ended up installed in the
+        # test image, an import would become possible and the rule would be the
+        # only thing standing between a developer and a very convenient shortcut.
+        run: |
+          if docker compose -f docker/docker-compose.yml run --rm --no-deps --entrypoint python tests \
+               -c "import claimdesk" 2>/dev/null; then
+            echo "::error::The application is importable from the test image."
+            exit 1
+          fi
+          echo "Confirmed: 'import claimdesk' fails inside the test image."
+
+      - name: Application logs
+        if: failure()
+        run: docker compose -f docker/docker-compose.yml logs --tail 200
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-results
+          path: |
+            artifacts/
+            allure-results/
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Tear down
+        if: always()
+        # -v as well as down: the volumes hold the database. Leaving them behind
+        # on a self-hosted runner is how yesterday's data silently influences
+        # today's results.
+        run: docker compose -f docker/docker-compose.yml down -v

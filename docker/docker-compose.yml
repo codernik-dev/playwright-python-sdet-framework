@@ -1,0 +1,105 @@
+# The whole environment, from nothing, in one command.
+#
+#   docker compose -f docker/docker-compose.yml up -d db app
+#   docker compose -f docker/docker-compose.yml run --rm tests
+#
+# Three services, and the interesting part is how they are sequenced. Nothing
+# here sleeps: `depends_on: service_healthy` gates every start on a real health
+# check, because "wait ten seconds and hope" is the single most common source of
+# flakiness in a containerised suite - too slow on a fast machine, and not
+# nearly slow enough on a loaded CI agent.
+
+name: claimdesk
+
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-compose-local-superuser}
+      POSTGRES_DB: ${DB_NAME:-claimdesk}
+      # C locale and UTF-8, matching scripts/local_db.ps1. Collation affects
+      # ORDER BY, and a suite that asserts on sort order must not get a
+      # different answer from a different environment.
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    volumes:
+      # Runs once, on an empty data directory. Creates the two roles and the
+      # SELECT-only grants - the same split as every other environment (ADR 0003).
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      # `pg_isready -d` against the real database, not just the port. Postgres
+      # accepts connections briefly during initialisation and then restarts, so
+      # a port check can report ready twice with a closed window in between.
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ${DB_NAME:-claimdesk}"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+    # No published port by default. The database is reached by the app and the
+    # tests over the compose network; publishing it would collide with a local
+    # PostgreSQL on the same machine and invite a test to point at the wrong one.
+    expose:
+      - "5432"
+
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.app
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:-claimdesk}
+      APP_DB_USER: ${APP_DB_USER:-claimdesk_app}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:-compose-local-app}
+      APP_JWT_SECRET: ${APP_JWT_SECRET:-compose-local-not-a-real-secret}
+      SEED_USER_PASSWORD: ${SEED_USER_PASSWORD:-Passw0rd!seed}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      # /health/ready, not /health. Liveness says the process is up; readiness
+      # says it can reach the database. Gating the tests on liveness would start
+      # them against an application that cannot serve a single request.
+      test:
+        ["CMD-SHELL",
+         "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=3).status==200 else 1)\""]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+      start_period: 5s
+    ports:
+      - "${APP_PORT:-8000}:8000"
+
+  tests:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.tests
+    environment:
+      TEST_ENV: docker
+      BASE_URL: http://app:8000
+      DB_ENABLED: "true"
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:-claimdesk}
+      DB_USER: ${DB_USER:-claimdesk_qa_ro}
+      DB_PASSWORD: ${DB_PASSWORD:-compose-local-qa-ro}
+      SEED_USER_PASSWORD: ${SEED_USER_PASSWORD:-Passw0rd!seed}
+      HEADLESS: "true"
+      # A cold container start is legitimately slower than a warm local one.
+      READINESS_TIMEOUT_SECONDS: "120"
+    depends_on:
+      app:
+        condition: service_healthy
+    volumes:
+      # Evidence must outlive the container. Without these mounts a failing run
+      # in CI leaves nothing behind but the exit code.
+      - ../artifacts:/work/artifacts
+      - ../allure-results:/work/allure-results
+    # Chromium's default 64 MB /dev/shm is not enough for a real page and the
+    # browser dies with a crash that looks like a test failure. This is the
+    # single most common containerised-Playwright defect.
+    shm_size: "1gb"
+    profiles:
+      # Not started by `up`. The tests are a job that runs to completion, not a
+      # service that stays up: `run --rm tests` gives the exit code the pipeline
+      # needs to gate on.
+      - test

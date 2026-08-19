@@ -1,0 +1,49 @@
+# What never belongs in a build context.
+#
+# Two reasons, and the second is the one that bites. The obvious one is size: the
+# whole context is sent to the daemon before the first instruction runs, and a
+# .venv or a .pgdata directory turns a two-second build into a two-minute one.
+#
+# The one that actually causes incidents: anything copied into an image is IN the
+# image, and stays there in a layer even if a later instruction deletes it.
+# A .env with a real password is then shipped to whoever can pull the tag.
+
+# --- secrets and local state ------------------------------------------------
+.env
+.env.*
+!.env.example
+.pgdata/
+*.pem
+*.key
+
+# --- build and run output ---------------------------------------------------
+.venv/
+venv/
+artifacts/
+allure-results/
+allure-report/
+test-results/
+junit*.xml
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# --- version control and tooling --------------------------------------------
+.git/
+.github/
+.gitignore
+.gitattributes
+.pre-commit-config.yaml
+.idea/
+.vscode/
+
+# --- documentation ----------------------------------------------------------
+# Not README.md: pyproject.toml declares it as the package readme, and the build
+# fails at metadata generation without it. That exact mistake is recorded in
+# Phase 2, with a pip error message that pointed nowhere near the cause.
+docs/
+LICENSE
