@@ -37,8 +37,8 @@ Recorded because "works on my machine" is only useful if the machine is written 
 |---|---|---|
 | 1 | Design & architecture | ✅ Complete — [phase-1-design.md](phase-1-design.md) |
 | 2 | Repository structure + configuration | ✅ Complete — [phase-2-repository-and-configuration.md](phase-2-repository-and-configuration.md) |
-| 3 | Application under test + database | ⬜ Next |
-| 4 | pytest foundation (logging, artefacts, fixtures) | ⬜ |
+| 3 | Application under test + database | ✅ Complete — [phase-3-application-under-test.md](phase-3-application-under-test.md) |
+| 4 | pytest foundation (logging, artefacts, fixtures) | ⬜ Next |
 | 5 | API automation layer | ⬜ |
 | 6 | Playwright UI layer | ⬜ |
 | 7 | Database validation layer | ⬜ |
@@ -124,12 +124,74 @@ Recorded because the fixes are more instructive than the final state.
 
 ---
 
+## Phase 3 — Application under test + database ✅
+
+### What was built
+
+| Area | Detail |
+|---|---|
+| Disposable database | `scripts/local_db.ps1` — a project-local PostgreSQL cluster in `.pgdata/` on port 55432, with `start`/`stop`/`status`/`reset`/`psql` |
+| Two database roles | `claimdesk_app` owns the schema; `claimdesk_qa_ro` holds `SELECT` and nothing else |
+| Domain rules | Status machine, adjuster approval limit (5000.00, inclusive), ownership and coverage-limit validation |
+| Schema | `users`, `policies`, `claims`, `claim_events` (append-only), `payouts` (unique per claim); money as `NUMERIC(12,2)` |
+| REST API | 16 endpoints under `/api/v1` + `/health` and `/health/ready` |
+| HTML interface | Login, dashboard, claims list with async filtering, claim form, claim detail with actions, admin users |
+| Seed data | 4 users, 3 policies, 24 claims across all statuses with realistic audit trails |
+| Application unit tests | 58 tests in `app/tests/test_domain.py` |
+
+### Verification — commands run, output observed
+
+| Check | Result |
+|---|---|
+| Database cluster starts | ✅ **VERIFIED** — listening on 127.0.0.1:55432 |
+| Roles and database created | ✅ **VERIFIED** — `claimdesk_app`, `claimdesk_qa_ro`, database `claimdesk` |
+| Application starts | ✅ **VERIFIED** — `Schema ensured and seed data applied`, `Application startup complete` |
+| Liveness / readiness | ✅ **VERIFIED** — `{"status":"ok"}` / `{"status":"ready","database":"reachable"}` |
+| **End-to-end behaviour** | ✅ **VERIFIED** — **54/54 checks passed** across auth, RBAC, CRUD, validation, boundaries, the state machine, the HTML interface and the database |
+| Application unit tests | ✅ **VERIFIED** — `58 passed in 0.16s` |
+| Framework unit tests | ✅ **VERIFIED** — `32 passed in 0.35s` |
+| Linting | ✅ **VERIFIED** — `All checks passed!` (after fixing 8 real findings) |
+| Formatting | ✅ **VERIFIED** — `37 files already formatted` |
+| Static typing (strict) | ✅ **VERIFIED** — `Success: no issues found in 24 source files` |
+| **Black-box import ban fires** | ✅ **VERIFIED** — a file importing `claimdesk` from `tests/` was rejected with `TID251`; the application importing itself still passes |
+| **Read-only role cannot write** | ✅ **VERIFIED** — `INSERT` as `claimdesk_qa_ro` fails with `InsufficientPrivilege` |
+| Audit trail correctness | ✅ **VERIFIED** — `['DRAFT','SUBMITTED','UNDER_REVIEW','APPROVED','PAID']` recorded for one claim |
+| Exactly one payout per claim | ✅ **VERIFIED** — count is 1; a second `pay` returns 409 |
+| Passwords stored hashed | ✅ **VERIFIED** — bcrypt hash, plaintext absent |
+
+⚠️ **NOT VERIFIED in Phase 3:** nothing has been run in Docker, in Jenkins or in GitHub Actions; no
+browser has been driven yet (Phase 6). The `.pgdata` cluster has only been exercised on this machine.
+
+### Problems found and fixed
+
+| # | Problem | Lesson |
+|---|---|---|
+| 1 | **A negative auth test passed for the wrong reason.** `GET /claims` with no `Authorization` header returned 200 — because `httpx.Client` had a `session` cookie from an earlier login. `curl` proved the application correctly returns 401. | The most dangerous test defect is the one that *passes*. Recorded as [ADR 0007](adr/0007-no-shared-cookie-jar.md): one client per identity, cookie persistence off |
+| 2 | `pg_ctl start` never returned although the server was up and serving | On Windows the server inherits the parent's stdout handle and holds the pipe open. Fixed with `Start-Process -RedirectStandardOutput`. **Read the log before theorising** — it already said "ready to accept connections" |
+| 3 | `.env.example` shipped `FAKER_SEED=` (empty) which fails `int` parsing | The documented first step produced a framework that could not start. Fixed, and a test now loads `.env.example` itself so the template can never silently break |
+| 4 | Framework unit tests were not hermetic against the `.env` **file** | Clearing environment variables was only half the isolation; tests now `chdir` to a temp directory |
+| 5 | Seed emails used `@claimdesk.test` | `email-validator` rejects the RFC 2606 `.test` TLD as special-use, so every login returned 422. Moved to `example.com` |
+| 6 | Two `assert`s used for control flow | `python -O` strips them, turning a guard into a silent `None` dereference. Replaced with explicit raises |
+| 7 | `next` used as a parameter name | Shadowed the builtin; renamed to `next_url` with `alias="next"` so the URL contract is unchanged |
+| 8 | `get_policy` could return `None` where `Policy` was declared | Found by mypy, not by a human. Rewriting as two explicit guards fixed the type and made the non-enumeration rule readable |
+| 9 | 53 `B008` warnings on FastAPI's `Depends()` idiom | Configured `extend-immutable-calls` rather than disabling the rule, so B008 still catches genuine mutable defaults elsewhere |
+
+### Deviation from the Phase 1 design
+
+The design named **HTMX** for asynchronous UI behaviour. The implementation uses about 25 lines of
+plain JavaScript instead. Same outcome — a real asynchronous partial refresh for Playwright to wait
+on, with `aria-busy` toggled around the request — with no vendored library, no CDN dependency and no
+build step. Adding a dependency that a few lines of code replace would have contradicted the
+project's own rule about unjustified technology.
+
+---
+
 ## Open items carried forward
 
 | # | Item | Blocks | Owner action |
 |---|---|---|---|
 | 1 | Install Docker Desktop (WSL2 backend is already present) | Phases 10–12 | Yours |
-| 2 | Create the local database + roles | Phase 3 verification | `scripts/setup_local_db.ps1` (Phase 3) — needs your PostgreSQL superuser password, entered by you, never stored |
+| 2 | ~~Create the local database + roles~~ | — | ✅ Done — `scripts/local_db.ps1` builds a disposable cluster; your existing PostgreSQL service was never touched and no superuser password was needed |
 | 3 | `playwright install chromium` (~200 MB) | Phase 6 | Runs during Phase 6 |
 | 4 | Free disk space on C: (~9 GB left) | Phase 10 image builds | Monitor |
-| 5 | Add `app` to the mypy `files` list | Phase 3 | Done as part of Phase 3 |
+| 5 | ~~Add `app` to the mypy `files` list~~ | — | ✅ Done — mypy now checks `src`, `tests` and `app/claimdesk` |

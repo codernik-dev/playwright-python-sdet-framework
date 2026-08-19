@@ -41,20 +41,39 @@ intentions:
 ## Quick start (local, Windows)
 
 ```powershell
-# 1. Create the virtual environment and install the framework
+# 1. Create the virtual environment and install everything
 py -3.11 -m venv .venv
 .\.venv\Scripts\Activate.ps1
-pip install -e ".[dev]"
+pip install -e ".[dev,app]"
 
 # 2. Configure
-Copy-Item .env.example .env    # then edit the values
+Copy-Item .env.example .env
 
-# 3. Run the framework's own unit tests (no application required)
-pytest -m framework
+# 3. Start a disposable, project-local PostgreSQL cluster on port 55432.
+#    It does not touch any PostgreSQL server you already run.
+.\scripts\local_db.ps1 start
+
+# 4. Start the application under test
+python -m uvicorn claimdesk.main:app --app-dir app --port 8000
+
+# 5. In a second terminal: prove it works
+curl http://localhost:8000/health/ready     # {"status":"ready","database":"reachable"}
+pytest -m framework -q                      # the framework's own unit tests
+pytest app/tests -q                         # the application's own unit tests
 ```
 
-Everything else — the application, the database, browsers, Docker, Jenkins — is documented in
-[docs/progress.md](docs/progress.md) as it is built.
+Then open <http://localhost:8000/login> and sign in as `customer@example.com` /
+`Passw0rd!seed`. Interactive API docs are at <http://localhost:8000/docs>.
+
+Useful commands:
+
+```powershell
+.\scripts\local_db.ps1 reset   # destroy all local test data and rebuild
+.\scripts\quality.ps1          # the exact CI gate: ruff + mypy + unit tests
+```
+
+Browsers, Docker, Jenkins and GitHub Actions are documented in
+[docs/progress.md](docs/progress.md) as they are built.
 
 ## Technology
 

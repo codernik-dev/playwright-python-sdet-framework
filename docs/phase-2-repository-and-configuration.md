@@ -92,7 +92,8 @@ pytest --collect-only -q    # what would run, without running it
 The application under test lives in this repository. Sooner or later somebody writes:
 
 ```python
-from claimdesk.domain import ClaimStatus       # tempting, and fatal
+from claimdesk.domain import ClaimStatus  # tempting, and fatal
+
 assert response.json()["status"] == ClaimStatus.APPROVED
 ```
 
@@ -158,9 +159,9 @@ caused* is the single most useful thing to internalise about debugging build too
 The naive approach:
 
 ```python
-base_url = os.environ["BASE_URL"]        # KeyError, 20 minutes into a CI run
-timeout  = int(os.getenv("TIMEOUT", 15)) # ValueError if someone writes "15s"
-url      = os.getenv("BASE_UR1")         # typo -> None -> "None/api/v1" -> confusing 404
+base_url = os.environ["BASE_URL"]  # KeyError, 20 minutes into a CI run
+timeout = int(os.getenv("TIMEOUT", 15))  # ValueError if someone writes "15s"
+url = os.getenv("BASE_UR1")  # typo -> None -> "None/api/v1" -> confusing 404
 ```
 
 Three separate failure modes, all discovered late, none of them saying what is actually wrong. The
