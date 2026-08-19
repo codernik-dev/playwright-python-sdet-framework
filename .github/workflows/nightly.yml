@@ -78,8 +78,17 @@ jobs:
       - name: Install the framework and the application
         run: pip install -e ".[dev,app]"
 
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ matrix.browser }}-${{ hashFiles('pyproject.toml') }}
+
+      - name: Install browser system libraries
+        run: playwright install-deps ${{ matrix.browser }}
+
       - name: Install ${{ matrix.browser }}
-        run: playwright install --with-deps ${{ matrix.browser }}
+        run: playwright install ${{ matrix.browser }}
 
       - name: Create the database and its two roles
         env:

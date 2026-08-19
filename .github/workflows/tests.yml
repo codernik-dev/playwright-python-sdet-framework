@@ -123,11 +123,22 @@ jobs:
       - name: Install the framework and the application
         run: pip install -e ".[dev,app]"
 
+      - name: Cache Playwright browsers
+        # The browser binaries are ~120 MB and identical between runs. The apt
+        # system libraries are NOT cacheable - they are installed into the runner
+        # image, which is discarded - so the two are installed as separate steps
+        # to make their costs individually visible.
+        id: browser-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pyproject.toml') }}
+
+      - name: Install browser system libraries
+        run: playwright install-deps chromium
+
       - name: Install Chromium
-        # --with-deps installs the system libraries the browser needs. Only
-        # Chromium here; Firefox and WebKit run nightly, because a PR gate should
-        # answer "did I break it?" not "does it work everywhere?".
-        run: playwright install --with-deps chromium
+        run: playwright install chromium
 
       - name: Create the database and its two roles
         env:
