@@ -96,6 +96,16 @@ class Settings(BaseSettings):
     http_timeout_seconds: float = Field(default=15.0, gt=0, le=300)
     ui_action_timeout_ms: int = Field(default=10_000, gt=0, le=300_000)
     ui_navigation_timeout_ms: int = Field(default=20_000, gt=0, le=300_000)
+    readiness_timeout_seconds: float = Field(
+        default=60.0,
+        gt=0,
+        le=600,
+        description=(
+            "How long to wait for the application to answer its readiness probe. "
+            "A cold container start in CI legitimately needs a minute; a developer "
+            "who forgot to start the app wants to be told in seconds."
+        ),
+    )
 
     # --- database validation (read-only) -------------------------------------
     db_enabled: bool = Field(
@@ -243,6 +253,7 @@ class Settings(BaseSettings):
             "database": self.db_dsn_safe if self.db_enabled else "disabled",
             "headless": self.headless,
             "http_timeout_seconds": self.http_timeout_seconds,
+            "readiness_timeout_seconds": self.readiness_timeout_seconds,
             "ui_action_timeout_ms": self.ui_action_timeout_ms,
             "ui_navigation_timeout_ms": self.ui_navigation_timeout_ms,
             "log_level": self.log_level,

@@ -182,13 +182,13 @@ indent-style = "space"
 # ---------------------------------------------------------------------------
 [tool.mypy]
 python_version = "3.11"
-# app/claimdesk rather than app: two conftest.py files with no package __init__
-# are ambiguous to mypy, and the application's own tests are verified by running
-# them, not by type-checking them.
 files = ["src", "tests", "app/claimdesk"]
-# The application is not an installed package, so mypy needs to be told where its
-# root is - the same reason app/tests/conftest.py adjusts sys.path.
-mypy_path = ["app"]
+# Every source root is listed explicitly so mypy can derive a unique module name
+# for each file. Without this, tests/conftest.py and tests/framework/conftest.py
+# both resolve to "conftest" and mypy refuses to check either.
+mypy_path = ["src", "app", "."]
+explicit_package_bases = true
+namespace_packages = true
 plugins = ["pydantic.mypy"]
 strict = true
 warn_unreachable = true
