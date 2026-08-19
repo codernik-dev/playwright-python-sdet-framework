@@ -29,6 +29,7 @@ import httpx
 
 from claimdesk_qa.core.exceptions import ServiceNotReadyError
 from claimdesk_qa.core.logging import get_logger
+from claimdesk_qa.core.tls import shared_ssl_context
 
 logger = get_logger(__name__)
 
@@ -48,7 +49,11 @@ def http_probe(url: str, *, timeout_seconds: float = 5.0) -> Probe:
 
     def _probe() -> tuple[bool, str]:
         try:
-            response = httpx.get(url, timeout=timeout_seconds)
+            # The shared context matters more here than anywhere else: a probe is
+            # called repeatedly in a loop, so a per-call SSL context would make
+            # every retry hundreds of milliseconds slower than the interval that
+            # was asked for.
+            response = httpx.get(url, timeout=timeout_seconds, verify=shared_ssl_context())
         except httpx.HTTPError as exc:
             return False, f"{type(exc).__name__}: {exc}"
         if response.is_success:

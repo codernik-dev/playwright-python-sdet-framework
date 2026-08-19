@@ -29,6 +29,7 @@ from pydantic import BaseModel, ValidationError
 
 from claimdesk_qa.core.correlation import get_request_id
 from claimdesk_qa.core.logging import get_logger
+from claimdesk_qa.core.tls import shared_ssl_context
 
 logger = get_logger(__name__)
 
@@ -174,6 +175,10 @@ class ApiClient:
             base_url=self.base_url,
             timeout=self.timeout_seconds,
             follow_redirects=False,
+            # One shared, fully-verifying TLS context instead of a new one per
+            # client. A client per identity per test made this the single largest
+            # cost in the suite - see claimdesk_qa.core.tls for the measurements.
+            verify=shared_ssl_context(),
         )
         self._exchanges = deque(maxlen=MAX_RECORDED_EXCHANGES)
 
