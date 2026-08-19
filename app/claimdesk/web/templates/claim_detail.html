@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}{{ claim.reference }} - ClaimDesk{% endblock %}
+{% block content %}
+<h1 data-testid="page-title">Claim {{ claim.reference }}</h1>
+
+{% if message %}<div class="alert alert-success" role="status" data-testid="toast-success">{{ message }}</div>{% endif %}
+{% if error %}<div class="alert alert-error" role="alert" data-testid="toast-error">{{ error }}</div>{% endif %}
+
+<div class="card">
+  <p>Status: <span class="chip" data-testid="claim-status">{{ claim.status }}</span></p>
+  <p>Amount: <strong data-testid="claim-amount">{{ "%.2f"|format(claim.amount) }}</strong></p>
+  <p>Incident date: <span data-testid="claim-incident-date">{{ claim.incident_date }}</span></p>
+  <p>Description: <span data-testid="claim-description">{{ claim.description }}</span></p>
+  {% if payout %}
+  <p>Payout: <strong data-testid="claim-payout">{{ "%.2f"|format(payout.amount) }}</strong> on {{ payout.paid_at.date() }}</p>
+  {% endif %}
+</div>
+
+{% if actions %}
+<div class="card">
+  <h2 style="font-size:1.05rem">Actions</h2>
+  <div class="row-actions">
+    {% for action in actions %}
+    <form method="post" action="/claims/{{ claim.id }}/action" style="margin:0">
+      <input type="hidden" name="action" value="{{ action }}">
+      <button type="submit" data-testid="action-{{ action }}">{{ action.replace("_", " ")|title }}</button>
+    </form>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<div class="card">
+  <h2 style="font-size:1.05rem">Audit trail</h2>
+  <table data-testid="events-table">
+    <thead><tr><th>When</th><th>From</th><th>To</th><th>Note</th></tr></thead>
+    <tbody>
+      {% for event in events %}
+      <tr data-testid="event-row">
+        <td>{{ event.occurred_at.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+        <td>{{ event.from_status or "-" }}</td>
+        <td data-testid="event-to-status">{{ event.to_status }}</td>
+        <td>{{ event.note or "" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - ClaimDesk{% endblock %}
+{% block content %}
+<h1 data-testid="page-title">Dashboard</h1>
+<p class="muted">Signed in as {{ user.email }}</p>
+<div class="stat-grid">
+  {% for status, count in counts.items() %}
+  <div class="stat" data-testid="stat-{{ status }}">
+    <div class="muted">{{ status }}</div>
+    <div class="value">{{ count }}</div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -6,6 +6,9 @@
 *.key
 secrets/
 
+# --- local disposable database cluster -------------------------------------
+.pgdata/
+
 # --- test output ------------------------------------------------------------
 # One gitignored root instead of four half-empty folders: one thing to ignore,
 # one thing to archive in CI, one thing to delete. See docs/phase-1-design.md §16.

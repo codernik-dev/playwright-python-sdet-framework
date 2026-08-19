@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Claims - ClaimDesk{% endblock %}
+{% block content %}
+<h1 data-testid="page-title">Claims</h1>
+
+<div class="card">
+  <form class="filters" id="filter-form" onsubmit="return false;">
+    <div>
+      <label for="status">Status</label>
+      <select id="status" name="status" data-testid="filter-status">
+        <option value="">All statuses</option>
+        {% for s in statuses %}
+        <option value="{{ s }}" {% if s == status_value %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="q">Search</label>
+      <input id="q" name="q" value="{{ q }}" placeholder="Reference or description" data-testid="filter-search">
+    </div>
+    <div style="flex:0 0 auto">
+      <button type="button" id="apply-filters" data-testid="apply-filters">Apply</button>
+    </div>
+  </form>
+</div>
+
+<div id="claims-container" data-testid="claims-container" aria-busy="false">
+  {% include "_claims_table.html" %}
+</div>
+
+<script>
+  // Small, dependency-free async refresh. It exists so the browser tests have real
+  // asynchronous behaviour to wait on. Playwright's auto-waiting handles this
+  // correctly, so no test ever needs a sleep. aria-busy is toggled around the
+  // request, which also gives assistive technology - and the tests - a signal.
+  (function () {
+    var container = document.getElementById("claims-container");
+    var button = document.getElementById("apply-filters");
+
+    function refresh() {
+      var params = new URLSearchParams({
+        status: document.getElementById("status").value,
+        q: document.getElementById("q").value,
+        sort: "{{ sort }}"
+      });
+      container.setAttribute("aria-busy", "true");
+      fetch("/claims/table?" + params.toString(), { credentials: "same-origin" })
+        .then(function (response) { return response.text(); })
+        .then(function (html) {
+          container.innerHTML = html;
+          container.setAttribute("aria-busy", "false");
+          history.replaceState(null, "", "/claims?" + params.toString());
+        })
+        .catch(function () { container.setAttribute("aria-busy", "false"); });
+    }
+
+    button.addEventListener("click", refresh);
+    document.getElementById("status").addEventListener("change", refresh);
+  })();
+</script>
+{% endblock %}

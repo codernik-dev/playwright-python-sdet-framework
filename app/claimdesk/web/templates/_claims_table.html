@@ -1,0 +1,37 @@
+{# Partial: the claims table alone. Re-fetched asynchronously when a filter changes. #}
+<table data-testid="claims-table">
+  <thead>
+    <tr>
+      <th><a href="?sort={% if sort == 'reference' %}-reference{% else %}reference{% endif %}" data-testid="sort-reference">Reference</a></th>
+      <th><a href="?sort={% if sort == 'amount' %}-amount{% else %}amount{% endif %}" data-testid="sort-amount">Amount</a></th>
+      <th>Status</th>
+      <th><a href="?sort={% if sort == 'incident_date' %}-incident_date{% else %}incident_date{% endif %}" data-testid="sort-incident-date">Incident date</a></th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for claim in claims %}
+    <tr data-testid="claim-row" data-reference="{{ claim.reference }}">
+      <td><a href="/claims/{{ claim.id }}" data-testid="claim-link">{{ claim.reference }}</a></td>
+      <td data-testid="claim-amount">{{ "%.2f"|format(claim.amount) }}</td>
+      <td><span class="chip" data-testid="claim-status">{{ claim.status }}</span></td>
+      <td>{{ claim.incident_date }}</td>
+      <td>{{ claim.description }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5" data-testid="empty-state">No claims match these filters.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+<p class="muted">
+  <span data-testid="result-count">{{ total }}</span> claim(s) &middot;
+  page <span data-testid="current-page">{{ page }}</span> of <span data-testid="total-pages">{{ pages }}</span>
+</p>
+<div class="row-actions">
+  {% if page > 1 %}
+  <a href="?status={{ status_value }}&amp;q={{ q }}&amp;sort={{ sort }}&amp;page={{ page - 1 }}" data-testid="prev-page">Previous</a>
+  {% endif %}
+  {% if page < pages %}
+  <a href="?status={{ status_value }}&amp;q={{ q }}&amp;sort={{ sort }}&amp;page={{ page + 1 }}" data-testid="next-page">Next</a>
+  {% endif %}
+</div>

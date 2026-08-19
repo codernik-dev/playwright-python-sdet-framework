@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Sign in - ClaimDesk{% endblock %}
+{% block content %}
+<h1>Sign in to ClaimDesk</h1>
+<div class="card" style="max-width:420px">
+  {% if error %}
+  <div class="alert alert-error" role="alert" data-testid="login-error">{{ error }}</div>
+  {% endif %}
+  <form method="post" action="/login">
+    <input type="hidden" name="next" value="{{ next }}">
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" required autocomplete="username" data-testid="email">
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" required autocomplete="current-password" data-testid="password">
+    <p><button type="submit" data-testid="submit-login">Sign in</button></p>
+  </form>
+</div>
+{% endblock %}

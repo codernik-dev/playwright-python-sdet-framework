@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}New claim - ClaimDesk{% endblock %}
+{% block content %}
+<h1 data-testid="page-title">Submit a new claim</h1>
+<div class="card" style="max-width:560px">
+  {% if error %}
+  <div class="alert alert-error" role="alert" data-testid="form-error">{{ error }}</div>
+  {% endif %}
+  {# novalidate: server-side validation must stay reachable from the browser, so
+     the tests can prove the server rejects bad input rather than only the browser. #}
+  <form method="post" action="/claims/new" novalidate>
+    <label for="policy_id">Policy</label>
+    <select id="policy_id" name="policy_id" required data-testid="policy">
+      {% for policy in policies %}
+      <option value="{{ policy.id }}" {% if form.get('policy_id') == policy.id|string %}selected{% endif %}>
+        {{ policy.policy_number }} - coverage {{ "%.2f"|format(policy.coverage_limit) }}
+      </option>
+      {% endfor %}
+    </select>
+
+    <label for="amount">Amount</label>
+    <input id="amount" name="amount" required value="{{ form.get('amount', '') }}" data-testid="amount">
+
+    <label for="incident_date">Incident date</label>
+    <input id="incident_date" name="incident_date" type="date" max="{{ today }}"
+           required value="{{ form.get('incident_date', '') }}" data-testid="incident-date">
+
+    <label for="description">Description ({{ min_length }}-{{ max_length }} characters)</label>
+    <textarea id="description" name="description" rows="4" required data-testid="description">{{ form.get('description', '') }}</textarea>
+
+    <p><button type="submit" data-testid="submit-claim">Submit claim</button></p>
+  </form>
+</div>
+{% endblock %}

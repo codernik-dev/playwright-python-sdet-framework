@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}ClaimDesk{% endblock %}</title>
+  <style>
+    :root { --line:#d8dee9; --ink:#1f2933; --muted:#5b6b7c; --accent:#1f4e79; --bad:#a4262c; --good:#0f7b3f; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: "Segoe UI", system-ui, sans-serif; color:var(--ink); background:#f7f9fb; }
+    header { background:var(--accent); color:#fff; padding:0.75rem 1.5rem; display:flex; align-items:center; gap:1.5rem; }
+    header a { color:#fff; text-decoration:none; font-weight:500; }
+    header a:hover { text-decoration:underline; }
+    .brand { font-weight:700; font-size:1.1rem; margin-right:auto; }
+    main { max-width:1100px; margin:2rem auto; padding:0 1.5rem; }
+    h1 { font-size:1.5rem; margin-top:0; }
+    table { width:100%; border-collapse:collapse; background:#fff; }
+    th, td { padding:0.6rem 0.75rem; border-bottom:1px solid var(--line); text-align:left; font-size:0.92rem; }
+    th { background:#eef2f6; font-weight:600; }
+    .card { background:#fff; border:1px solid var(--line); border-radius:6px; padding:1.25rem; margin-bottom:1.25rem; }
+    label { display:block; font-weight:600; margin:0.75rem 0 0.25rem; font-size:0.9rem; }
+    input, select, textarea { width:100%; padding:0.5rem; border:1px solid var(--line); border-radius:4px; font:inherit; }
+    button { background:var(--accent); color:#fff; border:0; border-radius:4px; padding:0.55rem 1.1rem; font:inherit; cursor:pointer; }
+    button.secondary { background:#5b6b7c; }
+    .alert { padding:0.7rem 1rem; border-radius:4px; margin-bottom:1rem; }
+    .alert-error { background:#fdecea; color:var(--bad); border:1px solid #f3c6c6; }
+    .alert-success { background:#e8f5ec; color:var(--good); border:1px solid #b7dfc4; }
+    .chip { display:inline-block; padding:0.15rem 0.6rem; border-radius:999px; font-size:0.78rem; font-weight:600; background:#e3e9f0; }
+    .filters { display:flex; gap:1rem; flex-wrap:wrap; align-items:flex-end; }
+    .filters > div { flex:1 1 180px; }
+    .muted { color:var(--muted); font-size:0.85rem; }
+    .stat-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:0.75rem; }
+    .stat { background:#fff; border:1px solid var(--line); border-radius:6px; padding:0.9rem; }
+    .stat .value { font-size:1.6rem; font-weight:700; }
+    .row-actions { display:flex; gap:0.5rem; flex-wrap:wrap; }
+  </style>
+</head>
+<body>
+  {% if user %}
+  <header>
+    <span class="brand">ClaimDesk</span>
+    <a href="/dashboard" data-testid="nav-dashboard">Dashboard</a>
+    <a href="/claims" data-testid="nav-claims">Claims</a>
+    <a href="/claims/new" data-testid="nav-new-claim">New claim</a>
+    {% if user.role == "ADMIN" %}
+    <a href="/admin/users" data-testid="nav-admin">Admin</a>
+    {% endif %}
+    <span data-testid="current-user">{{ user.full_name }} ({{ user.role }})</span>
+    <form method="post" action="/logout" style="margin:0">
+      <button type="submit" class="secondary" data-testid="logout">Log out</button>
+    </form>
+  </header>
+  {% endif %}
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
