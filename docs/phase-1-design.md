@@ -819,6 +819,11 @@ recruiters and engineers both look at the commit list.
 
 ## 22. What you will be able to claim on your CV (after completion, with honest metrics)
 
+> **Measured in Phase 15.** Every placeholder below has since been filled from a real run —
+> see [phase-15-measurement.md](phase-15-measurement.md) for the numbers and the machine, and
+> [presentation.md](presentation.md) for the final wording. This section is left as written so
+> the discipline is visible: the bullets existed with holes in them for fourteen phases.
+
 **Draft bullets — placeholders stay until measured:**
 
 1. Designed and built an end-to-end test automation framework in Python (Playwright, pytest, httpx,

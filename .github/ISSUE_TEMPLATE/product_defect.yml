@@ -1,0 +1,66 @@
+name: Product defect
+description: ClaimDesk behaved incorrectly (found by a test, or by hand)
+labels: ["defect"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ClaimDesk is the application under test. A defect here is a defect in the
+        **product**, not in the framework — and the distinction is the point of
+        the whole project, so please make it deliberately.
+
+        If the application or database was unreachable, that is an *environment*
+        problem and not this template.
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour, and where that expectation comes from
+      description: |
+        A rule from docs/phase-1-design.md §3, an API contract, or the published
+        status machine. "I assumed" is a valid answer — it usually means the
+        specification is what needs fixing, which is a finding in itself.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: Status code, response body, or what the page showed.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      description: |
+        Ideally a `curl` as well as the test — proving it outside the framework
+        rules out the framework, which is the first thing anyone will ask.
+      render: shell
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity, and argue for it
+      description: |
+        Not every finding is a bug. Non-ASCII digits being normalised was
+        assessed low and kept as a characterisation test — knowing which findings
+        are bugs is the actual skill.
+      options:
+        - "High — money, authorisation, audit trail, or data loss"
+        - "Medium — a documented rule is not enforced"
+        - "Low — surprising but unambiguous, no rule bypassed"
+        - "Not a bug — characterisation only"
+    validations:
+      required: true
+
+  - type: input
+    id: correlation
+    attributes:
+      label: Correlation id
+      description: From the assertion message or the test log. Joins the test, the HTTP exchange and the server log.
+      placeholder: qa-933749c975

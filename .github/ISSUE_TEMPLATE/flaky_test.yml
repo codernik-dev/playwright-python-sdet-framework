@@ -1,0 +1,73 @@
+name: Flaky test
+description: A test that changed outcome without the code changing
+labels: ["flaky"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A flake is a bug **against the test**, and it gets a deadline like any
+        other bug. It does not get a retry.
+
+        Before filing: check whether the test asserts on an **aggregate** over
+        the shared database (`count(*) WHERE ...`) or on "the first row in the
+        table". That is the cause of most flakes in this suite, and it is a real
+        defect in the test rather than bad luck.
+
+  - type: input
+    id: nodeid
+    attributes:
+      label: Test node id
+      placeholder: tests/ui/test_claims_list.py::test_the_table_paginates
+    validations:
+      required: true
+
+  - type: input
+    id: frequency
+    attributes:
+      label: How often, and under what conditions
+      description: The conditions matter more than the rate.
+      placeholder: "~50% at -n 4; never serially; never seen in CI"
+    validations:
+      required: true
+
+  - type: input
+    id: seed
+    attributes:
+      label: Faker seed and run id
+      description: Both are printed in the run header and in the Allure environment block.
+      placeholder: "faker_seed=1683326883  run_id=jenkins-9"
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: |
+        From `artifacts/<run-id>/<test>/` — the assertion message, and whichever
+        of test.log / http.log / sql.log explains it. Attach trace.zip for a
+        browser failure.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: hypothesis
+    attributes:
+      label: Most likely cause
+      options:
+        - Asserts on an aggregate or on shared state another worker can change
+        - Assumes ordering that is not guaranteed
+        - Waits on the wrong condition (a sleep, or the wrong element)
+        - Depends on the local clock, timezone or locale
+        - Genuine product race
+        - Unknown
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: policy
+    attributes:
+      label: Policy acknowledgement
+      options:
+        - label: I understand a retry is not a fix, and that quarantine carries a deadline (ADR 0009)
+          required: true

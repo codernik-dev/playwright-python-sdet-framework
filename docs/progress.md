@@ -11,13 +11,17 @@ Verification vocabulary, used strictly:
 | ⬜ **NOT STARTED** | Planned, no code yet |
 
 No timing, coverage, pass-rate or "improvement" figure appears anywhere in this repository until it
-comes from a real measured run (Phase 15).
+comes from a real measured run (Phase 15 — [phase-15-measurement.md](phase-15-measurement.md)).
 
 ---
 
-## Machine this was built on
+## Machines this was built on
 
-Recorded because "works on my machine" is only useful if the machine is written down.
+Recorded because "works on my machine" is only useful if the machine is written down —
+and because **it stopped being the same machine**, which turned out to be one of the most
+useful things that happened to this project.
+
+### Machine A — phases 1 to 7 and 12
 
 | Item | Value | How it affected decisions |
 |---|---|---|
@@ -26,8 +30,30 @@ Recorded because "works on my machine" is only useful if the machine is written 
 | PostgreSQL | **18.1, running as a service on :5432** (scram-sha-256) | Local DB work possible immediately, before Docker |
 | Java | OpenJDK 25.0.1 | Allure CLI can render reports locally |
 | Node | 24.13.0 | Not required; an alternative route to the Allure CLI |
-| Docker | **Engine 29.7.2 inside WSL2** (Compose v5.5.0, buildx v0.36.1) | Installed without elevation; see [ADR 0008](adr/0008-docker-engine-in-wsl2.md). Phases 10–12 unblocked |
-| Free disk (C:) | ~32 GB (was 9.1 GB) | Still building a lean test image rather than pulling the 2.5 GB official Playwright one — faster CI pulls |
+| Docker | **Engine 29.7.2 inside WSL2** (Compose v5.5.0, buildx v0.36.1) | Installed without elevation; see [ADR 0008](adr/0008-docker-engine-in-wsl2.md) |
+| Free disk (C:) | ~32 GB | Lean test image preferred over the 2.5 GB official Playwright one |
+
+### Machine B — phases 8 to 11, 13 to 18
+
+The build resumed on a **different machine**, with a different toolchain and none of the
+prerequisites installed. That is recorded rather than quietly papered over, because the
+project's central claim is reproducibility, and this was the first real test of it.
+
+| Item | Value | Consequence |
+|---|---|---|
+| CPU | AMD Ryzen 7 5800H, **16 logical cores** | Every timing in Phase 15 is quoted against this |
+| OS | Windows 11 Home Single Language 26200 | Same family as Machine A |
+| Python | 3.13, **3.12.10**, 3.8, 3.7 — **no 3.11** | Built on 3.12, which is what CI already used. `requires-python = ">=3.11,<3.14"` held |
+| PostgreSQL | **none installed** — only pgAgent under `C:\Program Files\PostgreSQL\17` | Server binaries fetched as a no-install zip and pointed at with `$env:PGBIN` |
+| Java | Corretto **17** | Too old for current Jenkins (needs 21+); a portable JDK 21 was used |
+| Node | 22.22.2 | Allure CLI via `npm i -g allure-commandline` |
+| Docker | **none, and not installable** — WSL2 has no distribution and installing one needs elevation | Phase 10 is written and labelled NOT VERIFIED; a GitHub workflow performs the verification instead |
+
+**What the machine change was worth.** Rebuilding from nothing exercised the documented
+first steps for real and broke three of them — `scripts/local_db.ps1` failed in three
+separate ways that Machine A could never have surfaced (see Phase 8's preamble below).
+A reproducibility claim that has only ever been tested on the machine that wrote it is
+not a claim, it is a habit.
 
 ---
 
@@ -42,17 +68,17 @@ Recorded because "works on my machine" is only useful if the machine is written 
 | 5 | API automation layer | ✅ Complete — [phase-5-api-automation.md](phase-5-api-automation.md) |
 | 6 | Playwright UI layer | ✅ Complete — [phase-6-playwright-ui.md](phase-6-playwright-ui.md) |
 | 7 | Database validation + cross-layer journeys | ✅ Complete — [phase-7-database-validation.md](phase-7-database-validation.md) |
-| 8 | Reporting + failure artefacts | ⬜ Next |
-| 9 | Parallel execution + markers | ⬜ |
-| 10 | Docker | ⬜ |
-| 11 | Jenkins | ⬜ |
+| 8 | Reporting + failure artefacts | ✅ Complete — [phase-8-reporting.md](phase-8-reporting.md) |
+| 9 | Parallel execution + markers | ✅ Complete — [phase-9-parallel-execution.md](phase-9-parallel-execution.md) |
+| 10 | Docker | ⚠️ Written, **NOT VERIFIED** — [phase-10-docker.md](phase-10-docker.md) |
+| 11 | Jenkins | ✅ Complete — [phase-11-jenkins.md](phase-11-jenkins.md) |
 | 12 | GitHub Actions | ✅ Complete — [phase-12-github-actions.md](phase-12-github-actions.md) |
-| 13 | Refactor + code quality pass | ⬜ |
-| 14 | README + diagrams | ⬜ |
-| 15 | Execution + measurement | ⬜ |
-| 16 | GitHub presentation | ⬜ |
-| 17 | LinkedIn presentation | ⬜ |
-| 18 | Interview preparation | ⬜ |
+| 13 | Refactor + code quality pass | ✅ Complete — [phase-13-quality-pass.md](phase-13-quality-pass.md) |
+| 14 | README + diagrams + runbook | ✅ Complete — [debugging.md](debugging.md) + README |
+| 15 | Execution + measurement | ✅ Complete — [phase-15-measurement.md](phase-15-measurement.md) |
+| 16 | GitHub presentation | ✅ Complete — issue templates, PR template, [presentation.md](presentation.md) |
+| 17 | LinkedIn presentation | ✅ Complete — [presentation.md](presentation.md) |
+| 18 | Interview preparation | ✅ Complete — [interview-preparation.md](interview-preparation.md) |
 
 ---
 
@@ -439,11 +465,211 @@ mistake as an earlier `&&`-after-`head`. Exit codes are now checked explicitly.
 
 ---
 
+## Rebuilding on Machine B — the reproducibility claim, tested for real
+
+Before Phase 8 could start, the whole environment had to be recreated on a machine with
+none of the prerequisites. This is reported as its own section because it found more
+defects than most of the phases did.
+
+| Step | Result |
+|---|---|
+| `py -3.12 -m venv` + `pip install -e ".[dev,app]"` | ✅ **VERIFIED** — identical dependency versions to Machine A |
+| PostgreSQL server binaries (no installer, no elevation) | ✅ **VERIFIED** — extracted and pointed at with `$env:PGBIN` |
+| `.\scripts\local_db.ps1 start` | ❌ **VERIFIED FAILURE** — three separate defects, below |
+| `.\scripts\local_db.ps1 reset` | ❌ **VERIFIED FAILURE** — created the cluster one directory too deep |
+| Baseline suite, after fixes | ✅ **VERIFIED** — `293 passed in 107.19s` |
+| Baseline suite, after the TLS fix | ✅ **VERIFIED** — `293 passed in 30.14s` |
+
+### Three defects in the documented first step
+
+Every one of them was unreachable from the machine the script was written on.
+
+| # | Defect | Lesson |
+|---|---|---|
+| 1 | `-o "-p 55432"` reached `pg_ctl` as **three arguments**. PowerShell 7's `Start-Process` does not quote an `ArgumentList` element containing a space; Windows PowerShell 5.1 did | The port now lives in the cluster's own `postgresql.conf`, so the quoting question disappears entirely rather than being answered |
+| 2 | `Start-Process -Wait` **never returned**. The server inherits the redirected stdout handle, so `-Wait` waits for the *server* to exit — and it is not supposed to. The database was up and serving while the script sat there forever | Replaced with a readiness poll and a deadline, which is what the framework preaches everywhere else. The most confusing possible failure: everything works and nothing continues |
+| 3 | `reset` created the cluster at `.pgdata\data\data`, then failed to start it with *"not a database cluster directory"* — about a directory it had just created. `$dataDir` meant two different things, reassigned from inside the switch branches | Two names, each meaning exactly one thing. A variable that changes meaning is a bug waiting for the one code path nobody exercises often |
+
+**And the fourth, which was the point of the exercise:** the suite ran in 107 s here
+against 23.6 s on Machine A. The per-test overhead was **uniform**, which rules out the
+application — the same reasoning that found the `localhost`/IPv6 stall in Phase 5.
+Measured: `httpx.Client()` builds a fresh SSL context per instance, **355 ms**, and the
+framework builds one client per identity per test. Sharing one context: **107.19 s →
+30.14 s**, with two regression tests pinning both that it is reused *and* that it still
+verifies certificates.
+
+---
+
+## Phase 8 — Reporting + failure artefacts ✅
+
+Full write-up: [phase-8-reporting.md](phase-8-reporting.md).
+
+| Check | Result |
+|---|---|
+| Full suite with `--alluredir` and `--junitxml` | ✅ **VERIFIED** — `330 passed in 26.56s` |
+| Environment block written | ✅ **VERIFIED** — 19 entries, DB password `***masked***` |
+| Report rendered by the Allure CLI | ✅ **VERIFIED** — `Report successfully generated` |
+| Categories applied to real failures | ✅ **VERIFIED** — 2 product · 1 browser timeout · **13 environment** |
+| Attachments on an API failure | ✅ **VERIFIED** — `test log`, `HTTP exchanges` |
+| Attachments on a DB failure | ✅ **VERIFIED** — `test log`, `SQL executed` |
+| Attachments on a browser failure | ✅ **VERIFIED** — log, PNG screenshot, page HTML, `trace.zip` |
+| Passing tests attach nothing | ✅ **VERIFIED** |
+
+⚠️ **NOT VERIFIED in Phase 8:** the nightly workflow's Allure publication to GitHub Pages
+— written, but it needs a push and Pages enabled.
+
+### Findings
+
+| # | Finding | Outcome |
+|---|---|---|
+| 1 | **Every failure-category regex matched nothing.** Allure requires a *full* match and `.` does not cross newlines, so no stack trace could ever match. Triage had silently stopped working while the report looked healthy | `(?s)` on every pattern, plus a test asserting `re.DOTALL` on the **compiled** pattern. My unit test had passed because it fed the regex a one-line trace — *a test that feeds simpler input than reality is a rehearsal* |
+| 2 | The browser category keyed on `playwright._impl`, which does not appear in what Allure records — pytest's failure repr, not a Python traceback | Fixed by **reading the recorded trace** instead of guessing a third time. Two wrong patterns, both written from a mental model of a data structure I had never looked at |
+| 3 | **A feature the library already had.** A marker→tag mapping duplicated allure-pytest's own behaviour; the report showed every tag twice | Verified by running the same test with and without the loop, then deleted — code, export and unit test. Severity was kept, because that part genuinely is missing |
+| 4 | My throwaway inspection script crashed on an attachment with no MIME type and aborted its loop, so I concluded the browser artefacts were missing. They had been correct all along | When a tool reports the system is broken, **the tool is also a suspect** |
+
+---
+
+## Phase 9 — Parallel execution, markers, retry policy ✅
+
+Full write-up: [phase-9-parallel-execution.md](phase-9-parallel-execution.md) ·
+[ADR 0009](adr/0009-retries-are-diagnostics.md).
+
+| Check | Result |
+|---|---|
+| Two-pass runner | ✅ **VERIFIED** — `Suite passed (both passes).`, exit code **0** |
+| Serial pass with nothing to run | ✅ **VERIFIED** — reported, not failed |
+| Five consecutive `-n 4` runs | ✅ **VERIFIED** — `342 passed` in 21.46 / 22.79 / 21.64 / 22.47 / 23.39 s |
+| Effective seed in the run header | ✅ **VERIFIED** — `faker_seed=1683326883  (set FAKER_SEED to reproduce)` |
+
+⚠️ **NOT VERIFIED in Phase 9:** the retry path itself has never fired — it is CI-only and
+nothing has flaked in CI. `reruns_for` is unit-tested in both directions; the `FLAKY`
+summary block is written and reviewed, not observed.
+
+### Findings
+
+| # | Finding | Outcome |
+|---|---|---|
+| 1 | `pytest -m serial` collects nothing and exits **5**, so the runner reported a fully passing suite as failed | Exit 5 is success for that pass. **No test carries the `serial` marker** — that is the intended outcome, not an omission |
+| 2 | The script then printed `Suite passed` and **exited 5 anyway**, because PowerShell returns the last command's status | Explicit `exit 0`. Same shape of bug twice: a wrapper that reports its own success incorrectly is worse than no wrapper |
+| 3 | The run header printed `faker_seed=None` whenever none was configured — true, and useless to anyone trying to reproduce | One `effective_seed()` used by the header, the fixture and the report, so they cannot disagree. `effective_seed(0, ...)` has its own test, because `if configured:` would silently ignore a seed of zero |
+| 4 | The `regression` marker had never been applied, and to be honest would have to mean *every* test | Deleted. A marker that selects everything is a second name for the suite, not a filter |
+
+---
+
+## Phase 10 — Docker ⚠️ WRITTEN, NOT VERIFIED
+
+Full write-up: [phase-10-docker.md](phase-10-docker.md).
+
+**Docker cannot run on Machine B**: no Linux kernel, no WSL distribution, and installing
+one requires elevation that is not available. Rather than ship compose files described as
+working, the verification is delegated to `.github/workflows/docker.yml`, which builds
+both images, starts the stack, runs the suite inside the runner container, and asserts
+that `import claimdesk` **fails** inside the test image.
+
+| Check | Status |
+|---|---|
+| Images build | ⚠️ **NOT VERIFIED** — the workflow performs it on a clean runner |
+| Suite passes in the containerised runner | ⚠️ **NOT VERIFIED** — same workflow |
+| The black-box boundary holds inside the image | ⚠️ **NOT VERIFIED** — asserted by the same workflow |
+
+A ⚠️ that says exactly what would make it a ✅ is worth more than a ✅ nobody checked.
+
+---
+
+## Phase 11 — Jenkins ✅
+
+Full write-up: [phase-11-jenkins.md](phase-11-jenkins.md).
+
+Executed on a real controller — Jenkins LTS as a WAR under a portable JDK 21, no Docker
+and no administrator rights. **Nine builds, six of them red first.**
+
+| Build | Parameters | Result |
+|---|---|---|
+| #7 | `SUITE=framework` | ✅ **VERIFIED** — 127 s, `121 passed` |
+| #8 | `SUITE=api or db`, `WORKERS=4` | ✅ **VERIFIED** — 158 s, `185 passed in 9.64s` |
+| #9 | `SUITE=all`, `WORKERS=4` | ✅ **VERIFIED** — 223 s, **`342 passed in 25.30s`** |
+
+Verified in those runs: four parameters, **credential binding** (two secrets, never
+printed), `timestamps`, `disableConcurrentBuilds`, the two-pass runner, JUnit recording,
+artefact archiving and `post { cleanup }` wiping the workspace.
+
+⚠️ **NOT VERIFIED in Phase 11:** the Allure Jenkins plugin's own publisher (its fallback
+ran instead, which is a verified *degradation path*); `USE_DOCKER=true`; and the `sh`
+branch of every step, since only a Windows agent was available.
+
+### Findings
+
+| # | Finding | Outcome |
+|---|---|---|
+| 1 | Java 17 is too old for current Jenkins (`Supported Java versions are: [21, 25]`) | Portable JDK 21, rather than an outdated Jenkins |
+| 2 | PowerShell split `-Djenkins.install.runSetupWizard=false` into its own arguments | Quoted. **The third time** PowerShell argument handling has caused a failure in this project that looked like something else |
+| 3 | Jenkins refuses a `file://` SCM checkout as insecure | Overridden explicitly for a local controller, and recorded rather than silently worked around |
+| 4 | `Filename too long` — `JENKINS_HOME` plus `@script/<64-char sha>` exceeded Windows `MAX_PATH` | Short `JENKINS_HOME`. Invisible on Linux, immediate on Windows, and the error names `.git/hooks` rather than the cause |
+| 5 | A `steps { }` block is **not** free-form Groovy — the parser resolves every call as a *step*. Positional args were rejected; named args then matched a **real** step called `run` | Call the helper from inside `script { }` and rename it `onAgent` |
+| 6 | **The quality gate needs the `app` extra.** mypy checks `app/claimdesk`, so a workspace with only `[dev]` fails with ~40 stub errors | A property of the repository, not of Jenkins — invisible locally where everyone has both extras, and only findable by an environment that installed the minimum |
+| 7 | The Report stage failed a build whose quality gate had just passed, because a framework-only run produces no Allure results | **Phase 12 recorded this exact lesson and the pipeline repeated it**: a step that explains a failure must never be able to cause one |
+
+---
+
+## Phase 13 — Refactor and code-quality pass ✅
+
+Full write-up: [phase-13-quality-pass.md](phase-13-quality-pass.md).
+
+| Check | Result |
+|---|---|
+| TODO / FIXME / XXX / HACK anywhere | ✅ **VERIFIED** — none |
+| Commented-out code, stray `print()` | ✅ **VERIFIED** — none |
+| Full suite | ✅ **VERIFIED** — `351 passed in 29.84s` |
+| Application's own tests | ✅ **VERIFIED** — `58 passed in 0.31s` |
+| ruff · ruff-format · mypy `--strict` | ✅ **VERIFIED** — clean, 94 files |
+| `pre-commit run --all-files` | ✅ **VERIFIED** — all hooks pass, **for the first time** |
+| Framework size against the Phase 1 cap | ✅ **VERIFIED** — 2,914 lines excluding blanks and comments, under 3,000 |
+
+### Findings
+
+| # | Finding | Outcome |
+|---|---|---|
+| 1 | **A timezone flake that had never failed.** The application and the framework both asked `date.today()` — the *local* date of whichever machine asked. Phase 10 made them two machines: a UTC container and an IST runner. Between 00:00 and 05:30 the runner is a day ahead, so `test_an_incident_dated_today_is_accepted` would fail for five and a half hours a day while its matched pair passed, hiding half the problem | Both sides answer in **UTC explicitly**, so they agree by construction. The application was changed in `schemas.py` *and* `web/routes.py` — not to make a test pass, since the tests passed, but because deciding "is this in the future" from a server's local timezone is wrong on its own terms. `DTZ` added to ruff |
+| 2 | **pre-commit had been configured since Phase 2 and never run.** It found two gates contradicting each other: ruff pinned at v0.9.6 in the hook versus 0.16.3 in `pyproject.toml`, and `mixed-line-ending --fix=lf` forcing LF onto the `.ps1` files `.gitattributes` requires to be CRLF | Both aligned. A hook that fights the developer teaches `--no-verify`, and the same file holds the private-key detection |
+| 3 | **`junit.xml` was tracked.** The ignore pattern was `*.junit.xml`, which requires a dot before the word and has never matched `junit.xml` — exactly what `--junitxml=junit.xml` produces | Pattern fixed, file untracked. **A near-miss glob is worse than no glob, because it looks handled** |
+| 4 | Six linter suggestions declined with reasons — docstrings on every `test_*`, `TYPE_CHECKING` import moves, `assert` in tests, and three others | Recorded in the phase document. A linter is an opinion; taking every opinion is not rigour, it is an absence of judgement |
+
+---
+
+## Phase 15 — Execution and measurement ✅
+
+Full write-up: [phase-15-measurement.md](phase-15-measurement.md). Machine B: AMD Ryzen 7
+5800H, 16 logical cores.
+
+| Measurement | Result |
+|---|---|
+| Test counts | ✅ **VERIFIED** — **351**: 130 framework, 157 API, 32 UI, 28 DB, 4 E2E |
+| By intent | ✅ **VERIFIED** — 94 smoke, **136 negative**, 28 boundary, 23 authz, 22 integrity, 5 contract |
+| Serial wall-clock | ✅ **VERIFIED** — median **24.88 s** (27.20 / 24.31 / 24.88) |
+| `-n 2` | ✅ **VERIFIED** — median **18.75 s** |
+| **`-n 4`** | ✅ **VERIFIED** — median **16.82 s** ← optimum, **1.48×** |
+| `-n 8` | ✅ **VERIFIED** — median **19.03 s** — *slower than 4* |
+| `-n auto` (16) | ✅ **VERIFIED** — median **23.81 s** — *barely better than serial* |
+| Flake rate | ✅ **VERIFIED** — **0 failures in 10 consecutive `-n 4` runs**, 3,510 test executions |
+
+### Findings
+
+| # | Finding | Outcome |
+|---|---|---|
+| 1 | **The parallelism curve turns around.** Eight workers are slower than four; sixteen are barely faster than serial | `-n auto` is the default everyone reaches for and it discards nearly the whole benefit here. Session fixtures are per worker, the application is one process, the suite is I/O-bound. *"Use all your cores" is a guess, and it is measurable in ten minutes* |
+| 2 | **The same suite measured 32.77 s serial in Phase 9 and 24.88 s here**, on the same machine, with nothing between them that explains it | A **24% swing from nothing at all** — larger than the entire gap between two and four workers. Exactly the trap Phase 12 warned about when a CI step took 249 s and then 13 s. Every figure is therefore published as a median, with its spread and its machine |
+| 3 | Ten identical runs got **steadily slower**, 14.99 s → 18.86 s | The seeded corpus grows as each run creates claims, so later runs query more rows. Noticed rather than averaged away: a suite that slows down the more it is run is a suite people eventually stop running |
+| 4 | The one performance claim made without hedging — the TLS fix, 107 s → 30 s — survives that scepticism | Because the **cause was measured directly** (355 ms to build a context, 0.1 ms to reuse one, one client per identity per test) rather than inferred from the difference between two suite runs. *A mechanism that explains the number is worth more than the number* |
+
+---
+
 ## Open items carried forward
 
 | # | Item | Blocks | Owner action |
 |---|---|---|---|
-| 1 | ~~Install Docker~~ | — | ✅ Done — Docker Engine 29.7.2 installed inside WSL2 with Compose and buildx, daemon enabled under systemd. `postgres:18-alpine` and `python:3.12-slim` pre-pulled and verified |
+| 0 | **Run the Docker workflow** | Phase 10 verification | Push to `main`, or dispatch `docker.yml` manually. It builds both images, runs the suite in the container, and asserts the black-box boundary holds inside the image |
+| 0b | **Enable GitHub Pages** | Nightly Allure publication | Settings → Pages → source `gh-pages`. The nightly workflow publishes there already |
+| 1 | ~~Install Docker~~ | — | ✅ Done on Machine A — Docker Engine 29.7.2 inside WSL2. ⚠️ **Not available on Machine B**, which is why Phase 10 is unverified |
 | 2 | ~~Create the local database + roles~~ | — | ✅ Done — `scripts/local_db.ps1` builds a disposable cluster; your existing PostgreSQL service was never touched and no superuser password was needed |
 | 3 | ~~`playwright install chromium`~~ | — | ✅ Done — Chromium 114.5 MiB installed, Playwright 1.62.0 |
 | 4 | ~~Free disk space on C:~~ | — | ✅ Resolved — ~32 GB free |
