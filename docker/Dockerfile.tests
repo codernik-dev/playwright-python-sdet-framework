@@ -13,7 +13,18 @@
 # The tag MUST match the Playwright version in pyproject.toml. A mismatched pair
 # fails at runtime with "Executable doesn't exist", which reads like a broken
 # installation rather than a version skew.
-FROM mcr.microsoft.com/playwright/python:v1.62.0-jammy
+#
+# `-noble`, not `-jammy`, and that is not cosmetic. The jammy image is Ubuntu
+# 22.04, which ships **Python 3.10** - below this project's floor - so the build
+# died on:
+#
+#   ERROR: Package 'claimdesk-qa' requires a different Python: 3.10.12 not in '<3.14,>=3.11'
+#
+# The Dockerfile read perfectly and could never have worked. It was found by
+# building it, which is the entire argument for verifying rather than shipping
+# something labelled "should work". noble is Ubuntu 24.04 with Python 3.12.3,
+# matching what CI uses.
+FROM mcr.microsoft.com/playwright/python:v1.62.0-noble
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \

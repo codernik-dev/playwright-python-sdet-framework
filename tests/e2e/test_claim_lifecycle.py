@@ -15,6 +15,7 @@ real systems come apart.
 from __future__ import annotations
 
 from decimal import Decimal
+from urllib.parse import urlparse
 
 import pytest
 from playwright.sync_api import Page, expect
@@ -160,12 +161,19 @@ def test_deactivating_a_user_immediately_ends_their_browser_session(
     # not by a failing test, which is exactly why credential handling deserves a
     # deliberate second look rather than a green tick.
     context = context_factory(None)
+    # The domain is DERIVED from the configured base URL, never hard-coded.
+    # It used to read "127.0.0.1", which is correct in exactly one environment.
+    # Inside docker compose the application answers on `sut`, so the cookie was
+    # scoped to a host the browser never contacted, silently sent nothing, and
+    # the "already signed in" page redirected to /login - a failure that looks
+    # like the application logging the user out for no reason.
+    host = urlparse(settings.base_url).hostname or "127.0.0.1"
     context.add_cookies(  # the session the user already has in their browser
         [
             {
                 "name": "session",
                 "value": token,
-                "domain": "127.0.0.1",
+                "domain": host,
                 "path": "/",
                 "httpOnly": True,
                 "secure": False,

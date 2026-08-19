@@ -188,8 +188,8 @@ pipeline {
             steps {
                 script {
                     onAgent(
-                        unix: 'docker compose -f docker/docker-compose.yml up -d db app',
-                        windows: 'docker compose -f docker/docker-compose.yml up -d db app'
+                        unix: 'docker compose -f docker/docker-compose.yml up -d db sut',
+                        windows: 'docker compose -f docker/docker-compose.yml up -d db sut'
                     )
                 }
             }

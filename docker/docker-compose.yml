@@ -40,7 +40,24 @@ services:
     expose:
       - "5432"
 
-  app:
+  # Named `sut` (system under test), NOT `app`, and that is a bug fix rather than
+  # a naming preference.
+  #
+  # A compose service name becomes a hostname on the network. With the service
+  # called `app`, every browser test failed with:
+  #
+  #     net::ERR_SSL_PROTOCOL_ERROR at http://app:8000/login
+  #
+  # Chromium had silently upgraded the request to HTTPS and then spoken TLS to a
+  # plain HTTP server. The reason is that **`.app` is a real gTLD and the entire
+  # TLD is HSTS-preloaded** - Google requires HTTPS across it - so Chromium
+  # treats the bare hostname `app` as preloaded and refuses to use HTTP.
+  #
+  # The giveaway was the failure pattern: every API test passed and every browser
+  # test failed, against the same URL. httpx does not implement HSTS; browsers
+  # do. When one client can reach a service and another cannot, the difference is
+  # in the client, not the server.
+  sut:
     build:
       context: ..
       dockerfile: docker/Dockerfile.app
@@ -75,7 +92,8 @@ services:
       dockerfile: docker/Dockerfile.tests
     environment:
       TEST_ENV: docker
-      BASE_URL: http://app:8000
+      # http://sut:8000, not http://app:8000 - see the note on the service above.
+      BASE_URL: http://sut:8000
       DB_ENABLED: "true"
       DB_HOST: db
       DB_PORT: "5432"
@@ -87,7 +105,7 @@ services:
       # A cold container start is legitimately slower than a warm local one.
       READINESS_TIMEOUT_SECONDS: "120"
     depends_on:
-      app:
+      sut:
         condition: service_healthy
     volumes:
       # Evidence must outlive the container. Without these mounts a failing run
@@ -102,4 +120,13 @@ services:
       # Not started by `up`. The tests are a job that runs to completion, not a
       # service that stays up: `run --rm tests` gives the exit code the pipeline
       # needs to gate on.
+      #
+      # WARNING, and it cost a debugging session: a profile also hides this
+      # service from `docker compose build`. Building the images requires
+      #
+      #     docker compose --profile test ... build
+      #
+      # or this image is never rebuilt and `compose run` quietly executes the
+      # last one that was, which is how a pipeline ends up reporting on stale
+      # tests. Use `run --build` as well.
       - test

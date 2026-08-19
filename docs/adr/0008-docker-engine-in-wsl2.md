@@ -8,6 +8,16 @@ Phases 10–12 (containerisation, Jenkins, GitHub Actions) need a working Docker
 daemon. The development machine is Windows 11 with WSL2 and Ubuntu 22.04 already
 installed.
 
+> **Confirmed a second time, on a machine that had no distribution at all.** When
+> the build resumed elsewhere, `wsl -l -v` reported *"has no installed
+> distributions"* and Docker was written off as impossible without elevation.
+> That was wrong, and worth recording as part of this decision: WSL2 itself was
+> already present (`wsl --version` → 2.7.3.0 with a kernel), and installing a
+> distribution — `wsl --install -d Ubuntu-24.04` — is a **per-user** operation
+> that needs no administrator rights. Inside the distribution root is available,
+> so everything below applied unchanged. The route in this ADR survives the case
+> where nothing is set up yet, which is a stronger claim than it originally made.
+
 Two routes were available.
 
 **Docker Desktop.** The default choice on Windows: a native `docker` command, a
@@ -37,7 +47,10 @@ Docker Engine inside WSL2.
 
 `scripts/docker.ps1` bridges the one genuine drawback: `docker` is not on the
 Windows PATH. It translates the repository path to its `/mnt/c` form and runs the
-command inside WSL with the working directory already correct.
+command inside WSL with the working directory already correct. It targets the
+**default** distribution rather than a hard-coded `-d Ubuntu`: the second machine
+installed `Ubuntu-24.04`, and the hard-coded name failed with "no distribution"
+on a system where Docker was working perfectly.
 
 ## Consequences
 

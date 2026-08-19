@@ -28,7 +28,7 @@ records, and a lint rule that makes the black-box boundary impossible to violate
 | **Flake rate** | **0 over 10 consecutive `-n 4` runs** (3,510 test executions) |
 | **Application's own tests** | 58 (the app under test is real, not a stub) |
 | **Quality gate** | ruff · ruff-format · **mypy `strict` across 94 files** · every pre-commit hook |
-| **CI** | GitHub Actions PR gate + nightly Chromium/Firefox/WebKit · **Jenkins, 351 tests green on a real controller** |
+| **CI** | GitHub Actions PR gate + nightly Chromium/Firefox/WebKit · **Jenkins, 351 green on a real controller** · **351 green in Docker Compose** |
 
 ---
 
@@ -230,12 +230,16 @@ Interactive API docs: <http://127.0.0.1:8000/docs>.
 ### Everything in containers instead
 
 ```powershell
-docker compose -f docker/docker-compose.yml up -d db app
-docker compose -f docker/docker-compose.yml run --rm tests
+docker compose --profile test -f docker/docker-compose.yml build
+docker compose -f docker/docker-compose.yml up -d db sut
+docker compose -f docker/docker-compose.yml run --build --rm tests
 ```
 
-⚠️ Written but **not verified locally** — Docker could not be installed on the build machine.
-`.github/workflows/docker.yml` performs that verification on a clean runner. See
+Verified: **`351 passed in 36.39s`** inside the containerised runner, with the black-box
+boundary asserted in the image itself (`import claimdesk` fails, proved against a positive
+control). Getting there exposed four defects that were invisible in review — including a
+compose service named `app`, which broke *every* browser test because `.app` is an
+HSTS-preloaded gTLD and Chromium refuses to speak HTTP to it. See
 [docs/phase-10-docker.md](docs/phase-10-docker.md).
 
 ### If PostgreSQL is not installed

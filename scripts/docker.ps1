@@ -56,5 +56,10 @@ if (-not $DockerArgs -or $DockerArgs.Count -eq 0) {
 $escaped = $DockerArgs | ForEach-Object { "'" + ($_ -replace "'", "'\''") + "'" }
 $command = "cd '$wslRepo' && docker " + ($escaped -join " ")
 
-& wsl -d Ubuntu -e bash -lc $command
+# The DEFAULT distribution, not a hard-coded `-d Ubuntu`. The original name was
+# the one that happened to exist on the machine this was written on; the next
+# machine installed `Ubuntu-24.04` and the wrapper failed with "no distribution"
+# on a system where Docker was working perfectly. A script should not encode a
+# local accident as a requirement.
+& wsl -e bash -lc $command
 exit $LASTEXITCODE

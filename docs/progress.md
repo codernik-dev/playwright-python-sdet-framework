@@ -47,7 +47,7 @@ project's central claim is reproducibility, and this was the first real test of 
 | PostgreSQL | **none installed** — only pgAgent under `C:\Program Files\PostgreSQL\17` | Server binaries fetched as a no-install zip and pointed at with `$env:PGBIN` |
 | Java | Corretto **17** | Too old for current Jenkins (needs 21+); a portable JDK 21 was used |
 | Node | 22.22.2 | Allure CLI via `npm i -g allure-commandline` |
-| Docker | **none, and not installable** — WSL2 has no distribution and installing one needs elevation | Phase 10 is written and labelled NOT VERIFIED; a GitHub workflow performs the verification instead |
+| Docker | **Engine 29.7.2 inside WSL2 Ubuntu 24.04**, installed with no elevation | Initially assessed as impossible; re-checking showed WSL2 was already installed and only a distribution was missing. See Phase 10 |
 
 **What the machine change was worth.** Rebuilding from nothing exercised the documented
 first steps for real and broke three of them — `scripts/local_db.ps1` failed in three
@@ -70,7 +70,7 @@ not a claim, it is a habit.
 | 7 | Database validation + cross-layer journeys | ✅ Complete — [phase-7-database-validation.md](phase-7-database-validation.md) |
 | 8 | Reporting + failure artefacts | ✅ Complete — [phase-8-reporting.md](phase-8-reporting.md) |
 | 9 | Parallel execution + markers | ✅ Complete — [phase-9-parallel-execution.md](phase-9-parallel-execution.md) |
-| 10 | Docker | ⚠️ Written, **NOT VERIFIED** — [phase-10-docker.md](phase-10-docker.md) |
+| 10 | Docker | ✅ Complete — [phase-10-docker.md](phase-10-docker.md) |
 | 11 | Jenkins | ✅ Complete — [phase-11-jenkins.md](phase-11-jenkins.md) |
 | 12 | GitHub Actions | ✅ Complete — [phase-12-github-actions.md](phase-12-github-actions.md) |
 | 13 | Refactor + code quality pass | ✅ Complete — [phase-13-quality-pass.md](phase-13-quality-pass.md) |
@@ -556,23 +556,46 @@ summary block is written and reviewed, not observed.
 
 ---
 
-## Phase 10 — Docker ⚠️ WRITTEN, NOT VERIFIED
+## Phase 10 — Docker ✅
 
 Full write-up: [phase-10-docker.md](phase-10-docker.md).
 
-**Docker cannot run on Machine B**: no Linux kernel, no WSL distribution, and installing
-one requires elevation that is not available. Rather than ship compose files described as
-working, the verification is delegated to `.github/workflows/docker.yml`, which builds
-both images, starts the stack, runs the suite inside the runner container, and asserts
-that `import claimdesk` **fails** inside the test image.
+**First shipped as NOT VERIFIED, then verified for real.** The original assessment —
+"Docker needs a Linux kernel and WSL2 needs an elevated install" — was wrong on the part
+that mattered: WSL2 **was already installed** and only a *distribution* was missing, and
+installing one is a per-user operation needing no elevation. Inside the distribution root
+is available, so Docker Engine installs from its own apt repository and runs under
+systemd exactly as on a server.
 
-| Check | Status |
+*"It cannot be done here" is a claim, and claims get tested.*
+
+| Check | Result |
 |---|---|
-| Images build | ⚠️ **NOT VERIFIED** — the workflow performs it on a clean runner |
-| Suite passes in the containerised runner | ⚠️ **NOT VERIFIED** — same workflow |
-| The black-box boundary holds inside the image | ⚠️ **NOT VERIFIED** — asserted by the same workflow |
+| Docker installed without administrator rights | ✅ **VERIFIED** — Engine 29.7.2, Compose v5.5.0, buildx v0.36.1 |
+| Both images build | ✅ **VERIFIED** |
+| DB healthy **before** the application starts | ✅ **VERIFIED** — `claimdesk-db-1 Healthy` gates `claimdesk-sut-1 Starting` |
+| Application readiness | ✅ **VERIFIED** — `starting → starting → healthy` |
+| **Full suite in the containerised runner** | ✅ **VERIFIED** — **`351 passed in 36.39s`** |
+| Positive control: Python runs in the test image | ✅ **VERIFIED** — `framework importable: ok` |
+| **`import claimdesk` fails inside the test image** | ✅ **VERIFIED** |
+| Teardown removes containers, network and volumes | ✅ **VERIFIED** |
 
-A ⚠️ that says exactly what would make it a ✅ is worth more than a ✅ nobody checked.
+⚠️ **NOT VERIFIED in Phase 10:** the same workflow on a **GitHub runner** — written, and
+now known to describe a working stack, but not dispatched. That needs a push.
+
+### Findings — four defects, none visible in review
+
+| # | Finding | Outcome |
+|---|---|---|
+| 1 | **The base image shipped a Python this project cannot use.** `playwright/python:v1.62.0-jammy` is Ubuntu 22.04 with **Python 3.10**, below the `>=3.11` floor: `ERROR: Package 'claimdesk-qa' requires a different Python` | Moved to `-noble` (Python 3.12.3). The Dockerfile read perfectly and could never have worked — the tag's *distribution* half matters as much as the version half |
+| 2 | **Naming the compose service `app` broke every browser test** with `net::ERR_SSL_PROTOCOL_ERROR at http://app:8000`. `.app` is a real gTLD and the whole TLD is **HSTS-preloaded**, so Chromium force-upgrades it to HTTPS | Renamed to `sut`. The diagnostic was the *pattern*: every API test passed and every browser test failed against the same URL. httpx does not implement HSTS; browsers do. **When one client reaches a service and another cannot, the difference is in the client** |
+| 3 | **The pipeline was running yesterday's tests.** A compose `profile` hides a service from `docker compose build`, so the test image was never rebuilt and `compose run` reused a stale one | Caught only because a just-fixed test kept failing *with the old assertion text in the traceback*. Fixed twice over: `--profile test` on the build and `run --build` on the run. A pipeline reporting on stale tests is worse than one that fails, because the result looks authoritative |
+| 4 | **A test hard-coded the environment it was written in** — the session cookie's `"domain": "127.0.0.1"`. Inside compose the app answers on `sut`, so nothing was sent and the signed-in page redirected to `/login` | Derived from `settings.base_url`. Presented as the application logging the user out for no reason |
+| 5 | **My own boundary check passed for the wrong reason.** It ran `import claimdesk` and treated any non-zero exit as success — so while the image was *failing to build* it reported the boundary as confirmed | A **positive control** now runs first: `import claimdesk_qa` must succeed before the negative is asserted. The same defect as the Phase 3 cookie that made an "anonymous" request pass, in a different costume |
+
+Also learned the hard way: **WSL2 terminates the distribution shortly after its last
+session exits**, stopping systemd and every container with it — so `up` in one
+`wsl -e ...` invocation and `run` in another silently loses the stack in between.
 
 ---
 
@@ -668,9 +691,9 @@ Full write-up: [phase-15-measurement.md](phase-15-measurement.md). Machine B: AM
 
 | # | Item | Blocks | Owner action |
 |---|---|---|---|
-| 0 | **Run the Docker workflow** | Phase 10 verification | Push to `main`, or dispatch `docker.yml` manually. It builds both images, runs the suite in the container, and asserts the black-box boundary holds inside the image |
+| 0 | **Run the Docker workflow on a GitHub runner** | Independent confirmation only | Phase 10 is verified locally (Docker Engine 29.7.2 in WSL2, `351 passed` in the container). Push to `main`, or dispatch `docker.yml`, to have a genuinely clean machine confirm it |
 | 0b | **Enable GitHub Pages** | Nightly Allure publication | Settings → Pages → source `gh-pages`. The nightly workflow publishes there already |
-| 1 | ~~Install Docker~~ | — | ✅ Done on Machine A — Docker Engine 29.7.2 inside WSL2. ⚠️ **Not available on Machine B**, which is why Phase 10 is unverified |
+| 1 | ~~Install Docker~~ | — | ✅ Done on **both** machines — Engine 29.7.2 inside WSL2, installed on Machine B with no elevation after the initial "impossible" assessment turned out to be wrong |
 | 2 | ~~Create the local database + roles~~ | — | ✅ Done — `scripts/local_db.ps1` builds a disposable cluster; your existing PostgreSQL service was never touched and no superuser password was needed |
 | 3 | ~~`playwright install chromium`~~ | — | ✅ Done — Chromium 114.5 MiB installed, Playwright 1.62.0 |
 | 4 | ~~Free disk space on C:~~ | — | ✅ Resolved — ~32 GB free |

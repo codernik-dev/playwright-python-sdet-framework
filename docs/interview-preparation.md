@@ -84,6 +84,15 @@ accepted" would fail for five and a half hours a day — while its matched pair
 still passed, hiding half the problem. Both sides now answer in UTC explicitly,
 so they agree by construction.
 
+**A bug that only exists in containers.** Moving the suite into Docker Compose made
+*every* browser test fail with `net::ERR_SSL_PROTOCOL_ERROR at http://app:8000` while
+*every* API test passed. The compose service was named `app`, a service name becomes a
+hostname, and **`.app` is a real gTLD whose entire namespace is HSTS-preloaded** — so
+Chromium force-upgraded the URL to HTTPS and spoke TLS to a plain HTTP server. The
+diagnostic was the pattern rather than the message: httpx does not implement HSTS,
+browsers do, so when one client reaches a service and another cannot over the same URL,
+the difference is in the client.
+
 **A finding I decided was not a bug.** Non-ASCII digits (`１２３`, `١٢٣`) are
 accepted and normalised. Unambiguous value, no rule bypassed, so it is a
 characterisation test with the reasoning recorded rather than a "fix". Knowing
@@ -228,7 +237,7 @@ Prepared deliberately. Being caught without an answer is worse than the gap.
 | "Have you used a real device cloud / Selenium Grid?" | No. Playwright's browser contexts removed the need here, and I would not claim experience I do not have. |
 | "What is your test coverage?" | Of the application, unknown and deliberately unmeasured — black-box tests do not have meaningful line coverage, and reporting one would be misleading. What is measured is the matrix: which rules are asserted and at which layer. |
 | "Load testing?" | Explicitly out of scope. There is one soft response-time check labelled smoke-level, and no performance claims anywhere. |
-| "Did Docker actually run?" | Not on my machine — no Linux kernel and no rights to install one. It is written, labelled NOT VERIFIED, and a GitHub workflow performs the verification on a clean runner. |
+| "Did Docker actually run?" | Yes — 351 tests green inside the container. I first assessed it as impossible here (no admin) and that was wrong: WSL2 was already installed and only a distribution was missing, which is a per-user install. The GitHub workflow still exists as independent confirmation on a clean runner, and that part has not been dispatched. |
 
 ---
 

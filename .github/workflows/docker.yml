@@ -46,10 +46,21 @@ jobs:
       - name: Build the images
         # Built explicitly rather than implicitly by `up`, so a build failure is
         # its own red step instead of being buried in service startup output.
-        run: docker compose -f docker/docker-compose.yml build
+        #
+        # `--profile test` is REQUIRED and its absence was a real defect. The
+        # tests service sits behind that profile, so a plain `compose build`
+        # silently builds only db and sut - `compose config --services` proves
+        # it - and `compose run` then reuses whatever test image already exists
+        # rather than rebuilding a stale one.
+        #
+        # The result was a pipeline that ran YESTERDAY'S TESTS and reported on
+        # them as if they were today's. It was caught because a test whose
+        # assertion had just been fixed kept failing with the old assertion text
+        # in the traceback.
+        run: docker compose --profile test -f docker/docker-compose.yml build
 
       - name: Start the database and the application
-        run: docker compose -f docker/docker-compose.yml up -d db app
+        run: docker compose -f docker/docker-compose.yml up -d db sut
 
       - name: Wait for the application to report ready
         # compose's `depends_on: service_healthy` already gates the tests
@@ -58,7 +69,7 @@ jobs:
         # readiness fixture that can only say "the environment is broken".
         run: |
           for attempt in $(seq 1 60); do
-            state=$(docker inspect -f '{{.State.Health.Status}}' claimdesk-app-1 2>/dev/null || echo missing)
+            state=$(docker inspect -f '{{.State.Health.Status}}' claimdesk-sut-1 2>/dev/null || echo missing)
             echo "attempt $attempt: app health=$state"
             [ "$state" = "healthy" ] && exit 0
             sleep 2
@@ -69,16 +80,33 @@ jobs:
 
       - name: Run the suite inside the runner container
         # --rm: a job, not a service. The exit code is what gates the build.
-        run: docker compose -f docker/docker-compose.yml run --rm tests
+        # `--build` as well, belt and braces: it guarantees the image matches the
+        # source at the moment the suite runs, even if the build step above is
+        # ever changed or reordered. Running stale tests is worse than not
+        # running them, because the result looks authoritative.
+        run: docker compose -f docker/docker-compose.yml run --build --rm tests
 
       - name: Prove the black-box boundary holds inside the image
         # The lint rule enforces it in source; this asserts it in the artefact
         # that actually ships. If the application ever ended up installed in the
         # test image, an import would become possible and the rule would be the
         # only thing standing between a developer and a very convenient shortcut.
+        #
+        # The positive control on the first line is the important part. The
+        # original version of this check ran only the import and treated any
+        # non-zero exit as success - so when the image FAILED TO BUILD it
+        # reported the boundary as confirmed. A check that passes when nothing
+        # ran is the same defect this project found in Phase 3, where a leftover
+        # cookie made an "anonymous" request pass.
         run: |
-          if docker compose -f docker/docker-compose.yml run --rm --no-deps --entrypoint python tests \
-               -c "import claimdesk" 2>/dev/null; then
+          set -e
+          echo "control: python must actually run in this image"
+          docker compose -f docker/docker-compose.yml run --rm --no-deps \
+            --entrypoint python tests -c "import claimdesk_qa; print('framework importable: ok')"
+
+          echo "assertion: the application must NOT be importable"
+          if docker compose -f docker/docker-compose.yml run --rm --no-deps \
+               --entrypoint python tests -c "import claimdesk" 2>/dev/null; then
             echo "::error::The application is importable from the test image."
             exit 1
           fi
