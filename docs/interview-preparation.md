@@ -191,8 +191,8 @@ failures:
 Both, for different reasons. GitHub Actions is the CI that genuinely runs this
 repository — PR gate plus a nightly Chromium/Firefox/WebKit matrix, all three
 green. Jenkins is what most enterprise QA organisations actually run, and the
-Jenkinsfile was **executed**: nine builds on a real controller, six of them red
-first. Build #9 ran 342 tests green through the quality gate, the two-pass
+Jenkinsfile was **executed**: ten builds on a real controller, six of them red
+first. The final build ran **351 tests green** through the quality gate, the two-pass
 runner, report generation, JUnit publishing, archiving and workspace cleanup.
 
 The difference worth stating: a Jenkins agent is **persistent**. A GitHub runner

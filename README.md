@@ -28,7 +28,7 @@ records, and a lint rule that makes the black-box boundary impossible to violate
 | **Flake rate** | **0 over 10 consecutive `-n 4` runs** (3,510 test executions) |
 | **Application's own tests** | 58 (the app under test is real, not a stub) |
 | **Quality gate** | ruff · ruff-format · **mypy `strict` across 94 files** · every pre-commit hook |
-| **CI** | GitHub Actions PR gate + nightly Chromium/Firefox/WebKit · **Jenkins, 342 tests green on a real controller** |
+| **CI** | GitHub Actions PR gate + nightly Chromium/Firefox/WebKit · **Jenkins, 351 tests green on a real controller** |
 
 ---
 

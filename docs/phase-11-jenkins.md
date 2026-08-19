@@ -1,6 +1,6 @@
 # Phase 11 — Jenkins
 
-> Teaching document. A pipeline that was actually executed — nine builds, six of
+> Teaching document. A pipeline that was actually executed — ten builds, six of
 > them red — and what each failure taught. A Jenkinsfile nobody has run is a
 > Jenkinsfile that does not work; the only question is which of these six ways it
 > would have failed on first contact.
@@ -30,7 +30,7 @@ needs no Docker and no administrator rights — so that is how it was verified.
 | Plugins | workflow-aggregator, junit, git, credentials-binding, timestamper, ws-cleanup, powershell, allure |
 | Job | Pipeline from SCM, `Jenkinsfile` on `main` |
 
-**Nine builds. Six failures, then three successes.** Every failure is below,
+**Ten builds. Six failures, then four successes.** Every failure is below,
 because they are the content of this phase — the pipeline was wrong in six
 distinct ways that no amount of reading would have found.
 
@@ -142,13 +142,14 @@ there is.
 
 ---
 
-## Verification — the three green builds
+## Verification — the four green builds
 
 | Build | Parameters | Result |
 |---|---|---|
 | #7 | `SUITE=framework` | ✅ **SUCCESS** in 127 s — ruff, ruff-format, mypy (92 files), `121 passed` |
 | #8 | `SUITE=api or db`, `WORKERS=4` | ✅ **SUCCESS** in 158 s — quality gate, then `185 passed in 9.64s`, report generated |
-| #9 | `SUITE=all`, `WORKERS=4` | ✅ **SUCCESS** in 223 s — **`342 passed in 25.30s`**, both passes, report generated |
+| #9 | `SUITE=all`, `WORKERS=4` | ✅ **SUCCESS** in 223 s — `342 passed in 25.30s`, both passes, report generated |
+| #10 | `SUITE=all`, `WORKERS=4`, re-run on the final commit | ✅ **SUCCESS** — **`351 passed in 23.86s`** |
 
 Observed in build #9's console output, in order:
 
@@ -232,7 +233,7 @@ shipped both script flavours, so `onAgent` only has to choose between them.
 ## Interview questions this phase earns you
 
 **"Is your Jenkinsfile real?"**
-Nine builds on a real controller, six of them red. The failures are documented
+Ten builds on a real controller, six of them red. The failures are documented
 because they are the evidence: a Jenkinsfile that has never run does not work,
 and the only open question is which of those six ways it fails first.
 

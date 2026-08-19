@@ -581,13 +581,14 @@ A ⚠️ that says exactly what would make it a ✅ is worth more than a ✅ nob
 Full write-up: [phase-11-jenkins.md](phase-11-jenkins.md).
 
 Executed on a real controller — Jenkins LTS as a WAR under a portable JDK 21, no Docker
-and no administrator rights. **Nine builds, six of them red first.**
+and no administrator rights. **Ten builds, six of them red first.**
 
 | Build | Parameters | Result |
 |---|---|---|
 | #7 | `SUITE=framework` | ✅ **VERIFIED** — 127 s, `121 passed` |
 | #8 | `SUITE=api or db`, `WORKERS=4` | ✅ **VERIFIED** — 158 s, `185 passed in 9.64s` |
-| #9 | `SUITE=all`, `WORKERS=4` | ✅ **VERIFIED** — 223 s, **`342 passed in 25.30s`** |
+| #9 | `SUITE=all`, `WORKERS=4` | ✅ **VERIFIED** — 223 s, `342 passed in 25.30s` |
+| #10 | `SUITE=all`, re-run on the final commit | ✅ **VERIFIED** — **`351 passed in 23.86s`** |
 
 Verified in those runs: four parameters, **credential binding** (two secrets, never
 printed), `timestamps`, `disableConcurrentBuilds`, the two-pass runner, JUnit recording,
