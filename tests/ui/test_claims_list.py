@@ -25,8 +25,8 @@ from claimdesk_qa.ui import ClaimsListPage
 def test_a_claim_created_through_the_api_appears_in_the_table(
     customer_page: Page,
     settings: Settings,
-    customer_api: ClaimsApi,
-    ui_claim_factory: ClaimFactory,
+    customer_claims: ClaimsApi,
+    claim_factory: ClaimFactory,
 ) -> None:
     """UI-CLM-001 — the read path, end to end.
 
@@ -35,7 +35,7 @@ def test_a_claim_created_through_the_api_appears_in_the_table(
     this moment, so "it is somewhere on the page" is not a safe assertion under
     parallel execution.
     """
-    claim = customer_api.create_claim(ui_claim_factory.payload(amount="432.10"))
+    claim = customer_claims.create_claim(claim_factory.payload(amount="432.10"))
 
     claims = ClaimsListPage(customer_page, settings).open().expect_loaded()
     claims.search_for(claim.reference)
@@ -48,8 +48,8 @@ def test_a_claim_created_through_the_api_appears_in_the_table(
 def test_searching_narrows_the_table_to_one_claim(
     customer_page: Page,
     settings: Settings,
-    customer_api: ClaimsApi,
-    ui_claim_factory: ClaimFactory,
+    customer_claims: ClaimsApi,
+    claim_factory: ClaimFactory,
 ) -> None:
     """UI-CLM-002 — asynchronous filtering, with no sleep anywhere.
 
@@ -57,9 +57,9 @@ def test_searching_narrows_the_table_to_one_claim(
     ``aria-busy`` flipping back to ``false`` — a state the application publishes,
     not a duration someone guessed.
     """
-    description = ui_claim_factory.description()
+    description = claim_factory.description()
     marker = description.split()[1]
-    claim = customer_api.create_claim(ui_claim_factory.payload(description=description))
+    claim = customer_claims.create_claim(claim_factory.payload(description=description))
 
     claims = ClaimsListPage(customer_page, settings).open().expect_loaded()
     claims.search_for(marker)
@@ -100,15 +100,15 @@ def test_filtering_by_status_shows_only_that_status(
 def test_a_new_claim_is_absent_from_a_non_matching_status_filter(
     customer_page: Page,
     settings: Settings,
-    customer_api: ClaimsApi,
-    ui_claim_factory: ClaimFactory,
+    customer_claims: ClaimsApi,
+    claim_factory: ClaimFactory,
 ) -> None:
     """The negative half of filtering, which most suites skip.
 
     Proving a filter *shows* matching rows says nothing about whether it *hides*
     the rest. This creates a DRAFT claim and asserts it does not appear under PAID.
     """
-    claim = customer_api.create_claim(ui_claim_factory.payload())
+    claim = customer_claims.create_claim(claim_factory.payload())
 
     claims = ClaimsListPage(customer_page, settings).open().expect_loaded()
     claims.filter_by_status(ClaimStatus.PAID.value)
@@ -165,11 +165,11 @@ def test_the_table_paginates(customer_page: Page, settings: Settings) -> None:
 def test_opening_a_claim_from_the_table_navigates_to_its_detail_page(
     customer_page: Page,
     settings: Settings,
-    customer_api: ClaimsApi,
-    ui_claim_factory: ClaimFactory,
+    customer_claims: ClaimsApi,
+    claim_factory: ClaimFactory,
 ) -> None:
     """The link between two pages — the thing a UI test is uniquely able to prove."""
-    claim = customer_api.create_claim(ui_claim_factory.payload())
+    claim = customer_claims.create_claim(claim_factory.payload())
 
     claims = ClaimsListPage(customer_page, settings).open().expect_loaded()
     claims.search_for(claim.reference)

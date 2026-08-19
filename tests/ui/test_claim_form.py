@@ -30,19 +30,19 @@ def form(customer_page: Page, settings: Settings) -> ClaimFormPage:
 
 @pytest.mark.smoke
 def test_submitting_a_valid_claim_creates_it(
-    form: ClaimFormPage, customer_page: Page, settings: Settings, ui_claim_factory: ClaimFactory
+    form: ClaimFormPage, customer_page: Page, settings: Settings, claim_factory: ClaimFactory
 ) -> None:
     """UI-FORM-001 — the full create journey through the interface.
 
     This is one of the few tests that genuinely *needs* a browser: it proves a
     person can complete the workflow, which no API test can tell you.
     """
-    description = ui_claim_factory.description()
+    description = claim_factory.description()
 
     form.fill_in(
         amount="1234.56",
         description=description,
-        incident_date=ui_claim_factory.recent_date().isoformat(),
+        incident_date=claim_factory.recent_date().isoformat(),
     ).submit()
 
     detail = ClaimDetailPage(customer_page, settings)
@@ -62,7 +62,7 @@ def test_submitting_a_valid_claim_creates_it(
     ],
 )
 def test_invalid_amounts_are_rejected_with_a_visible_message(
-    form: ClaimFormPage, ui_claim_factory: ClaimFactory, amount: str, fragment: str
+    form: ClaimFormPage, claim_factory: ClaimFactory, amount: str, fragment: str
 ) -> None:
     """UI-FORM-002.
 
@@ -72,8 +72,8 @@ def test_invalid_amounts_are_rejected_with_a_visible_message(
     """
     form.fill_in(
         amount=amount,
-        description=ui_claim_factory.description(),
-        incident_date=ui_claim_factory.recent_date().isoformat(),
+        description=claim_factory.description(),
+        incident_date=claim_factory.recent_date().isoformat(),
     ).submit()
 
     form.expect_error_containing(fragment)
@@ -83,13 +83,13 @@ def test_invalid_amounts_are_rejected_with_a_visible_message(
 @pytest.mark.negative
 @pytest.mark.boundary
 def test_a_description_below_the_minimum_length_is_rejected(
-    form: ClaimFormPage, ui_claim_factory: ClaimFactory
+    form: ClaimFormPage, claim_factory: ClaimFactory
 ) -> None:
     """UI-FORM-003 — the outside edge of the length rule."""
     form.fill_in(
         amount="100.00",
         description="x" * (DESCRIPTION_MIN_LENGTH - 1),
-        incident_date=ui_claim_factory.recent_date().isoformat(),
+        incident_date=claim_factory.recent_date().isoformat(),
     ).submit()
 
     form.expect_error_containing("Description must be between")
@@ -97,14 +97,14 @@ def test_a_description_below_the_minimum_length_is_rejected(
 
 @pytest.mark.negative
 def test_a_future_incident_date_is_rejected(
-    form: ClaimFormPage, ui_claim_factory: ClaimFactory
+    form: ClaimFormPage, claim_factory: ClaimFactory
 ) -> None:
     """UI-FORM-004. A claim cannot be filed for an incident that has not happened."""
     tomorrow = (date.today() + timedelta(days=1)).isoformat()
 
     form.fill_in(
         amount="100.00",
-        description=ui_claim_factory.description(),
+        description=claim_factory.description(),
         incident_date=tomorrow,
     ).submit()
 
@@ -114,7 +114,7 @@ def test_a_future_incident_date_is_rejected(
 @pytest.mark.negative
 @pytest.mark.boundary
 def test_an_amount_over_the_policy_coverage_limit_is_rejected(
-    form: ClaimFormPage, ui_claim_factory: ClaimFactory
+    form: ClaimFormPage, claim_factory: ClaimFactory
 ) -> None:
     """UI-FORM-005 — a business rule surfaced in the interface.
 
@@ -125,8 +125,8 @@ def test_an_amount_over_the_policy_coverage_limit_is_rejected(
 
     form.fill_in(
         amount=str(over_limit),
-        description=ui_claim_factory.description(),
-        incident_date=ui_claim_factory.recent_date().isoformat(),
+        description=claim_factory.description(),
+        incident_date=claim_factory.recent_date().isoformat(),
         policy_number=None,
     )
     form.policy_select.select_option(index=1)  # POL-1002, the low-coverage policy
@@ -136,19 +136,19 @@ def test_an_amount_over_the_policy_coverage_limit_is_rejected(
 
 
 def test_a_rejected_submission_keeps_what_the_user_typed(
-    form: ClaimFormPage, ui_claim_factory: ClaimFactory
+    form: ClaimFormPage, claim_factory: ClaimFactory
 ) -> None:
     """UI-FORM-006 — small, and the difference between usable and infuriating.
 
     Losing a 400-character description because the amount had a typo is the kind
     of defect users complain about loudly and test suites rarely check.
     """
-    description = ui_claim_factory.description()
+    description = claim_factory.description()
 
     form.fill_in(
         amount="not-a-number",
         description=description,
-        incident_date=ui_claim_factory.recent_date().isoformat(),
+        incident_date=claim_factory.recent_date().isoformat(),
     ).submit()
 
     form.expect_error_containing("must be a number")

@@ -31,11 +31,11 @@ from claimdesk_qa.ui import AdminUsersPage, ClaimDetailPage, ClaimsListPage
 def test_a_customer_can_submit_their_draft(
     customer_page: Page,
     settings: Settings,
-    customer_api: ClaimsApi,
-    ui_claim_factory: ClaimFactory,
+    customer_claims: ClaimsApi,
+    claim_factory: ClaimFactory,
 ) -> None:
     """UI-CLM-007 — an action taken in the browser changes real state."""
-    claim = customer_api.create_claim(ui_claim_factory.payload(amount="640.00"))
+    claim = customer_claims.create_claim(claim_factory.payload(amount="640.00"))
 
     detail = ClaimDetailPage(customer_page, settings, str(claim.id)).open().expect_loaded()
     detail.expect_status(ClaimStatus.DRAFT.value)
@@ -48,17 +48,17 @@ def test_a_customer_can_submit_their_draft(
 def test_an_adjuster_can_review_and_approve(
     adjuster_page: Page,
     settings: Settings,
-    customer_api: ClaimsApi,
-    adjuster_api: ClaimsApi,
-    ui_claim_factory: ClaimFactory,
+    customer_claims: ClaimsApi,
+    adjuster_claims: ClaimsApi,
+    claim_factory: ClaimFactory,
 ) -> None:
     """UI-CLM-008 — the staff half of the workflow.
 
     Arranged to SUBMITTED through the API; the review and approval steps are the
     part under test and are done in the browser.
     """
-    claim = customer_api.create_claim(ui_claim_factory.payload(amount="820.00"))
-    customer_api.drive_to(claim.id, ClaimStatus.SUBMITTED, staff=adjuster_api)
+    claim = customer_claims.create_claim(claim_factory.payload(amount="820.00"))
+    customer_claims.drive_to(claim.id, ClaimStatus.SUBMITTED, staff=adjuster_claims)
 
     detail = ClaimDetailPage(adjuster_page, settings, str(claim.id)).open().expect_loaded()
     detail.perform(ClaimAction.START_REVIEW.value)
@@ -71,13 +71,13 @@ def test_an_adjuster_can_review_and_approve(
 def test_the_audit_trail_is_visible_and_complete(
     adjuster_page: Page,
     settings: Settings,
-    customer_api: ClaimsApi,
-    adjuster_api: ClaimsApi,
-    ui_claim_factory: ClaimFactory,
+    customer_claims: ClaimsApi,
+    adjuster_claims: ClaimsApi,
+    claim_factory: ClaimFactory,
 ) -> None:
     """UI-CLM-009 — the history a compliance reviewer would actually read."""
-    claim = customer_api.create_claim(ui_claim_factory.payload(amount="410.00"))
-    customer_api.drive_to(claim.id, ClaimStatus.PAID, staff=adjuster_api)
+    claim = customer_claims.create_claim(claim_factory.payload(amount="410.00"))
+    customer_claims.drive_to(claim.id, ClaimStatus.PAID, staff=adjuster_claims)
 
     detail = ClaimDetailPage(adjuster_page, settings, str(claim.id)).open().expect_loaded()
 
@@ -93,17 +93,17 @@ def test_the_audit_trail_is_visible_and_complete(
 def test_a_settled_claim_offers_no_further_actions(
     adjuster_page: Page,
     settings: Settings,
-    customer_api: ClaimsApi,
-    adjuster_api: ClaimsApi,
-    ui_claim_factory: ClaimFactory,
+    customer_claims: ClaimsApi,
+    adjuster_claims: ClaimsApi,
+    claim_factory: ClaimFactory,
 ) -> None:
     """UI-CLM-010 — a terminal state must look terminal.
 
     Offering a button that can only fail is a defect in its own right: the user
     tries it, gets an error, and loses confidence in everything else on the page.
     """
-    claim = customer_api.create_claim(ui_claim_factory.payload(amount="410.00"))
-    customer_api.drive_to(claim.id, ClaimStatus.PAID, staff=adjuster_api)
+    claim = customer_claims.create_claim(claim_factory.payload(amount="410.00"))
+    customer_claims.drive_to(claim.id, ClaimStatus.PAID, staff=adjuster_claims)
 
     detail = ClaimDetailPage(adjuster_page, settings, str(claim.id)).open().expect_loaded()
 
@@ -117,9 +117,9 @@ def test_a_settled_claim_offers_no_further_actions(
 def test_the_approve_button_is_offered_but_the_server_refuses_over_the_limit(
     adjuster_page: Page,
     settings: Settings,
-    customer_api: ClaimsApi,
-    adjuster_api: ClaimsApi,
-    ui_claim_factory: ClaimFactory,
+    customer_claims: ClaimsApi,
+    adjuster_claims: ClaimsApi,
+    claim_factory: ClaimFactory,
 ) -> None:
     """UI-CLM-011 — the most interesting test in the browser suite.
 
@@ -134,8 +134,8 @@ def test_the_approve_button_is_offered_but_the_server_refuses_over_the_limit(
     move**. Only the third one catches a refusal that changed state anyway.
     """
     over_limit = ADJUSTER_APPROVAL_LIMIT + Decimal("0.01")
-    claim = customer_api.create_claim(ui_claim_factory.payload(amount=str(over_limit)))
-    customer_api.drive_to(claim.id, ClaimStatus.UNDER_REVIEW, staff=adjuster_api)
+    claim = customer_claims.create_claim(claim_factory.payload(amount=str(over_limit)))
+    customer_claims.drive_to(claim.id, ClaimStatus.UNDER_REVIEW, staff=adjuster_claims)
 
     detail = ClaimDetailPage(adjuster_page, settings, str(claim.id)).open().expect_loaded()
     detail.expect_action_available(ClaimAction.APPROVE.value)
@@ -156,11 +156,11 @@ def test_the_approve_button_is_offered_but_the_server_refuses_over_the_limit(
 def test_a_customer_never_sees_another_customers_claim(
     other_customer_page: Page,
     settings: Settings,
-    customer_api: ClaimsApi,
-    ui_claim_factory: ClaimFactory,
+    customer_claims: ClaimsApi,
+    claim_factory: ClaimFactory,
 ) -> None:
     """UI-AUTHZ-001 — checked in the table, where a scoping bug would show first."""
-    claim = customer_api.create_claim(ui_claim_factory.payload())
+    claim = customer_claims.create_claim(claim_factory.payload())
 
     claims = ClaimsListPage(other_customer_page, settings).open().expect_loaded()
     claims.search_for(claim.reference)
