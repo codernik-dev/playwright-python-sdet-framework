@@ -43,8 +43,22 @@ $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $repoRoot
 
-$dataDir = Join-Path $repoRoot ".pgdata"
-$logFile = Join-Path $dataDir "server.log"
+# Two paths, two names, each meaning exactly one thing for the whole script.
+#
+#   clusterRoot  .pgdata        the project-local folder; holds the server log
+#   dataDir      .pgdata\data   the PGDATA directory pg_ctl is pointed at
+#
+# They used to be one variable that was reassigned from inside the switch
+# branches, and `reset` was silently broken as a result: after the folder was
+# deleted, the existence check looked for `.pgdata\data\data`, did not find it,
+# and initdb created the cluster one level too deep. The start that followed then
+# reported `directory ... is not a database cluster directory` about a directory
+# the same script had just created. A variable that means different things at
+# different moments is not a shortcut, it is a bug waiting for the one code path
+# nobody exercises often.
+$clusterRoot = Join-Path $repoRoot ".pgdata"
+$dataDir = Join-Path $clusterRoot "data"
+$logFile = Join-Path $clusterRoot "server.log"
 
 # --- locate the PostgreSQL binaries -----------------------------------------
 function Get-PgBin {
@@ -62,6 +76,7 @@ $pgBin = Get-PgBin
 $initdb = Join-Path $pgBin "initdb.exe"
 $pgCtl = Join-Path $pgBin "pg_ctl.exe"
 $psqlExe = Join-Path $pgBin "psql.exe"
+$pgIsReady = Join-Path $pgBin "pg_isready.exe"
 
 # --- read credentials from .env so there is one source of truth --------------
 function Get-EnvValue([string]$name, [string]$fallback) {
@@ -88,6 +103,32 @@ function Test-Running {
     return ($LASTEXITCODE -eq 0)
 }
 
+function Wait-Accepting([int]$TimeoutSeconds = 60) {
+    # Poll until the server ACCEPTS CONNECTIONS, which is not the same thing as
+    # "the process exists": postmaster.pid appears well before recovery finishes.
+    # Same principle as the framework's readiness fixture - poll for the condition
+    # you actually depend on, with a deadline, instead of sleeping and hoping.
+    $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+    while ((Get-Date) -lt $deadline) {
+        if (Test-Path $pgIsReady) {
+            & $pgIsReady -h localhost -p $Port -q *> $null
+            if ($LASTEXITCODE -eq 0) { return $true }
+        } else {
+            $client = [System.Net.Sockets.TcpClient]::new()
+            try {
+                $client.Connect("127.0.0.1", $Port)
+                if ($client.Connected) { return $true }
+            } catch {
+                # not up yet - keep polling until the deadline
+            } finally {
+                $client.Dispose()
+            }
+        }
+        Start-Sleep -Milliseconds 250
+    }
+    return $false
+}
+
 function Invoke-Superuser([string]$sql, [string]$database = "postgres") {
     $env:PGPASSWORD = $SuperPassword
     try {
@@ -100,41 +141,81 @@ function Invoke-Superuser([string]$sql, [string]$database = "postgres") {
 
 function Initialize-Cluster {
     Write-Host "==> Creating a new cluster in .pgdata (this happens once)" -ForegroundColor Cyan
-    New-Item -ItemType Directory -Path $dataDir -Force | Out-Null
+    New-Item -ItemType Directory -Path $clusterRoot -Force | Out-Null
     $pwFile = Join-Path $env:TEMP "claimdesk-pgpw-$PID.txt"
     Set-Content -Path $pwFile -Value $SuperPassword -Encoding ascii -NoNewline
     try {
-        & $initdb -D (Join-Path $dataDir "data") -U postgres --pwfile=$pwFile -E UTF8 --locale=C -A scram-sha-256 | Out-Null
-        if ($LASTEXITCODE -ne 0) { throw "initdb failed" }
+        # initdb's own stderr is the only explanation available when it fails, so
+        # it is captured and printed rather than discarded into Out-Null. The
+        # first run on this machine failed with "postgres.bki does not exist" -
+        # a message that names the problem exactly, and that the original
+        # `| Out-Null` threw away, leaving only "initdb failed".
+        $output = & $initdb -D $dataDir -U postgres --pwfile=$pwFile -E UTF8 --locale=C -A scram-sha-256 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            $output | ForEach-Object { Write-Host $_ -ForegroundColor Red }
+            throw "initdb failed"
+        }
     } finally {
         Remove-Item $pwFile -Force -ErrorAction SilentlyContinue
     }
 }
 
-function Start-Cluster {
-    if (-not (Test-Path (Join-Path $dataDir "data"))) { Initialize-Cluster }
+function Set-ClusterPort {
+    # The port lives in the cluster's own postgresql.conf rather than being passed
+    # on the command line with `-o "-p $Port"`.
+    #
+    # That is not a style preference. PowerShell 7's Start-Process does NOT quote
+    # an ArgumentList element containing a space (Windows PowerShell 5.1 did), so
+    # `-o "-p 55432"` arrived at pg_ctl as three separate arguments and it failed
+    # with `unrecognized operation mode "55432"`. A cluster that knows its own port
+    # removes the quoting question entirely, and `pg_ctl stop`/`status` then agree
+    # with `start` without anyone having to pass the port again.
+    $conf = Join-Path $dataDir "postgresql.conf"
+    if (-not (Test-Path $conf)) { return }
+    $marker = "# --- managed by scripts/local_db.ps1 ---"
+    $lines = @(Get-Content $conf | Where-Object { $_ -ne $marker -and $_ -notmatch '^\s*port\s*=' })
+    $lines += $marker
+    $lines += "port = $Port"
+    Set-Content -Path $conf -Value $lines -Encoding ascii
+}
 
-    $script:dataDir = Join-Path $repoRoot ".pgdata\data"
+function Start-Cluster {
+    if (-not (Test-Path (Join-Path $dataDir "PG_VERSION"))) { Initialize-Cluster }
+    Set-ClusterPort
+
     if (Test-Running) {
         Write-Host "==> Cluster already running on port $Port" -ForegroundColor Green
     } else {
         Write-Host "==> Starting PostgreSQL on port $Port" -ForegroundColor Cyan
-        # Start-Process rather than the call operator: the server process inherits
-        # the parent's stdout handle, so a piped `& pg_ctl ... start` never returns
-        # on Windows even after the server is up and serving. Redirecting to files
-        # detaches the handles. `-w` makes pg_ctl wait for readiness, so the role
-        # creation below cannot race the server.
+        # Started WITHOUT -Wait, and readiness is then polled below.
+        #
+        # `-Wait` looks like the obvious choice and it hangs forever. The server
+        # pg_ctl launches inherits the redirected stdout/stderr handles, so
+        # PowerShell's -Wait is waiting for the SERVER to exit, not for pg_ctl -
+        # and the server is not supposed to exit. Redirecting to files does not
+        # help, because the handles are still inherited. The result is a start
+        # command that never returns even though the database is up and serving,
+        # which is the most confusing possible failure: everything works and
+        # nothing continues.
         $outFile = Join-Path $env:TEMP "claimdesk-pgctl-$PID.out"
         $errFile = Join-Path $env:TEMP "claimdesk-pgctl-$PID.err"
-        $proc = Start-Process -FilePath $pgCtl `
-            -ArgumentList @("-D", $dataDir, "-l", $logFile, "-o", "-p $Port", "-w", "-t", "60", "start") `
-            -Wait -PassThru -NoNewWindow -RedirectStandardOutput $outFile -RedirectStandardError $errFile
-        Remove-Item $outFile, $errFile -Force -ErrorAction SilentlyContinue
-        if ($proc.ExitCode -ne 0) {
+        Start-Process -FilePath $pgCtl `
+            -ArgumentList @("-D", $dataDir, "-l", $logFile, "start") `
+            -PassThru -NoNewWindow -RedirectStandardOutput $outFile -RedirectStandardError $errFile | Out-Null
+
+        if (-not (Wait-Accepting 60)) {
+            # Print pg_ctl's own message as well as the server log. A failed start
+            # can leave the server log EMPTY - the server never got far enough to
+            # write one - so a diagnostic that reads only the log says nothing at
+            # exactly the moment it is needed.
+            $startupError = (Get-Content $errFile -ErrorAction SilentlyContinue) -join "`n"
+            if ($startupError) { Write-Host $startupError -ForegroundColor Red }
             Write-Host "Server log:" -ForegroundColor Red
             if (Test-Path $logFile) { Get-Content $logFile -Tail 20 }
-            throw "pg_ctl start failed with exit code $($proc.ExitCode)"
+            Remove-Item $outFile, $errFile -Force -ErrorAction SilentlyContinue
+            throw "PostgreSQL did not start accepting connections on port $Port within 60s."
         }
+        Remove-Item $outFile, $errFile -Force -ErrorAction SilentlyContinue
     }
 
     Write-Host "==> Ensuring database and roles exist (idempotent)" -ForegroundColor Cyan
@@ -194,7 +275,6 @@ switch ($Action) {
     "start" { Start-Cluster }
 
     "stop" {
-        $script:dataDir = Join-Path $repoRoot ".pgdata\data"
         if (Test-Running) {
             Write-Host "==> Stopping cluster" -ForegroundColor Cyan
             & $pgCtl -D $dataDir -m fast -w stop | Out-Null
@@ -205,7 +285,6 @@ switch ($Action) {
     }
 
     "status" {
-        $script:dataDir = Join-Path $repoRoot ".pgdata\data"
         if (Test-Running) {
             Write-Host "Running on port $Port" -ForegroundColor Green
         } else {
@@ -215,10 +294,9 @@ switch ($Action) {
     }
 
     "reset" {
-        $script:dataDir = Join-Path $repoRoot ".pgdata\data"
         if (Test-Running) { & $pgCtl -D $dataDir -m immediate -w stop | Out-Null }
         Write-Host "==> Deleting .pgdata (all local test data will be lost)" -ForegroundColor Yellow
-        Remove-Item -Recurse -Force (Join-Path $repoRoot ".pgdata") -ErrorAction SilentlyContinue
+        Remove-Item -Recurse -Force $clusterRoot -ErrorAction SilentlyContinue
         Start-Cluster
     }
 
