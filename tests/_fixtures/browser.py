@@ -16,6 +16,7 @@ from __future__ import annotations
 from collections.abc import Callable, Iterator
 from pathlib import Path
 
+import allure
 import pytest
 from playwright.sync_api import Browser, BrowserContext, Page
 
@@ -25,7 +26,7 @@ from claimdesk_qa.core.artifacts import ArtifactManager
 from claimdesk_qa.core.logging import get_logger
 from claimdesk_qa.data.seeded import SeededAccounts
 from claimdesk_qa.ui.session import write_storage_state
-from tests.conftest import test_failed
+from tests.conftest import attach_file, test_failed
 
 logger = get_logger(__name__)
 
@@ -118,12 +119,27 @@ def context_factory(
             trace_path = directory / f"trace{suffix}.zip"
             context.tracing.stop(path=str(trace_path))
             for page_index, page in enumerate(context.pages):
-                page.screenshot(
-                    path=str(directory / f"screenshot{suffix}-{page_index}.png"), full_page=True
+                screenshot = directory / f"screenshot{suffix}-{page_index}.png"
+                markup = directory / f"page{suffix}-{page_index}.html"
+                page.screenshot(path=str(screenshot), full_page=True)
+                markup.write_text(page.content(), encoding="utf-8")
+                # Into the report as well as onto disk. The screenshot answers
+                # "what did the user see", the HTML answers "was the element
+                # there at all" - the two questions that decide whether a
+                # locator is wrong or the page is.
+                attach_file(
+                    screenshot,
+                    name=f"screenshot{suffix}-{page_index}",
+                    attachment_type=allure.attachment_type.PNG,
                 )
-                (directory / f"page{suffix}-{page_index}.html").write_text(
-                    page.content(), encoding="utf-8"
+                attach_file(
+                    markup,
+                    name=f"page{suffix}-{page_index}.html",
+                    attachment_type=allure.attachment_type.HTML,
                 )
+            # The trace is the one artefact worth the download: it replays the
+            # test with DOM snapshots, network and console at every step.
+            attach_file(trace_path, name=f"playwright trace{suffix}", extension="zip")
             logger.error(
                 "Saved failure artefacts to %s - inspect with: playwright show-trace %s",
                 directory,

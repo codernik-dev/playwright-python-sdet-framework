@@ -29,6 +29,7 @@ from pydantic import BaseModel, ValidationError
 
 from claimdesk_qa.core.correlation import get_request_id
 from claimdesk_qa.core.logging import get_logger
+from claimdesk_qa.core.recording import record_http
 from claimdesk_qa.core.tls import shared_ssl_context
 
 logger = get_logger(__name__)
@@ -264,6 +265,9 @@ class ApiClient:
             response_body=response.text,
         )
         self._exchanges.append(exchange)
+        # Also into the current test's recorder, so one test using four clients
+        # produces one timeline rather than four fragments to interleave by hand.
+        record_http(exchange)
         logger.debug("%s", exchange.render())
 
     def get(self, path: str, **kwargs: Any) -> ApiResponse:

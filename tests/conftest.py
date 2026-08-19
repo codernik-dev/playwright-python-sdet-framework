@@ -15,10 +15,13 @@ from __future__ import annotations
 
 import hashlib
 import os
+import platform
 import shutil
 from collections.abc import Generator, Iterator
-from typing import TYPE_CHECKING, Final
+from pathlib import Path
+from typing import Final
 
+import allure
 import pytest
 
 from claimdesk_qa.config import Settings, load_settings
@@ -26,9 +29,8 @@ from claimdesk_qa.core.artifacts import RUN_ID_ENV_VAR, ArtifactManager, new_run
 from claimdesk_qa.core.correlation import request_id_for
 from claimdesk_qa.core.logging import configure_logging, get_logger, per_test_log
 from claimdesk_qa.core.readiness import http_probe, wait_until_ready
-
-if TYPE_CHECKING:
-    from pathlib import Path
+from claimdesk_qa.core.recording import recording
+from claimdesk_qa.reporting import severity_for_markers, write_report_metadata
 
 logger = get_logger(__name__)
 
@@ -75,6 +77,44 @@ def pytest_configure(config: pytest.Config) -> None:
     """
     if not hasattr(config, "workerinput"):  # controller, or not running under xdist
         os.environ.setdefault(RUN_ID_ENV_VAR, new_run_id())
+        _write_allure_metadata(config)
+
+
+def _write_allure_metadata(config: pytest.Config) -> None:
+    """Describe this run to Allure, before any test produces a result.
+
+    Written by the controller only. Every xdist worker also runs
+    ``pytest_configure``, and having eight processes write the same three files
+    at once is a good way to produce a truncated environment block that nobody
+    can reproduce or explain.
+
+    Silent when ``--alluredir`` was not passed: the metadata has nowhere to go,
+    and a framework that creates directories nobody asked for is a framework
+    people stop trusting with their filesystem.
+    """
+    results_dir = config.getoption("--alluredir", default=None)
+    if not results_dir:
+        return
+
+    settings = load_settings()
+    environment: dict[str, object] = dict(settings.masked())
+    environment.update(
+        {
+            "run_id": os.environ.get(RUN_ID_ENV_VAR, "unknown"),
+            "python": platform.python_version(),
+            "platform": f"{platform.system()} {platform.release()}",
+            "browser": ", ".join(config.getoption("browser", default=None) or ["chromium"]),
+            "workers": config.getoption("numprocesses", default=None) or "1 (serial)",
+            "commit": os.environ.get("GITHUB_SHA", os.environ.get("GIT_COMMIT", "unknown")),
+        }
+    )
+
+    written = write_report_metadata(
+        Path(results_dir),
+        environment=environment,
+        env=os.environ,
+    )
+    logger.debug("Wrote Allure metadata: %s", ", ".join(path.name for path in written))
 
 
 def pytest_report_header(config: pytest.Config) -> list[str]:
@@ -313,3 +353,91 @@ def _test_log(
 
     if not test_failed(request.node):
         shutil.rmtree(log_path.parent, ignore_errors=True)
+        return
+
+    # Attached rather than merely left on disk. An artefact directory on a CI
+    # runner is only useful to whoever knows how to download the archive; the
+    # same bytes inside the report are one click from the failure itself.
+    attach_file(log_path, name="test log", attachment_type=allure.attachment_type.TEXT)
+
+
+@pytest.fixture(autouse=True)
+def _report_severity(request: pytest.FixtureRequest) -> None:
+    """Set each result's severity from its markers, so triage has an order.
+
+    Severity only. This fixture originally emitted **tags** as well, and the
+    report showed every one of them twice: allure-pytest already converts pytest
+    markers into tags by itself. Verified by running the same test with and
+    without the loop — two ``tag=framework`` labels became one. The duplicate
+    half was deleted rather than kept, because a feature the library already
+    provides is not a feature, it is a maintenance cost with a bug in it.
+
+    Severity is genuinely missing from that automatic behaviour: without this,
+    every test in the report is "normal" and a smoke failure sorts alongside a
+    quarantined one.
+    """
+    names = {mark.name for mark in request.node.iter_markers()}
+    # allure's dynamic API is untyped, so the call is annotated for mypy rather
+    # than the whole module being loosened.
+    allure.dynamic.severity(severity_for_markers(names))  # type: ignore[no-untyped-call]
+
+
+@pytest.fixture(autouse=True)
+def _recorded_evidence(
+    request: pytest.FixtureRequest, artifacts: ArtifactManager
+) -> Iterator[None]:
+    """Record every HTTP exchange and SQL statement; keep them only on failure.
+
+    Same asymmetry as the logs, for the same reason: you cannot know in advance
+    which test will need explaining, and attaching a full request trace to 293
+    passing tests would produce a report too large to open in order to answer
+    nothing.
+    """
+    with recording() as recorded:
+        yield
+
+    if not test_failed(request.node) or recorded.is_empty():
+        return
+
+    directory = artifacts.dir_for(request.node.nodeid)
+    for stream, filename, title in (
+        (recorded.http, "http.log", "HTTP exchanges"),
+        (recorded.sql, "sql.log", "SQL executed"),
+    ):
+        if not len(stream):
+            continue
+        path = directory / filename
+        path.write_text(stream.render(), encoding="utf-8")
+        attach_file(path, name=title, attachment_type=allure.attachment_type.TEXT)
+
+
+def attach_file(
+    path: Path,
+    *,
+    name: str,
+    attachment_type: object | None = None,
+    extension: str | None = None,
+) -> None:
+    """Attach a file to the Allure result, tolerating its absence.
+
+    Attachment failures are swallowed on purpose. Reporting is a **description**
+    of a test run, and a description must never be able to change what it
+    describes: a screenshot that could not be read must not turn a clean product
+    failure into a confusing framework error stacked on top of it — the reader
+    would then be debugging the reporter instead of the defect.
+
+    Exported rather than private because the browser fixtures attach traces and
+    screenshots through it too, and one policy for "what happens when an
+    attachment goes wrong" is worth more than three copies of the same try block.
+    """
+    try:
+        if not path.exists():
+            return
+        allure.attach(
+            path.read_bytes(),
+            name=name,
+            attachment_type=attachment_type,
+            extension=extension,
+        )
+    except OSError as exc:  # pragma: no cover - defensive, by design
+        logger.warning("Could not attach %s to the report: %s", path.name, exc)

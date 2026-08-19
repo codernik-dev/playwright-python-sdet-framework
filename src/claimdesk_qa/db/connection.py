@@ -39,6 +39,7 @@ from psycopg.rows import class_row, dict_row
 
 from claimdesk_qa.core.exceptions import FrameworkError
 from claimdesk_qa.core.logging import get_logger
+from claimdesk_qa.core.recording import record_sql
 
 logger = get_logger(__name__)
 
@@ -169,6 +170,9 @@ class Database:
             row_count=row_count,
         )
         self._queries.append(query)
+        # Into the current test's recorder as well, so the report can answer the
+        # question a database assertion always raises: what did the query return?
+        record_sql(query)
         logger.debug("%s", query.render())
 
     def fetch_all(

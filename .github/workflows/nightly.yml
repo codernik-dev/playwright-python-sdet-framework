@@ -135,3 +135,55 @@ jobs:
             allure-results/
           retention-days: 30
           if-no-files-found: warn
+
+  publish:
+    # One published report, from the Chromium run. Publishing three would
+    # overwrite each other at the same URL and the last one to finish would
+    # decide what the link showed - which is worse than not publishing, because
+    # the page would look authoritative and be arbitrary.
+    name: publish the Allure report
+    runs-on: ubuntu-latest
+    needs: regression
+    if: always() && github.event_name != 'pull_request'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download the Chromium results
+        uses: actions/download-artifact@v4
+        with:
+          name: results-chromium
+          path: .
+
+      - name: Restore the report history
+        # History lives in the RESULTS directory when generating and is produced
+        # into the report. Restoring it from the published branch is what turns a
+        # snapshot into a trend - without it every nightly report claims to be
+        # the first run that ever happened.
+        continue-on-error: true
+        run: |
+          git fetch origin gh-pages --depth=1 || exit 0
+          git checkout origin/gh-pages -- history 2>/dev/null || exit 0
+          mkdir -p allure-results
+          cp -r history allure-results/history
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Generate the report
+        run: |
+          npm install -g allure-commandline
+          ./scripts/report.sh --no-open
+
+      - name: Publish to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: allure-report
+          # keep_files is off: the report is a complete site each time, and
+          # leaving orphaned files from previous layouts is how a published
+          # report starts serving a stale index.
+          keep_files: false
