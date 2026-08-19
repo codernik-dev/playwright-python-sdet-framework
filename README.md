@@ -7,7 +7,7 @@ three independent layers — **browser, REST API, and database** — with the di
 engineering codebase: an installable package, strict typing, architecture decision records, and a
 lint rule that makes the black-box boundary impossible to violate.
 
-> **Build in progress.** Phases 1–5 of 18 are complete and verified. Every claim below was produced
+> **Build in progress.** Phases 1–6 of 18 are complete and verified. Every claim below was produced
 > by a command that was actually run — see [docs/progress.md](docs/progress.md), which separates
 > ✅ VERIFIED from ⚠️ NOT VERIFIED throughout. No pass-rate, timing or coverage figure appears
 > anywhere in this repository until it has been measured.
@@ -18,11 +18,11 @@ lint rule that makes the black-box boundary impossible to violate.
 
 | | |
 |---|---|
-| **Tests passing** | **229** — 72 framework unit tests, 157 API tests |
-| **Serial run** | `229 passed in 11.42s` |
-| **Parallel run** (`-n 4`) | `229 passed` in **6.89s / 6.84s / 7.18s** — three consecutive runs, no flakes |
+| **Tests passing** | **261** — 72 framework, 157 API, 32 browser |
+| **Serial run** | `261 passed in 21.04s` |
+| **Parallel run** (`-n 4`) | `261 passed` in **12.81 / 13.46 / 12.86 / 13.10 / 13.20 s** — five consecutive runs, no flakes |
 | **Application's own tests** | 58 (the app under test is real, not a stub) |
-| **Quality gate** | ruff clean · ruff-format clean · **mypy `strict` clean across 52 files** |
+| **Quality gate** | ruff clean · ruff-format clean · **mypy `strict` clean across 69 files** |
 
 ---
 
@@ -109,6 +109,12 @@ entirely. And setting the logger to `INFO` left every per-test log file empty.
 a 404 on the detail endpoint would contradict the list endpoint. I corrected the specification, not
 the product.
 
+**A flaky test that was reproduced instead of retried.** A pagination test failed ~50% of the time
+at `-n 4` and never serially: other workers inserted rows between the two page requests, moving a
+claim from page one to page two. The assertion was right and the *premise* was wrong — you cannot
+paginate a data set that is being written to. Scoped to the immutable seeded corpus; five consecutive
+clean runs. A retry would have hidden the lesson.
+
 **A finding that was not a bug.** Non-ASCII digits (`１２３`, `١٢٣`) are accepted and normalised.
 Assessed low severity — unambiguous value, no rule bypassed — so it is a characterisation test with
 the reasoning recorded, not a "fix". Knowing which findings are bugs is the actual skill.
@@ -123,7 +129,8 @@ Negative and boundary coverage is **generated from the published contract**, not
 def illegal_transitions():
     return tuple(
         (action, status)
-        for action in ClaimAction for status in ClaimStatus
+        for action in ClaimAction
+        for status in ClaimStatus
         if (action, status) not in _LEGAL_PAIRS
     )
 ```
@@ -165,6 +172,7 @@ Then, in a second terminal:
 ```powershell
 pytest -m framework -q     # 72 unit tests, no application required
 pytest -m api -q           # 157 API tests
+pytest -m ui -q            # 32 browser tests (run `playwright install chromium` once)
 pytest -q -n 4             # everything, in parallel
 ```
 
@@ -213,8 +221,8 @@ scripts/                 bootstrap, quality gate, disposable database
 
 ## Roadmap
 
-Phases 1–5 complete. Remaining: Playwright UI layer · database validation · Allure reporting with
-traces and screenshots on failure · Docker · Jenkins pipeline · GitHub Actions · measurement.
+Phases 1–6 complete. Remaining: database validation · Allure reporting · cross-browser coverage ·
+Docker · Jenkins pipeline · GitHub Actions · measurement.
 Tracked in [docs/progress.md](docs/progress.md).
 
 ---

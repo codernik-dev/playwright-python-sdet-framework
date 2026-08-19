@@ -22,7 +22,7 @@
 
 ```python
 response = self._client.request(...)
-self._client.cookies.clear()   # discard Set-Cookie before it can authenticate later
+self._client.cookies.clear()  # discard Set-Cookie before it can authenticate later
 ```
 
 ClaimDesk returns a `session` cookie on login and `httpx.Client` persists cookies.
@@ -115,7 +115,8 @@ not produce a baffling failure three steps later.
 def illegal_transitions():
     return tuple(
         (action, status)
-        for action in ClaimAction for status in ClaimStatus
+        for action in ClaimAction
+        for status in ClaimStatus
         if (action, status) not in _LEGAL_PAIRS
     )
 ```

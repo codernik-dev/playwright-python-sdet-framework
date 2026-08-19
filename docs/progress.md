@@ -40,8 +40,8 @@ Recorded because "works on my machine" is only useful if the machine is written 
 | 3 | Application under test + database | ✅ Complete — [phase-3-application-under-test.md](phase-3-application-under-test.md) |
 | 4 | pytest foundation (logging, artefacts, fixtures) | ✅ Complete — [phase-4-pytest-foundation.md](phase-4-pytest-foundation.md) |
 | 5 | API automation layer | ✅ Complete — [phase-5-api-automation.md](phase-5-api-automation.md) |
-| 6 | Playwright UI layer | ⬜ Next |
-| 7 | Database validation layer | ⬜ |
+| 6 | Playwright UI layer | ✅ Complete — [phase-6-playwright-ui.md](phase-6-playwright-ui.md) |
+| 7 | Database validation layer | ⬜ Next |
 | 8 | Reporting + failure artefacts | ⬜ |
 | 9 | Parallel execution + markers | ⬜ |
 | 10 | Docker | ⬜ |
@@ -271,6 +271,44 @@ All three silent failures now have regression tests named after the failure mode
 | 4 | `Authorization: "Bearer "` is untestable — httpx refuses to send a header with trailing whitespace (RFC 9110) | Case removed with the reason recorded |
 | 5 | My own bug: `zip(a, a[1:], strict=True)` always raises — offset slices differ in length by one | Replaced with `itertools.pairwise`, which ruff had already suggested |
 | 6 | **A race under `-n 4`**: all workers prune the same run directory, so one's `rmdir` hits a directory another already removed. Seen once, not reproduced in three further runs | Pruning is now concurrency-tolerant, with two regression tests. Cleanup must never fail a run |
+
+---
+
+## Phase 6 — Playwright UI layer ✅
+
+### What was built
+
+| Area | Detail |
+|---|---|
+| `ui/base_page.py` | Locators as properties (never stored elements), readiness assertions, no sleeps |
+| `ui/session.py` | Browser session from an API login — `storage_state` injection, no login form |
+| `ui/components/navigation.py` | The header, composed by six pages rather than inherited |
+| `ui/pages/` | Login, dashboard, claims list, claim form, claim detail, admin users |
+| `tests/ui/conftest.py` | Per-role browser contexts, tracing, failure artefacts |
+| `tests/ui/` | **32 tests**: sign-in, table, form, workflow, authorisation |
+
+### Verification — commands run, output observed
+
+| Check | Result |
+|---|---|
+| Full suite, serial | ✅ **VERIFIED** — `261 passed in 21.04s` |
+| Full suite, `-n 4`, five consecutive runs | ✅ **VERIFIED** — `261 passed` in 12.81 / 13.46 / 12.86 / 13.10 / 13.20 s |
+| Linting / formatting | ✅ **VERIFIED** — `All checks passed!` |
+| Static typing (strict) | ✅ **VERIFIED** — `Success: no issues found in 69 source files` |
+| Chromium installed | ✅ **VERIFIED** — 114.5 MiB, Playwright 1.62.0 |
+| **Failure artefacts** | ✅ **VERIFIED** — deliberate failure produced `trace.zip` (322,840 bytes, 24 entries incl. `trace.network` + 6 filmstrip frames), a valid PNG screenshot, page HTML and the per-test log |
+| Artefact path truncation | ✅ **VERIFIED** — long node id truncated with hash suffix `_12a9d708`, as Phase 4 specified |
+| Passing tests leave no trace | ✅ **VERIFIED** — traces stopped without a path are discarded |
+
+⚠️ **NOT VERIFIED in Phase 6:** only Chromium is installed — Firefox and WebKit are Phase 9. Nothing has run in Docker or CI.
+
+### Findings
+
+| # | Finding | Outcome |
+|---|---|---|
+| 1 | **My own suite broke its own parallel-safety rule.** `test_the_table_paginates` failed ~50% of the time at `-n 4`, never serially. The table sorts newest-first, so claims created by other workers between the page-one and page-two requests shifted a row across the boundary | The assertion was correct; the **premise** was wrong — you cannot paginate a data set being written to. Scoped to the immutable seeded corpus; five consecutive `-n 4` runs then passed. The API pagination test was latently flaky for the same reason (random references can insert anywhere even in a sorted list) and was scoped the same way |
+| 2 | The `anonymous_page` fixture used `yield` with no teardown | Converted to `return`; the context factory owns all teardown, so splitting cleanup would risk discarding a trace before the failure hook saved it |
+| 3 | Port 8000 was still held by the previous session's server | Not a defect — noted because it is why the readiness probe exists rather than a `sleep` |
 
 ---
 
