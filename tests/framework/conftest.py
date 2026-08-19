@@ -6,6 +6,8 @@ depend on a running application, a database, or the developer's local ``.env``.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 # Every environment variable the Settings model reads. Cleared before each test so
@@ -33,12 +35,17 @@ _SETTINGS_ENV_VARS = (
 
 
 @pytest.fixture(autouse=True)
-def isolated_env(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Remove all framework configuration variables from the environment.
+def isolated_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """Isolate these tests from BOTH sources of configuration.
 
-    Autouse, because forgetting it in a single test would make that test pass or
-    fail depending on whose machine it runs on — the exact class of flakiness this
-    framework is meant to demonstrate how to avoid.
+    Clearing the environment variables is only half the job: ``Settings`` also
+    reads a ``.env`` file from the working directory. Running the suite from the
+    repository root, where a developer's real ``.env`` lives, would otherwise feed
+    real values into unit tests — which is precisely how a suite starts passing or
+    failing depending on whose machine it runs on.
+
+    Autouse, because a rule that has to be remembered will eventually be forgotten.
     """
     for name in _SETTINGS_ENV_VARS:
         monkeypatch.delenv(name, raising=False)
+    monkeypatch.chdir(tmp_path)

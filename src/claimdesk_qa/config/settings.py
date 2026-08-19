@@ -147,6 +147,20 @@ class Settings(BaseSettings):
             raise ValueError(msg)
         return value.rstrip("/")
 
+    @field_validator("faker_seed", mode="before")
+    @classmethod
+    def _blank_means_unset(cls, value: object) -> object:
+        """Treat an empty dotenv value as absent.
+
+        ``.env`` files conventionally carry commented placeholders like
+        ``FAKER_SEED=``. Without this, copying `.env.example` to `.env` would fail
+        at startup with "unable to parse string as an integer" - a broken
+        out-of-the-box experience, and exactly the bug a unit test caught here.
+        """
+        if isinstance(value, str) and not value.strip():
+            return None
+        return value
+
     @field_validator("log_level")
     @classmethod
     def _normalise_log_level(cls, value: str) -> str:

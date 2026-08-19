@@ -272,6 +272,21 @@ def test_masked_block_answers_which_environment_this_run_targeted() -> None:
     assert {"environment", "base_url", "api_url", "database", "headless"} <= block.keys()
 
 
+def test_the_shipped_env_example_actually_loads() -> None:
+    """The file we tell people to copy must produce a valid configuration.
+
+    Added after `.env.example` shipped `FAKER_SEED=` with an empty value, which
+    failed integer parsing — so the documented first step, `cp .env.example .env`,
+    produced a framework that could not start.
+    """
+    example = Path(__file__).resolve().parents[2] / ".env.example"
+
+    settings = load_settings(env_file=example)
+
+    assert settings.base_url.startswith("http")
+    assert settings.faker_seed is None
+
+
 def test_settings_can_be_constructed_directly_for_tests() -> None:
     """Fixtures build purpose-made Settings objects without touching the environment."""
     settings = Settings(base_url="http://direct:1234", db_enabled=False)
