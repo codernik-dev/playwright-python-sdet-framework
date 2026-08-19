@@ -1,0 +1,180 @@
+name: tests
+
+# The pull-request gate. Fast, and it must stay fast: a gate people wait ten
+# minutes for is a gate people learn to bypass.
+#
+#   quality  - lint, types and the framework's own unit tests. No services, no
+#              browser, no database. Fails in under a minute when it fails.
+#   suite    - the API, database, browser and end-to-end tests against a real
+#              PostgreSQL and a real running application.
+#
+# The full cross-browser regression runs nightly, in nightly.yml.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  # A new push supersedes the run in progress. Nobody needs the results of a
+  # commit that has already been replaced.
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  quality:
+    name: lint, types, framework unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install the framework and its tooling
+        run: pip install -e ".[dev,app]"
+
+      - name: ruff check
+        run: ruff check .
+
+      - name: ruff format --check
+        run: ruff format --check .
+
+      - name: mypy
+        run: mypy
+
+      - name: Framework unit tests
+        # No application, no database, no browser: this proves the framework
+        # itself is sound before anything is started up to test against.
+        run: pytest -m framework -q --junitxml=junit-framework.xml
+
+      - name: Publish results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-quality
+          path: junit-framework.xml
+          if-no-files-found: warn
+
+  suite:
+    name: api, db, ui and e2e
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs: quality
+
+    services:
+      postgres:
+        # Pinned to the same major version used locally, so the two environments
+        # cannot disagree about SQL behaviour.
+        image: postgres:18-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+
+    env:
+      TEST_ENV: ci
+      # 127.0.0.1 rather than localhost. Measured on the development machine:
+      # localhost resolves to ::1 first and every request stalled ~2s before
+      # falling back, turning a 1.4s suite into 48s.
+      BASE_URL: http://127.0.0.1:8000
+      DB_ENABLED: "true"
+      DB_HOST: 127.0.0.1
+      DB_PORT: "5432"
+      DB_NAME: claimdesk
+      DB_USER: claimdesk_qa_ro
+      APP_DB_USER: claimdesk_app
+      READINESS_TIMEOUT_SECONDS: "90"
+      SEED_USER_PASSWORD: "Passw0rd!seed"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Generate ephemeral credentials
+        # Not GitHub secrets, deliberately. This database exists for four minutes
+        # inside one runner and is destroyed with it. A stored secret would be a
+        # long-lived credential protecting something that does not outlive the
+        # job - and a value nobody can read is safer than a value somebody must
+        # remember to rotate. Real environments get real secrets; disposable ones
+        # get disposable credentials.
+        run: |
+          echo "DB_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
+          echo "APP_DB_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
+          echo "APP_JWT_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+
+      - name: Install the framework and the application
+        run: pip install -e ".[dev,app]"
+
+      - name: Install Chromium
+        # --with-deps installs the system libraries the browser needs. Only
+        # Chromium here; Firefox and WebKit run nightly, because a PR gate should
+        # answer "did I break it?" not "does it work everywhere?".
+        run: playwright install --with-deps chromium
+
+      - name: Create the database and its two roles
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: "5432"
+          PGUSER: postgres
+          PGPASSWORD: postgres
+        run: ./scripts/setup_ci_db.sh
+
+      - name: Start ClaimDesk
+        run: |
+          nohup python -m uvicorn claimdesk.main:app --app-dir app \
+            --host 127.0.0.1 --port 8000 > app.log 2>&1 &
+          echo "started, pytest will poll /health/ready"
+
+      - name: Run the suite
+        # No sleep before this step. The app_ready fixture polls /health/ready and
+        # fails with a message that names the service and blames the environment,
+        # which is both faster when the app is up and correct when the runner is
+        # slow. See docs/phase-4-pytest-foundation.md.
+        run: pytest -q -n 2 --junitxml=junit-suite.xml --alluredir=allure-results
+
+      - name: Application log
+        if: failure()
+        run: tail -n 200 app.log
+
+      - name: Upload failure artefacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-artefacts
+          # Traces, screenshots, page HTML and per-test logs. Passing tests leave
+          # nothing behind, so this upload is a list of problems rather than a
+          # haystack. Open a trace with: playwright show-trace trace.zip
+          path: |
+            artifacts/
+            app.log
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            junit-suite.xml
+            allure-results/
+          retention-days: 14
+          if-no-files-found: warn

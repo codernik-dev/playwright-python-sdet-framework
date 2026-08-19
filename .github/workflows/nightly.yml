@@ -1,0 +1,128 @@
+name: nightly
+
+# The full regression, across all three browser engines.
+#
+# Split from the pull-request gate on purpose. A PR gate answers "did I break
+# something?" and must be fast enough that nobody routes around it. A nightly run
+# answers "does it work everywhere?" and can afford to be thorough, because
+# nobody is waiting on it.
+#
+# Chromium, Firefox and WebKit run as a matrix that does NOT fail fast: knowing a
+# change breaks WebKit only is far more useful than knowing it broke "a browser".
+
+on:
+  schedule:
+    # 02:30 UTC. Off the hour, because everybody schedules on the hour and the
+    # queue is shorter five minutes later.
+    - cron: "30 2 * * *"
+  workflow_dispatch:
+    inputs:
+      browsers:
+        description: "Browsers to run (JSON array)"
+        required: false
+        default: '["chromium","firefox","webkit"]'
+
+env:
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  regression:
+    name: regression (${{ matrix.browser }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+
+    env:
+      TEST_ENV: ci
+      BASE_URL: http://127.0.0.1:8000
+      DB_ENABLED: "true"
+      DB_HOST: 127.0.0.1
+      DB_PORT: "5432"
+      DB_NAME: claimdesk
+      DB_USER: claimdesk_qa_ro
+      APP_DB_USER: claimdesk_app
+      READINESS_TIMEOUT_SECONDS: "90"
+      SEED_USER_PASSWORD: "Passw0rd!seed"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Generate ephemeral credentials
+        run: |
+          echo "DB_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
+          echo "APP_DB_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
+          echo "APP_JWT_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+
+      - name: Install the framework and the application
+        run: pip install -e ".[dev,app]"
+
+      - name: Install ${{ matrix.browser }}
+        run: playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Create the database and its two roles
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: "5432"
+          PGUSER: postgres
+          PGPASSWORD: postgres
+        run: ./scripts/setup_ci_db.sh
+
+      - name: Start ClaimDesk
+        run: |
+          nohup python -m uvicorn claimdesk.main:app --app-dir app \
+            --host 127.0.0.1 --port 8000 > app.log 2>&1 &
+
+      - name: Full regression on ${{ matrix.browser }}
+        run: |
+          pytest -q -n 2 \
+            --browser ${{ matrix.browser }} \
+            --junitxml=junit-${{ matrix.browser }}.xml \
+            --alluredir=allure-results
+
+      - name: Application log
+        if: failure()
+        run: tail -n 200 app.log
+
+      - name: Upload failure artefacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-artefacts-${{ matrix.browser }}
+          path: |
+            artifacts/
+            app.log
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-${{ matrix.browser }}
+          path: |
+            junit-${{ matrix.browser }}.xml
+            allure-results/
+          retention-days: 30
+          if-no-files-found: warn
