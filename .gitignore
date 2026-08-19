@@ -16,6 +16,12 @@ artifacts/
 allure-results/
 allure-report/
 .allure/
+# `junit*.xml`, not `*.junit.xml`. The original pattern required a dot before
+# the word, so it matched `results.junit.xml` and never matched `junit.xml` -
+# which is exactly what --junitxml=junit.xml produces, and exactly what got
+# committed by accident in Phase 8. Caught by running pre-commit for the first
+# time; a near-miss glob is worse than no glob, because it looks handled.
+junit*.xml
 *.junit.xml
 
 # --- python -----------------------------------------------------------------

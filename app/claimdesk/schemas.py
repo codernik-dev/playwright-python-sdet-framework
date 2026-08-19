@@ -8,7 +8,7 @@ field-level error body, which is what the API tests assert against.
 from __future__ import annotations
 
 import uuid
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from decimal import Decimal
 from typing import Annotated, Generic, TypeVar
 
@@ -115,7 +115,13 @@ class ClaimCreateRequest(BaseModel):
     @field_validator("incident_date")
     @classmethod
     def _not_in_the_future(cls, value: date) -> date:
-        if value > date.today():
+        # UTC, not date.today(). "Is this in the future" answered from whichever
+        # timezone the server happens to be configured with is wrong on its own
+        # terms: the same claim would be accepted or refused depending on where
+        # the process runs. It also made a boundary test fail for five and a half
+        # hours a day once the application and the tests stopped sharing a
+        # machine - see src/claimdesk_qa/core/clock.py.
+        if value > datetime.now(UTC).date():
             msg = "Incident date cannot be in the future."
             raise ValueError(msg)
         return value

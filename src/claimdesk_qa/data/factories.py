@@ -22,12 +22,13 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass, field
-from datetime import date, timedelta
+from datetime import date
 from decimal import Decimal
 from typing import Any
 
 from faker import Faker
 
+from claimdesk_qa.core.clock import days_ago_utc
 from claimdesk_qa.domain import DESCRIPTION_MIN_LENGTH
 
 
@@ -82,8 +83,14 @@ class ClaimFactory:
         return (text * (length // len(text) + 1))[:length]
 
     def recent_date(self, *, days_ago: int = 7) -> date:
-        """A date in the past. The API rejects future incident dates."""
-        return date.today() - timedelta(days=days_ago)
+        """A date in the past. The API rejects future incident dates.
+
+        UTC, not the runner's local date — see :mod:`claimdesk_qa.core.clock`.
+        With ``days_ago=0`` this is the boundary value itself, and a local date
+        would make that assertion depend on the timezone of whichever machine
+        happened to run it.
+        """
+        return days_ago_utc(days_ago)
 
 
 @dataclass

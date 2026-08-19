@@ -146,6 +146,13 @@ select = [
     "TID",       # tidy imports  -> enforces the black-box rule below
     "PT",        # pytest style
     "RUF",       # ruff-specific
+    # Added in Phase 13, each after a real finding or to lock in a clean result.
+    "DTZ",       # naive datetimes - see src/claimdesk_qa/core/clock.py
+    "ERA",       # commented-out code left behind
+    "T20",       # stray print() where a logger belongs
+    "PIE",       # unnecessary constructs
+    "RSE",       # raise ... from
+    "PGH",       # blanket noqa / type: ignore without a code
 ]
 ignore = [
     "E501",    # line length is enforced by the formatter, not the linter

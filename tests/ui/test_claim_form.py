@@ -10,13 +10,13 @@ it would pass against a server that accepted anything at all.
 
 from __future__ import annotations
 
-from datetime import date, timedelta
 from decimal import Decimal
 
 import pytest
 from playwright.sync_api import Page, expect
 
 from claimdesk_qa.config import Settings
+from claimdesk_qa.core.clock import tomorrow_utc
 from claimdesk_qa.data import ClaimFactory
 from claimdesk_qa.data.seeded import SeededPolicies
 from claimdesk_qa.domain import DESCRIPTION_MIN_LENGTH, ClaimStatus
@@ -100,7 +100,9 @@ def test_a_future_incident_date_is_rejected(
     form: ClaimFormPage, claim_factory: ClaimFactory
 ) -> None:
     """UI-FORM-004. A claim cannot be filed for an incident that has not happened."""
-    tomorrow = (date.today() + timedelta(days=1)).isoformat()
+    # UTC, not the runner's local date. The server decides this boundary, and
+    # the two are not the same machine in Docker or CI - see core.clock.
+    tomorrow = tomorrow_utc().isoformat()
 
     form.fill_in(
         amount="100.00",

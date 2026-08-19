@@ -9,7 +9,7 @@ tests genuinely asynchronous behaviour to wait on.
 from __future__ import annotations
 
 import uuid
-from datetime import date
+from datetime import UTC, date, datetime
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
@@ -227,7 +227,7 @@ def new_claim_form(
             "user": user,
             "policies": list(session.scalars(query).all()),
             "error": None,
-            "today": date.today().isoformat(),
+            "today": datetime.now(UTC).date().isoformat(),
             "min_length": DESCRIPTION_MIN_LENGTH,
             "max_length": DESCRIPTION_MAX_LENGTH,
             "form": {},
@@ -259,7 +259,7 @@ def new_claim_submit(
                 "user": user,
                 "policies": list(session.scalars(query).all()),
                 "error": message,
-                "today": date.today().isoformat(),
+                "today": datetime.now(UTC).date().isoformat(),
                 "min_length": DESCRIPTION_MIN_LENGTH,
                 "max_length": DESCRIPTION_MAX_LENGTH,
                 "form": {
@@ -284,7 +284,10 @@ def new_claim_submit(
         parsed_date = date.fromisoformat(incident_date)
     except ValueError:
         return _render_error("Incident date must be a valid date.")
-    if parsed_date > date.today():
+    # UTC, matching the API's validator in schemas.py. The two must agree:
+    # the browser form and the REST endpoint enforce the SAME rule, and a
+    # boundary that moved between them would be a real product defect.
+    if parsed_date > datetime.now(UTC).date():
         return _render_error("Incident date cannot be in the future.")
 
     try:

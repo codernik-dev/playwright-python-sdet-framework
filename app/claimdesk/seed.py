@@ -13,7 +13,7 @@ Seeding is idempotent: running it twice changes nothing.
 
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 from sqlalchemy import func, select
@@ -181,7 +181,10 @@ def seed(session: Session) -> None:
         msg = "Seed policy POL-1001 is missing; the seed cannot continue."
         raise RuntimeError(msg)
 
-    today = date.today()
+    # UTC so the seeded corpus is identical wherever it is loaded. Seed data
+    # that shifts by a day depending on the server's timezone would make a
+    # date-range filter test pass in one environment and fail in another.
+    today = datetime.now(UTC).date()
     for index, (final_status, amount) in enumerate(_CORPUS, start=1):
         claim = Claim(
             reference=f"{SEED_REFERENCE_PREFIX}{index:04d}",

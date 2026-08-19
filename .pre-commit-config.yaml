@@ -1,6 +1,24 @@
 # Catches formatting problems and committed secrets BEFORE they reach CI.
 # Install once:  pre-commit install
 # Run manually:  pre-commit run --all-files
+#
+# Every hook here must agree with the rest of the project's tooling. A hook that
+# disagrees is worse than no hook: it fights the developer on every commit, and
+# it teaches people to use --no-verify, which is how the secret detection below
+# gets bypassed on the one day it would have mattered.
+#
+# Two such disagreements were found in Phase 13 by running these hooks for the
+# first time - they had been configured since Phase 2 and never executed:
+#
+#   1. ruff was pinned to v0.9.6 here while pyproject.toml installs 0.16.3.
+#      Two versions of the same linter is two gates with two verdicts; the
+#      older one reported a finding (A005) that the project's own gate does not.
+#      The pin now matches the installed version and is a single fact to update.
+#
+#   2. mixed-line-ending --fix=lf rewrote every file to LF, including the .ps1
+#      scripts that .gitattributes explicitly requires to be CRLF. The hook and
+#      the attributes file contradicted each other outright, so the exclusion
+#      below makes .gitattributes the single source of truth.
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
@@ -15,9 +33,12 @@ repos:
       - id: detect-private-key
       - id: mixed-line-ending
         args: ["--fix=lf"]
+        # .gitattributes mandates CRLF for these; see the note above.
+        exclude: '\.(ps1|bat|cmd)$'
 
+  # Pinned to the same version pyproject.toml installs, deliberately.
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.6
+    rev: v0.16.3
     hooks:
       - id: ruff
         args: ["--fix"]
