@@ -1,5 +1,8 @@
 # ClaimDesk QA — End-to-End SDET Automation Framework
 
+[![tests](https://github.com/codernik-dev/playwright-python-sdet-framework/actions/workflows/tests.yml/badge.svg)](https://github.com/codernik-dev/playwright-python-sdet-framework/actions/workflows/tests.yml)
+[![nightly](https://github.com/codernik-dev/playwright-python-sdet-framework/actions/workflows/nightly.yml/badge.svg)](https://github.com/codernik-dev/playwright-python-sdet-framework/actions/workflows/nightly.yml)
+
 **Python · pytest · Playwright · httpx · PostgreSQL · Docker · Jenkins · GitHub Actions**
 
 A production-style test automation framework that exercises an insurance-claims application through
@@ -7,7 +10,7 @@ three independent layers — **browser, REST API, and database** — with the di
 engineering codebase: an installable package, strict typing, architecture decision records, and a
 lint rule that makes the black-box boundary impossible to violate.
 
-> **Build in progress.** Phases 1–7 of 18 are complete and verified. Every claim below was produced
+> **Build in progress.** Phases 1–7 and 12 (CI) of 18 are complete and verified. Every claim below was produced
 > by a command that was actually run — see [docs/progress.md](docs/progress.md), which separates
 > ✅ VERIFIED from ⚠️ NOT VERIFIED throughout. No pass-rate, timing or coverage figure appears
 > anywhere in this repository until it has been measured.
@@ -23,6 +26,7 @@ lint rule that makes the black-box boundary impossible to violate.
 | **Parallel run** (`-n 4`) | `293 passed` in **15.14 / 16.86 / 14.83 / 14.88 / 15.04 s** — five consecutive runs, no flakes |
 | **Application's own tests** | 58 (the app under test is real, not a stub) |
 | **Quality gate** | ruff clean · ruff-format clean · **mypy `strict` clean across 83 files** |
+| **CI** | GitHub Actions — **all 293 pass on every push**, PR gate + nightly across Chromium/Firefox/WebKit |
 
 ---
 
@@ -252,8 +256,8 @@ scripts/                 bootstrap, quality gate, disposable database
 
 ## Roadmap
 
-Phases 1–7 complete. Remaining: Allure reporting · cross-browser coverage · Docker · Jenkins
-pipeline · GitHub Actions · measurement.
+Phases 1–7 and 12 complete. Remaining: Allure reporting · Docker Compose · Jenkins pipeline ·
+final measurement pass.
 Tracked in [docs/progress.md](docs/progress.md).
 
 ---

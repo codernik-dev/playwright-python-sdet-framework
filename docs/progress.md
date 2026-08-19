@@ -46,7 +46,7 @@ Recorded because "works on my machine" is only useful if the machine is written 
 | 9 | Parallel execution + markers | ⬜ |
 | 10 | Docker | ⬜ |
 | 11 | Jenkins | ⬜ |
-| 12 | GitHub Actions | ⬜ |
+| 12 | GitHub Actions | ✅ Complete — [phase-12-github-actions.md](phase-12-github-actions.md) |
 | 13 | Refactor + code quality pass | ⬜ |
 | 14 | README + diagrams | ⬜ |
 | 15 | Execution + measurement | ⬜ |
@@ -348,6 +348,50 @@ All three silent failures now have regression tests named after the failure mode
 | 2 | **The same concurrency bug, twice, in two layers.** `test_a_rejected_write_leaves_no_row` compared a global `count(*) WHERE status='DRAFT'` before and after; other workers create drafts in between. Failed 2 runs in 3 at `-n 4` | Scoped to the test's own marker. Stated as a **rule** rather than a second fix: *a test may assert an invariant globally, never an aggregate* — an invariant holds regardless of who else is writing; an aggregate is a fact about a shared database |
 | 3 | **A live bearer token was written into `artifacts/`**, which CI archives and publishes | Caught by re-reading the file, not by a failing test. The cookie is now injected directly into the browser context and never touches disk |
 | 4 | `customer_claims` existed in three conftests | Extracted to `tests/_fixtures/` as pytest plugins. The trigger was writing the fourth copy: three is a pattern, four is a problem |
+
+---
+
+## Phase 12 — GitHub Actions ✅ (brought forward)
+
+Brought forward from its planned position because Docker was installed and CI was the deliverable
+that makes the repository's state independently checkable rather than something I assert.
+
+| Workflow | Purpose |
+|---|---|
+| `tests.yml` | PR gate — `quality` (lint, types, framework tests; ~45 s, no services) then `suite` (API, DB, UI, E2E against PostgreSQL 18) |
+| `nightly.yml` | Full regression across Chromium, Firefox and WebKit, `fail-fast: false` |
+
+### Verification — real runs, watched to completion
+
+| Run | Result |
+|---|---|
+| Attempt 1 | ❌ **VERIFIED FAILURE** — `Permission denied` (exit 126); the executable bit was never in the commit |
+| Attempt 2 | ✅ **VERIFIED** — `quality` 43 s; `suite` reported **`293 passed in 18.55s`** |
+| Attempt 3 | ✅ **VERIFIED** — job total **752 s → 343 s** after splitting the browser install |
+
+Artefacts published: `test-results` (1.5 MB — JUnit XML + Allure results), `junit-quality`. On
+failure, `failure-artefacts` carries traces, screenshots, page HTML and logs.
+
+⚠️ **NOT VERIFIED:** `nightly.yml` has not yet run — it is scheduled at 02:30 UTC and has not been
+dispatched manually. Firefox and WebKit are therefore **untested**; only Chromium has run in CI.
+
+### CI measurements
+
+| Step | Before split | After split |
+|---|---|---|
+| Browser install (combined) | **684 s** | — |
+| ├ apt system libraries | — | **249 s** |
+| └ browser download | — | **11 s** |
+| Test execution | 21 s | 19 s |
+| **Job total** | **752 s** | **343 s** |
+
+### Findings
+
+| # | Finding | Outcome |
+|---|---|---|
+| 1 | **`chmod +x` locally changed nothing in the commit.** Git on Windows does not record the executable bit, so the runner checked out a non-executable script | `git update-index --chmod=+x`. A Windows-to-Linux crossing bug that local testing cannot surface — the script runs fine via `bash script.sh` |
+| 2 | A failing diagnostic step added a second red X that obscured the real failure | `tail ... \|\| echo` — a step whose job is to explain a failure must never be able to cause one |
+| 3 | **The cache I added may cost more than it saves.** Browser download is 11 s; writing the cache is 28 s | Recorded rather than quietly deleted. I cached before measuring, which was the wrong order — being willing to remove your own optimisation is part of the job |
 
 ---
 
