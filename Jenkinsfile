@@ -16,24 +16,26 @@
 //
 // 2. It runs on a Windows or a Linux agent. That is not gold-plating: this
 //    project is developed on Windows and its CI is Linux, so a Jenkinsfile that
-//    only worked on one of them could only ever be verified on the other.
-//    The repository already ships every script in both flavours, and `run`
-//    below simply picks the right one.
+//    only worked on one of them could only ever be verified on the other. The
+//    repository already ships every script in both flavours.
 
 /**
- * Run a step on whichever platform the agent is.
+ * Run a command on whichever platform the agent is.
  *
- * Declarative pipelines allow plain Groovy methods outside the pipeline block,
- * and using one here keeps each stage a single readable line instead of an
- * `if (isUnix())` ladder repeated six times.
+ * Called from inside `script { }` blocks, and that is not decoration either.
+ * A declarative `steps` block is **not** free-form Groovy - the parser tries to
+ * resolve every call in it as a pipeline *step*, which produced two different
+ * failures before this shape settled:
  *
- * The Map signature is not a style choice. A declarative `steps` block is NOT
- * free-form Groovy: the parser treats a bare method call inside it as a *step*,
- * and steps must use named arguments. `run('a', 'b')` fails validation before
- * the build starts, with `Arguments to "run" must be explicitly named` - so the
- * parameters are named, and the call sites read better for it.
+ *   run('a', 'b')                 -> Arguments to "run" must be explicitly named
+ *   run(unix: ..., windows: ...)  -> Invalid parameter "unix", did you mean "name"?
+ *
+ * The second is the instructive one: with named arguments the parser matched a
+ * *real* step called `run` and validated against its schema. `script { }` is the
+ * documented escape hatch into ordinary Groovy, and the helper is named
+ * `onAgent` so it cannot collide with a step name again.
  */
-def run(Map cfg) {
+def onAgent(Map cfg) {
     if (isUnix()) {
         sh cfg.unix
     } else {
@@ -113,38 +115,42 @@ pipeline {
             steps {
                 // Printed at the top of every build, because the first question
                 // asked about a surprising result is always "against what?".
-                run(
-                    unix: '''
-                        echo "build    : ${JOB_NAME} #${BUILD_NUMBER}"
-                        echo "suite    : ${SUITE}   workers: ${WORKERS}   docker: ${USE_DOCKER}"
-                        echo "base url : ${BASE_URL}"
-                        python3 --version
-                    ''',
-                    windows: '''
-                        Write-Host "build    : $env:JOB_NAME #$env:BUILD_NUMBER"
-                        Write-Host "suite    : $env:SUITE   workers: $env:WORKERS   docker: $env:USE_DOCKER"
-                        Write-Host "base url : $env:BASE_URL"
-                        py -3.12 --version
-                    '''
-                )
+                script {
+                    onAgent(
+                        unix: '''
+                            echo "build    : ${JOB_NAME} #${BUILD_NUMBER}"
+                            echo "suite    : ${SUITE}   workers: ${WORKERS}   docker: ${USE_DOCKER}"
+                            echo "base url : ${BASE_URL}"
+                            python3 --version
+                        ''',
+                        windows: '''
+                            Write-Host "build    : $env:JOB_NAME #$env:BUILD_NUMBER"
+                            Write-Host "suite    : $env:SUITE   workers: $env:WORKERS   docker: $env:USE_DOCKER"
+                            Write-Host "base url : $env:BASE_URL"
+                            py -3.12 --version
+                        '''
+                    )
+                }
             }
         }
 
         stage('Install') {
             steps {
-                run(
-                    unix: '''
-                        python3 -m venv .venv
-                        . .venv/bin/activate
-                        pip install --quiet --upgrade pip
-                        pip install --quiet -e ".[dev]"
-                    ''',
-                    windows: '''
-                        py -3.12 -m venv .venv
-                        .\\.venv\\Scripts\\python.exe -m pip install --quiet --upgrade pip
-                        .\\.venv\\Scripts\\python.exe -m pip install --quiet -e ".[dev]"
-                    '''
-                )
+                script {
+                    onAgent(
+                        unix: '''
+                            python3 -m venv .venv
+                            . .venv/bin/activate
+                            pip install --quiet --upgrade pip
+                            pip install --quiet -e ".[dev]"
+                        ''',
+                        windows: '''
+                            py -3.12 -m venv .venv
+                            .\\.venv\\Scripts\\python.exe -m pip install --quiet --upgrade pip
+                            .\\.venv\\Scripts\\python.exe -m pip install --quiet -e ".[dev]"
+                        '''
+                    )
+                }
             }
         }
 
@@ -153,10 +159,12 @@ pipeline {
             // database, no browser - so it fails in under a minute when it fails,
             // before anything expensive has been started.
             steps {
-                run(
-                    unix: '. .venv/bin/activate && ./scripts/quality.sh',
-                    windows: '.\\scripts\\quality.ps1'
-                )
+                script {
+                    onAgent(
+                        unix: '. .venv/bin/activate && ./scripts/quality.sh',
+                        windows: '.\\scripts\\quality.ps1'
+                    )
+                }
             }
         }
 
@@ -168,10 +176,12 @@ pipeline {
                 }
             }
             steps {
-                run(
-                    unix: 'docker compose -f docker/docker-compose.yml up -d db app',
-                    windows: 'docker compose -f docker/docker-compose.yml up -d db app'
-                )
+                script {
+                    onAgent(
+                        unix: 'docker compose -f docker/docker-compose.yml up -d db app',
+                        windows: 'docker compose -f docker/docker-compose.yml up -d db app'
+                    )
+                }
             }
         }
 
@@ -181,28 +191,32 @@ pipeline {
                 // One command. The two-pass model (parallel, then serial) lives in
                 // the script, so Jenkins and a developer's terminal cannot disagree
                 // about what "run the suite" means.
-                run(
-                    unix: '''
-                        . .venv/bin/activate
-                        export MARKERS="$( [ "${SUITE}" = "all" ] && echo "" || echo "${SUITE}" )"
-                        export WORKERS="${WORKERS}"
-                        export ALLURE=1
-                        ./scripts/run_suite.sh
-                    ''',
-                    windows: '''
-                        $markers = if ($env:SUITE -eq "all") { "" } else { $env:SUITE }
-                        .\\scripts\\run_suite.ps1 -Workers $env:WORKERS -Markers $markers -Allure
-                    '''
-                )
+                script {
+                    onAgent(
+                        unix: '''
+                            . .venv/bin/activate
+                            export MARKERS="$( [ "${SUITE}" = "all" ] && echo "" || echo "${SUITE}" )"
+                            export WORKERS="${WORKERS}"
+                            export ALLURE=1
+                            ./scripts/run_suite.sh
+                        ''',
+                        windows: '''
+                            $markers = if ($env:SUITE -eq "all") { "" } else { $env:SUITE }
+                            .\\scripts\\run_suite.ps1 -Workers $env:WORKERS -Markers $markers -Allure
+                        '''
+                    )
+                }
             }
         }
 
         stage('Report') {
             steps {
-                run(
-                    unix: './scripts/report.sh --no-open || echo "(allure CLI unavailable - raw results still published)"',
-                    windows: '.\\scripts\\report.ps1 -NoOpen'
-                )
+                script {
+                    onAgent(
+                        unix: './scripts/report.sh --no-open || echo "(allure CLI unavailable - raw results still published)"',
+                        windows: '.\\scripts\\report.ps1 -NoOpen'
+                    )
+                }
             }
         }
     }
@@ -239,7 +253,7 @@ pipeline {
             // silently decides today's result.
             script {
                 if (params.USE_DOCKER) {
-                    run(
+                    onAgent(
                         unix: 'docker compose -f docker/docker-compose.yml down -v || true',
                         windows: 'docker compose -f docker/docker-compose.yml down -v'
                     )
