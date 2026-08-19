@@ -220,11 +220,32 @@ pipeline {
         }
 
         stage('Report') {
+            // Skipped when no suite ran, and unable to fail the build when it
+            // does run. Phase 12 recorded this lesson in GitHub Actions and this
+            // pipeline repeated it: a step whose job is to EXPLAIN a failure
+            // must never be able to cause one. Here it failed a build whose
+            // quality gate had passed, purely because a framework-only run
+            // legitimately produces no Allure results - the console then showed
+            // a red build with 121 passing tests and a report error on top.
+            when { expression { params.SUITE != 'framework' } }
             steps {
                 script {
                     onAgent(
-                        unix: './scripts/report.sh --no-open || echo "(allure CLI unavailable - raw results still published)"',
-                        windows: '.\\scripts\\report.ps1 -NoOpen'
+                        unix: '''
+                            if [ -d allure-results ]; then
+                                ./scripts/report.sh --no-open || echo "(report generation failed - raw results are still published)"
+                            else
+                                echo "(no allure-results to report on)"
+                            fi
+                        ''',
+                        windows: '''
+                            if (Test-Path allure-results) {
+                                try { .\\scripts\\report.ps1 -NoOpen }
+                                catch { Write-Host "(report generation failed - raw results are still published): $_" }
+                            } else {
+                                Write-Host "(no allure-results to report on)"
+                            }
+                        '''
                     )
                 }
             }
