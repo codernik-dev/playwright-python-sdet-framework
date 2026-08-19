@@ -1,0 +1,189 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# ---------------------------------------------------------------------------
+# The FRAMEWORK is a real, installable Python package (src layout).
+# It is installed with `pip install -e .` so tests import it like any other
+# library: no sys.path juggling, no conftest.py import hacks, no name clashes
+# with the application under test.
+# ---------------------------------------------------------------------------
+[project]
+name = "claimdesk-qa"
+version = "0.1.0"
+description = "End-to-end SDET automation framework (UI + API + DB) for the ClaimDesk application"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+license = { text = "MIT" }
+authors = [{ name = "Techsapphire" }]
+keywords = ["sdet", "test-automation", "playwright", "pytest", "api-testing", "database-testing"]
+
+dependencies = [
+    # --- test runner + execution control -----------------------------------
+    "pytest>=8.3,<10",
+    "pytest-xdist>=3.6,<4",          # parallel execution (see docs/phase-1-design.md §12)
+    "pytest-rerunfailures>=15,<17",  # restricted retry policy (see §13)
+    # --- UI automation ------------------------------------------------------
+    "playwright>=1.55,<2",
+    "pytest-playwright>=0.9,<1",     # supplies page/context/browser fixtures + artefact flags
+    # --- API automation -----------------------------------------------------
+    "httpx>=0.28,<1",
+    # --- contracts + configuration -----------------------------------------
+    "pydantic>=2.9,<3",
+    "pydantic-settings>=2.6,<3",
+    # --- database validation ------------------------------------------------
+    "psycopg[binary]>=3.2,<4",       # binary wheel: no local libpq/compiler needed
+    # --- test data ----------------------------------------------------------
+    "faker>=30,<41",
+    "pyyaml>=6,<7",
+    # --- reporting ----------------------------------------------------------
+    "allure-pytest>=2.13,<3",
+]
+
+[project.optional-dependencies]
+# Developer tooling. Not needed to merely run the suite in CI.
+dev = [
+    "ruff>=0.9,<1",
+    "mypy>=1.11,<2",
+    "pre-commit>=4,<5",
+    "types-PyYAML>=6,<7",
+]
+# The application under test. Deliberately a SEPARATE extra: the framework must
+# never depend on the app, and this makes that boundary visible in the manifest.
+app = [
+    "fastapi>=0.115,<1",
+    "uvicorn[standard]>=0.32,<1",
+    "sqlalchemy>=2.0,<3",
+    "jinja2>=3.1,<4",
+    "pyjwt>=2.9,<3",
+    "bcrypt>=4.2,<6",
+    "python-multipart>=0.0.12,<1",
+]
+# Optional no-Java report fallback (Allure needs a JVM to render).
+html = ["pytest-html>=4.1,<5"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/claimdesk_qa"]
+
+# ---------------------------------------------------------------------------
+# pytest
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+# --import-mode=importlib works cleanly with the src layout and avoids the
+# legacy "rootdir on sys.path" behaviour that causes mysterious import bugs.
+addopts = [
+    "-ra",
+    "--strict-markers",   # a typo'd marker fails the run instead of silently doing nothing
+    "--strict-config",    # a typo'd ini key fails the run
+    "--import-mode=importlib",
+    "--showlocals",
+]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+log_cli = false
+log_cli_level = "INFO"
+log_format = "%(asctime)s %(levelname)-8s %(name)s %(message)s"
+log_date_format = "%H:%M:%S"
+
+markers = [
+    # --- layer (exactly one per test) --------------------------------------
+    "api: exercises the REST API directly",
+    "ui: drives a real browser with Playwright",
+    "db: asserts on PostgreSQL state",
+    "e2e: crosses layers (UI -> API -> DB) in a single business journey",
+    "framework: unit test of the framework itself; needs no running application",
+    # --- suite selection ----------------------------------------------------
+    "smoke: minimal high-value set; runs on every push and pull request",
+    "regression: full functional coverage; runs nightly",
+    # --- intent -------------------------------------------------------------
+    "negative: invalid input, wrong credentials, or forbidden operations",
+    "boundary: values at, just inside, and just outside an accepted range",
+    "authz: role and ownership based access control",
+    "contract: response shape, status codes, and headers",
+    "integrity: data integrity and audit-trail invariants",
+    # --- execution constraints ---------------------------------------------
+    "serial: MUST NOT run under xdist; mutates shared state (see docs/phase-1-design.md §12)",
+    "quarantine: known-flaky; excluded from gates, tracked as a bug with a deadline",
+    "slow: takes more than a few seconds; excluded from the fast feedback loop",
+]
+
+filterwarnings = [
+    "error",                                  # a new warning is a signal, not noise
+    "ignore::DeprecationWarning:allure_commons.*",
+    "ignore::DeprecationWarning:allure_pytest.*",
+]
+
+# ---------------------------------------------------------------------------
+# Ruff  (replaces flake8 + black + isort + pyupgrade + pep8-naming)
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests", "app"]
+extend-exclude = ["artifacts", ".venv"]
+
+[tool.ruff.lint]
+select = [
+    "E", "W",    # pycodestyle
+    "F",         # pyflakes
+    "I",         # isort
+    "N",         # pep8-naming
+    "UP",        # pyupgrade
+    "B",         # bugbear (mutable defaults, loop-variable capture, ...)
+    "A",         # builtin shadowing
+    "C4",        # comprehensions
+    "SIM",       # simplify
+    "PTH",       # use pathlib, not os.path
+    "RET",       # return consistency
+    "ARG",       # unused arguments
+    "TID",       # tidy imports  -> enforces the black-box rule below
+    "PT",        # pytest style
+    "RUF",       # ruff-specific
+]
+ignore = [
+    "E501",    # line length is enforced by the formatter, not the linter
+]
+
+# --- THE BLACK-BOX BOUNDARY, ENFORCED BY THE LINTER ------------------------
+# The framework and its tests may never import the application under test.
+# Everything must go through HTTP or SQL, exactly as in a real SDET role.
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"claimdesk".msg = "The test framework must NEVER import the application under test. Use the HTTP API, the browser, or read-only SQL instead. See docs/adr/0002-black-box-boundary.md"
+
+[tool.ruff.lint.per-file-ignores]
+# The application is allowed to import itself.
+"app/**" = ["TID251"]
+# Tests: magic numbers and long argument lists are normal and readable there.
+"tests/**" = ["PLR2004", "ARG001", "ARG002"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["claimdesk_qa"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+# ---------------------------------------------------------------------------
+# mypy: strict where it pays (shared framework code), relaxed where it does not
+# (test bodies, where a type error is usually just noise).
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.11"
+# "app" is added to this list in Phase 3, when the application under test exists.
+files = ["src", "tests"]
+plugins = ["pydantic.mypy"]
+strict = true
+warn_unreachable = true
+pretty = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+disallow_untyped_decorators = false
+
+[[tool.mypy.overrides]]
+module = ["allure.*", "allure_commons.*"]
+ignore_missing_imports = true

@@ -1,0 +1,13 @@
+# Normalise line endings so a Windows workstation and a Linux CI runner agree.
+* text=auto eol=lf
+
+# Windows-only scripts must keep CRLF or PowerShell/cmd can misbehave.
+*.ps1   text eol=crlf
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+
+# Binary artefacts must never be line-ending converted.
+*.png   binary
+*.jpg   binary
+*.zip   binary
+*.webm  binary
