@@ -7,7 +7,7 @@ three independent layers — **browser, REST API, and database** — with the di
 engineering codebase: an installable package, strict typing, architecture decision records, and a
 lint rule that makes the black-box boundary impossible to violate.
 
-> **Build in progress.** Phases 1–6 of 18 are complete and verified. Every claim below was produced
+> **Build in progress.** Phases 1–7 of 18 are complete and verified. Every claim below was produced
 > by a command that was actually run — see [docs/progress.md](docs/progress.md), which separates
 > ✅ VERIFIED from ⚠️ NOT VERIFIED throughout. No pass-rate, timing or coverage figure appears
 > anywhere in this repository until it has been measured.
@@ -18,11 +18,11 @@ lint rule that makes the black-box boundary impossible to violate.
 
 | | |
 |---|---|
-| **Tests passing** | **261** — 72 framework, 157 API, 32 browser |
-| **Serial run** | `261 passed in 21.04s` |
-| **Parallel run** (`-n 4`) | `261 passed` in **12.81 / 13.46 / 12.86 / 13.10 / 13.20 s** — five consecutive runs, no flakes |
+| **Tests passing** | **293** — 72 framework, 157 API, 32 browser, 28 database, 4 end-to-end |
+| **Serial run** | `293 passed in 23.60s` |
+| **Parallel run** (`-n 4`) | `293 passed` in **15.14 / 16.86 / 14.83 / 14.88 / 15.04 s** — five consecutive runs, no flakes |
 | **Application's own tests** | 58 (the app under test is real, not a stub) |
-| **Quality gate** | ruff clean · ruff-format clean · **mypy `strict` clean across 69 files** |
+| **Quality gate** | ruff clean · ruff-format clean · **mypy `strict` clean across 83 files** |
 
 ---
 
@@ -109,6 +109,20 @@ entirely. And setting the logger to `INFO` left every per-test log file empty.
 a 404 on the detail endpoint would contradict the list endpoint. I corrected the specification, not
 the product.
 
+**The same concurrency bug, written twice, in two different layers.** A pagination test and a
+database count test both asserted on a *global* fact in a database other workers were writing to.
+After fixing it twice, the fix stopped being the point: **a test may assert an invariant globally —
+it holds no matter who else is writing — but never an aggregate.** Both now scope to their own data;
+five consecutive `-n 4` runs clean.
+
+**`information_schema` is privilege-filtered, and least privilege exposed it.** A constraint query
+returned zero rows for the read-only role and sixteen for the owner. The test *would have passed*
+against a superuser. Switched to `pg_catalog`.
+
+**A live bearer token written into `artifacts/`** — the directory CI archives and publishes. Nothing
+failed; it was caught by re-reading the file. Credential handling deserves a second look, not a green
+tick.
+
 **A flaky test that was reproduced instead of retried.** A pagination test failed ~50% of the time
 at `-n 4` and never serially: other workers inserted rows between the two page requests, moving a
 claim from page one to page two. The assertion was right and the *premise* was wrong — you cannot
@@ -173,6 +187,8 @@ Then, in a second terminal:
 pytest -m framework -q     # 72 unit tests, no application required
 pytest -m api -q           # 157 API tests
 pytest -m ui -q            # 32 browser tests (run `playwright install chromium` once)
+pytest -m db -q            # 28 read-only database checks
+pytest -m e2e -q           # 4 browser -> API -> database journeys
 pytest -q -n 4             # everything, in parallel
 ```
 
@@ -221,8 +237,8 @@ scripts/                 bootstrap, quality gate, disposable database
 
 ## Roadmap
 
-Phases 1–6 complete. Remaining: database validation · Allure reporting · cross-browser coverage ·
-Docker · Jenkins pipeline · GitHub Actions · measurement.
+Phases 1–7 complete. Remaining: Allure reporting · cross-browser coverage · Docker · Jenkins
+pipeline · GitHub Actions · measurement.
 Tracked in [docs/progress.md](docs/progress.md).
 
 ---

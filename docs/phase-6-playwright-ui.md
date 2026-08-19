@@ -23,9 +23,9 @@
 Almost every UI test needs to be signed in. Almost none are *about* signing in.
 
 ```python
-token = AuthApi(client).token_for(email, password)     # one API call
-write_storage_state(token, base_url, path)             # a cookie in a JSON file
-browser.new_context(storage_state=str(path))           # already signed in
+token = AuthApi(client).token_for(email, password)  # one API call
+write_storage_state(token, base_url, path)  # a cookie in a JSON file
+browser.new_context(storage_state=str(path))  # already signed in
 ```
 
 ClaimDesk accepts the same JWT from an `Authorization` header **and** from a
@@ -58,10 +58,11 @@ is the fastest way to arrange state for every other layer.
 
 ```python
 @property
-def submit_button(self) -> Locator:          # correct
+def submit_button(self) -> Locator:  # correct
     return self._page.get_by_test_id("submit-login")
 
-self.submit_button = page.query_selector("#submit")   # wrong
+
+self.submit_button = page.query_selector("#submit")  # wrong
 ```
 
 A `Locator` is a *description* of how to find an element, resolved every time it is
@@ -93,8 +94,8 @@ better test *and* a better citizen.
 ### The negative-assertion trap
 
 ```python
-expect(self.row_for(reference)).to_have_count(0)        # correct
-expect(self.row_for(reference)).not_to_be_visible()     # passes for the wrong reason
+expect(self.row_for(reference)).to_have_count(0)  # correct
+expect(self.row_for(reference)).not_to_be_visible()  # passes for the wrong reason
 ```
 
 A negated visibility assertion is satisfied by a page that has not finished
@@ -133,7 +134,7 @@ if failed:
     page.screenshot(path=directory / "screenshot-0.png", full_page=True)
     (directory / "page-0.html").write_text(page.content())
 else:
-    context.tracing.stop()      # no path = discarded
+    context.tracing.stop()  # no path = discarded
 ```
 
 You cannot know in advance which test will fail, so tracing runs for all of them
@@ -181,10 +182,10 @@ request.
 The test asserts all three things that matter:
 
 ```python
-detail.expect_action_available(ClaimAction.APPROVE.value)   # offered
+detail.expect_action_available(ClaimAction.APPROVE.value)  # offered
 detail.perform(ClaimAction.APPROVE.value)
 expect(detail.error_toast).to_contain_text("approval limit")  # refused, legibly
-detail.expect_status(ClaimStatus.UNDER_REVIEW.value)          # and did not move
+detail.expect_status(ClaimStatus.UNDER_REVIEW.value)  # and did not move
 ```
 
 Only the third catches a refusal that changed state anyway.

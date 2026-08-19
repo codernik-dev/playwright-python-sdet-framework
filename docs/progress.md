@@ -41,8 +41,8 @@ Recorded because "works on my machine" is only useful if the machine is written 
 | 4 | pytest foundation (logging, artefacts, fixtures) | ✅ Complete — [phase-4-pytest-foundation.md](phase-4-pytest-foundation.md) |
 | 5 | API automation layer | ✅ Complete — [phase-5-api-automation.md](phase-5-api-automation.md) |
 | 6 | Playwright UI layer | ✅ Complete — [phase-6-playwright-ui.md](phase-6-playwright-ui.md) |
-| 7 | Database validation layer | ⬜ Next |
-| 8 | Reporting + failure artefacts | ⬜ |
+| 7 | Database validation + cross-layer journeys | ✅ Complete — [phase-7-database-validation.md](phase-7-database-validation.md) |
+| 8 | Reporting + failure artefacts | ⬜ Next |
 | 9 | Parallel execution + markers | ⬜ |
 | 10 | Docker | ⬜ |
 | 11 | Jenkins | ⬜ |
@@ -309,6 +309,45 @@ All three silent failures now have regression tests named after the failure mode
 | 1 | **My own suite broke its own parallel-safety rule.** `test_the_table_paginates` failed ~50% of the time at `-n 4`, never serially. The table sorts newest-first, so claims created by other workers between the page-one and page-two requests shifted a row across the boundary | The assertion was correct; the **premise** was wrong — you cannot paginate a data set being written to. Scoped to the immutable seeded corpus; five consecutive `-n 4` runs then passed. The API pagination test was latently flaky for the same reason (random references can insert anywhere even in a sorted list) and was scoped the same way |
 | 2 | The `anonymous_page` fixture used `yield` with no teardown | Converted to `return`; the context factory owns all teardown, so splitting cleanup would risk discarding a trace before the failure hook saved it |
 | 3 | Port 8000 was still held by the previous session's server | Not a defect — noted because it is why the readiness probe exists rather than a `sleep` |
+
+---
+
+## Phase 7 — Database validation + cross-layer journeys ✅
+
+### What was built
+
+| Area | Detail |
+|---|---|
+| `db/connection.py` | Read-only connection (role grants **and** `read_only`), parameterised queries only, recorded SQL for failure attachment |
+| `db/rows.py` | Typed row dataclasses; money as `Decimal` end to end |
+| `db/queries.py` | Query objects — SQL in one place, tests read as intent |
+| `tests/_fixtures/` | Shared fixtures extracted from three duplicated conftests; each layer conftest fell from ~120 lines to 15 |
+| `tests/db/` | **28 tests**: persistence, audit trail, payouts, integrity, schema assertions |
+| `tests/e2e/` | **4 journeys** crossing browser → API → database |
+
+### Verification — commands run, output observed
+
+| Check | Result |
+|---|---|
+| Full suite, serial | ✅ **VERIFIED** — `293 passed in 23.60s` |
+| Full suite, `-n 4`, five consecutive runs | ✅ **VERIFIED** — `293 passed` in 15.14 / 16.86 / 14.83 / 14.88 / 15.04 s |
+| Linting / formatting | ✅ **VERIFIED** — `All checks passed!` |
+| Static typing (strict) | ✅ **VERIFIED** — `Success: no issues found in 83 source files` |
+| **Read-only role cannot write** | ✅ **VERIFIED** — UPDATE, DELETE, INSERT and TRUNCATE all refused |
+| Money stored as exact NUMERIC(scale 2) | ✅ **VERIFIED** — asserted against `information_schema.columns` |
+| Payout uniqueness exists as a constraint | ✅ **VERIFIED** — read from `pg_catalog` |
+| Passwords hashed, never plaintext | ✅ **VERIFIED** — bcrypt prefix, zero plaintext matches |
+
+⚠️ **NOT VERIFIED in Phase 7:** nothing has run in Docker or CI; no Allure report has been generated yet.
+
+### Findings
+
+| # | Finding | Outcome |
+|---|---|---|
+| 1 | **`information_schema` is privilege-filtered.** The constraint query returned 0 rows for the read-only role. Measured: read-only via `information_schema` → **0**; via `pg_catalog` → **16**; owner via `information_schema` → **16** | Switched to `pg_catalog`. The trap is that the test **would have passed against a superuser** — least privilege is what exposed it |
+| 2 | **The same concurrency bug, twice, in two layers.** `test_a_rejected_write_leaves_no_row` compared a global `count(*) WHERE status='DRAFT'` before and after; other workers create drafts in between. Failed 2 runs in 3 at `-n 4` | Scoped to the test's own marker. Stated as a **rule** rather than a second fix: *a test may assert an invariant globally, never an aggregate* — an invariant holds regardless of who else is writing; an aggregate is a fact about a shared database |
+| 3 | **A live bearer token was written into `artifacts/`**, which CI archives and publishes | Caught by re-reading the file, not by a failing test. The cookie is now injected directly into the browser context and never touches disk |
+| 4 | `customer_claims` existed in three conftests | Extracted to `tests/_fixtures/` as pytest plugins. The trigger was writing the fourth copy: three is a pattern, four is a problem |
 
 ---
 
