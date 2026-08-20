@@ -1,6 +1,10 @@
 # Catches formatting problems and committed secrets BEFORE they reach CI.
-# Install once:  pre-commit install
+# Install once:  pre-commit install --hook-type pre-commit --hook-type commit-msg
 # Run manually:  pre-commit run --all-files
+#
+# Both hook types are needed. Plain `pre-commit install` wires up the pre-commit
+# stage only, and the commit-msg hook below would then never run - silently, and
+# only for the people who typed the shorter command.
 #
 # Every hook here must agree with the rest of the project's tooling. A hook that
 # disagrees is worse than no hook: it fights the developer on every commit, and
@@ -43,3 +47,21 @@ repos:
       - id: ruff
         args: ["--fix"]
       - id: ruff-format
+
+  # Commit messages: one author per commit.
+  #
+  # Whether a `Co-Authored-By:` trailer is appended is decided by whichever
+  # editor, CLI or commit template prepared the message - not by anything in this
+  # repository. That makes it precisely the kind of inconsistency a hook should
+  # absorb, rather than something each contributor has to remember to undo.
+  #
+  # The script prints whatever it removed to stderr. A hook that rewrites your
+  # commit message without saying so is a hook you stop trusting, and the point
+  # here is a predictable log, not a quiet one.
+  - repo: local
+    hooks:
+      - id: no-co-author-trailers
+        name: strip co-author trailers from the commit message
+        entry: python scripts/strip_co_authors.py
+        language: system
+        stages: [commit-msg]

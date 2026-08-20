@@ -203,6 +203,10 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -e ".[dev,app]"
 
+# Both hook types: plain `pre-commit install` wires up only the first, and the
+# commit-msg hook would then never run - silently, and only for some people.
+pre-commit install --hook-type pre-commit --hook-type commit-msg
+
 Copy-Item .env.example .env          # then set the two passwords
 
 .\scripts\local_db.ps1 start          # disposable cluster on port 55432
