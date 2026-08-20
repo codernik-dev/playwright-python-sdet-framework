@@ -1,0 +1,5 @@
+09:42:24 DEBUG    claimdesk_qa.tests.conftest start tests/db/test_integrity.py::test_no_claim_has_ever_been_paid_twice
+09:42:24 DEBUG    claimdesk_qa.claimdesk_qa.db.connection Connected read-only to postgresql://claimdesk_qa_ro:***masked***@127.0.0.1:5432/claimdesk
+09:42:24 DEBUG    claimdesk_qa.claimdesk_qa.db.connection SQL: SELECT c.reference AS label, count(p.id) AS total FROM claims c JOIN payouts p ON p.claim_id = c.id GROUP BY c.reference HAVING count(p.id) > 1
+  rows: 0
+09:42:24 DEBUG    claimdesk_qa.tests.conftest end tests/db/test_integrity.py::test_no_claim_has_ever_been_paid_twice

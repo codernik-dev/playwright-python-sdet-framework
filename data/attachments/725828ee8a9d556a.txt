@@ -1,0 +1,21 @@
+09:42:22 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_state_machine.py::test_every_published_transition_is_accepted[UNDER_REVIEW-approve-APPROVED]
+09:42:22 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/policies "HTTP/1.1 200 OK"
+09:42:22 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/policies -> 200 (4 ms)
+  response: [{"id":"433046d9-54fd-4af3-b793-7e8cb15fc3dc","policy_number":"POL-1001","holder_id":"b4d06d51-257c-443e-996f-0e920c6462b7","coverage_limit":"10000.00","is_active":true},{"id":"b62d37b6-fc44-48aa-8445-861bfd5f8be5","policy_number":"POL-1002","holder_id":"b4d06d51-257c-443e-996f-0e920c6462b7","coverage_limit":"2500.00","is_active":true}]
+09:42:22 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+09:42:22 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (9 ms)
+  request : {'policy_id': '433046d9-54fd-4af3-b793-7e8cb15fc3dc', 'amount': '100.00', 'description': 'QA c2eca911 Range drug old politics step plan.', 'incident_date': '2026-08-13'}
+  response: {"id":"b0e62367-2f8f-4aa3-a328-ac4a239ca62d","reference":"CLM-C2C8E852","policy_id":"433046d9-54fd-4af3-b793-7e8cb15fc3dc","claimant_id":"b4d06d51-257c-443e-996f-0e920c6462b7","amount":"100.00","description":"QA c2eca911 Range drug old politics step plan.","incident_date":"2026-08-13","status":"DRAFT","created_at":"2026-08-20T09:42:22.528488Z","updated_at":"2026-08-20T09:42:22.528488Z","withdrawn_at":null,"decided_by_id":null}
+09:42:22 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/b0e62367-2f8f-4aa3-a328-ac4a239ca62d/transitions "HTTP/1.1 200 OK"
+09:42:22 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/b0e62367-2f8f-4aa3-a328-ac4a239ca62d/transitions -> 200 (7 ms)
+  request : {'action': 'submit', 'note': None}
+  response: {"id":"b0e62367-2f8f-4aa3-a328-ac4a239ca62d","reference":"CLM-C2C8E852","policy_id":"433046d9-54fd-4af3-b793-7e8cb15fc3dc","claimant_id":"b4d06d51-257c-443e-996f-0e920c6462b7","amount":"100.00","description":"QA c2eca911 Range drug old politics step plan.","incident_date":"2026-08-13","status":"SUBMITTED","created_at":"2026-08-20T09:42:22.528488Z","updated_at":"2026-08-20T09:42:22.537725Z","withdrawn_at":null,"decided_by_id":null}
+09:42:22 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/b0e62367-2f8f-4aa3-a328-ac4a239ca62d/transitions "HTTP/1.1 200 OK"
+09:42:22 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/b0e62367-2f8f-4aa3-a328-ac4a239ca62d/transitions -> 200 (8 ms)
+  request : {'action': 'start_review', 'note': None}
+  response: {"id":"b0e62367-2f8f-4aa3-a328-ac4a239ca62d","reference":"CLM-C2C8E852","policy_id":"433046d9-54fd-4af3-b793-7e8cb15fc3dc","claimant_id":"b4d06d51-257c-443e-996f-0e920c6462b7","amount":"100.00","description":"QA c2eca911 Range drug old politics step plan.","incident_date":"2026-08-13","status":"UNDER_REVIEW","created_at":"2026-08-20T09:42:22.528488Z","updated_at":"2026-08-20T09:42:22.546295Z","withdrawn_at":null,"decided_by_id":null}
+09:42:22 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/b0e62367-2f8f-4aa3-a328-ac4a239ca62d/transitions "HTTP/1.1 200 OK"
+09:42:22 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/b0e62367-2f8f-4aa3-a328-ac4a239ca62d/transitions -> 200 (8 ms)
+  request : {'action': 'approve', 'note': None}
+  response: {"id":"b0e62367-2f8f-4aa3-a328-ac4a239ca62d","reference":"CLM-C2C8E852","policy_id":"433046d9-54fd-4af3-b793-7e8cb15fc3dc","claimant_id":"b4d06d51-257c-443e-996f-0e920c6462b7","amount":"100.00","description":"QA c2eca911 Range drug old politics step plan.","incident_date":"2026-08-13","status":"APPROVED","created_at":"2026-08-20T09:42:22.528488Z","updated_at":"2026-08-20T09:42:22.554672Z","withdrawn_at":null,"decided_by_id":"acba5cc6-c9e7-4922-b987-d7be1455fc49"}
+09:42:22 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_state_machine.py::test_every_published_transition_is_accepted[UNDER_REVIEW-approve-APPROVED]

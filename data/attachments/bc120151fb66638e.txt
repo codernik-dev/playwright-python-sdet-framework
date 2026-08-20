@@ -1,0 +1,2 @@
+21:42:30 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_logging_and_correlation.py::test_per_test_log_captures_only_its_own_window
+21:42:30 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_logging_and_correlation.py::test_per_test_log_captures_only_its_own_window

@@ -1,0 +1,32 @@
+09:42:23 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_state_machine.py::test_illegal_transitions_are_refused[PAID-cannot-approve]
+09:42:23 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/policies "HTTP/1.1 200 OK"
+09:42:23 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/policies -> 200 (6 ms)
+  response: [{"id":"433046d9-54fd-4af3-b793-7e8cb15fc3dc","policy_number":"POL-1001","holder_id":"b4d06d51-257c-443e-996f-0e920c6462b7","coverage_limit":"10000.00","is_active":true},{"id":"b62d37b6-fc44-48aa-8445-861bfd5f8be5","policy_number":"POL-1002","holder_id":"b4d06d51-257c-443e-996f-0e920c6462b7","coverage_limit":"2500.00","is_active":true}]
+09:42:23 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+09:42:23 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (11 ms)
+  request : {'policy_id': '433046d9-54fd-4af3-b793-7e8cb15fc3dc', 'amount': '100.00', 'description': 'QA 812eb7f3 Yard citizen example alone either.', 'incident_date': '2026-08-13'}
+  response: {"id":"055e2c66-3186-4c2a-97a7-09c9824b90e5","reference":"CLM-D3503C1B","policy_id":"433046d9-54fd-4af3-b793-7e8cb15fc3dc","claimant_id":"b4d06d51-257c-443e-996f-0e920c6462b7","amount":"100.00","description":"QA 812eb7f3 Yard citizen example alone either.","incident_date":"2026-08-13","status":"DRAFT","created_at":"2026-08-20T09:42:23.335160Z","updated_at":"2026-08-20T09:42:23.335160Z","withdrawn_at":null,"decided_by_id":null}
+09:42:23 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/055e2c66-3186-4c2a-97a7-09c9824b90e5/transitions "HTTP/1.1 200 OK"
+09:42:23 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/055e2c66-3186-4c2a-97a7-09c9824b90e5/transitions -> 200 (7 ms)
+  request : {'action': 'submit', 'note': None}
+  response: {"id":"055e2c66-3186-4c2a-97a7-09c9824b90e5","reference":"CLM-D3503C1B","policy_id":"433046d9-54fd-4af3-b793-7e8cb15fc3dc","claimant_id":"b4d06d51-257c-443e-996f-0e920c6462b7","amount":"100.00","description":"QA 812eb7f3 Yard citizen example alone either.","incident_date":"2026-08-13","status":"SUBMITTED","created_at":"2026-08-20T09:42:23.335160Z","updated_at":"2026-08-20T09:42:23.346046Z","withdrawn_at":null,"decided_by_id":null}
+09:42:23 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/055e2c66-3186-4c2a-97a7-09c9824b90e5/transitions "HTTP/1.1 200 OK"
+09:42:23 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/055e2c66-3186-4c2a-97a7-09c9824b90e5/transitions -> 200 (8 ms)
+  request : {'action': 'start_review', 'note': None}
+  response: {"id":"055e2c66-3186-4c2a-97a7-09c9824b90e5","reference":"CLM-D3503C1B","policy_id":"433046d9-54fd-4af3-b793-7e8cb15fc3dc","claimant_id":"b4d06d51-257c-443e-996f-0e920c6462b7","amount":"100.00","description":"QA 812eb7f3 Yard citizen example alone either.","incident_date":"2026-08-13","status":"UNDER_REVIEW","created_at":"2026-08-20T09:42:23.335160Z","updated_at":"2026-08-20T09:42:23.354088Z","withdrawn_at":null,"decided_by_id":null}
+09:42:23 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/055e2c66-3186-4c2a-97a7-09c9824b90e5/transitions "HTTP/1.1 200 OK"
+09:42:23 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/055e2c66-3186-4c2a-97a7-09c9824b90e5/transitions -> 200 (9 ms)
+  request : {'action': 'approve', 'note': None}
+  response: {"id":"055e2c66-3186-4c2a-97a7-09c9824b90e5","reference":"CLM-D3503C1B","policy_id":"433046d9-54fd-4af3-b793-7e8cb15fc3dc","claimant_id":"b4d06d51-257c-443e-996f-0e920c6462b7","amount":"100.00","description":"QA 812eb7f3 Yard citizen example alone either.","incident_date":"2026-08-13","status":"APPROVED","created_at":"2026-08-20T09:42:23.335160Z","updated_at":"2026-08-20T09:42:23.362530Z","withdrawn_at":null,"decided_by_id":"acba5cc6-c9e7-4922-b987-d7be1455fc49"}
+09:42:23 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/055e2c66-3186-4c2a-97a7-09c9824b90e5/transitions "HTTP/1.1 200 OK"
+09:42:23 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/055e2c66-3186-4c2a-97a7-09c9824b90e5/transitions -> 200 (11 ms)
+  request : {'action': 'pay', 'note': None}
+  response: {"id":"055e2c66-3186-4c2a-97a7-09c9824b90e5","reference":"CLM-D3503C1B","policy_id":"433046d9-54fd-4af3-b793-7e8cb15fc3dc","claimant_id":"b4d06d51-257c-443e-996f-0e920c6462b7","amount":"100.00","description":"QA 812eb7f3 Yard citizen example alone either.","incident_date":"2026-08-13","status":"PAID","created_at":"2026-08-20T09:42:23.335160Z","updated_at":"2026-08-20T09:42:23.371288Z","withdrawn_at":null,"decided_by_id":"acba5cc6-c9e7-4922-b987-d7be1455fc49"}
+09:42:23 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/055e2c66-3186-4c2a-97a7-09c9824b90e5/transitions "HTTP/1.1 409 Conflict"
+09:42:23 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/055e2c66-3186-4c2a-97a7-09c9824b90e5/transitions -> 409 (5 ms)
+  request : {'action': 'approve', 'note': None}
+  response: {"detail":"Cannot approve a claim in status PAID; it must be UNDER_REVIEW."}
+09:42:23 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/claims/055e2c66-3186-4c2a-97a7-09c9824b90e5 "HTTP/1.1 200 OK"
+09:42:23 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/claims/055e2c66-3186-4c2a-97a7-09c9824b90e5 -> 200 (5 ms)
+  response: {"id":"055e2c66-3186-4c2a-97a7-09c9824b90e5","reference":"CLM-D3503C1B","policy_id":"433046d9-54fd-4af3-b793-7e8cb15fc3dc","claimant_id":"b4d06d51-257c-443e-996f-0e920c6462b7","amount":"100.00","description":"QA 812eb7f3 Yard citizen example alone either.","incident_date":"2026-08-13","status":"PAID","created_at":"2026-08-20T09:42:23.335160Z","updated_at":"2026-08-20T09:42:23.371288Z","withdrawn_at":null,"decided_by_id":"acba5cc6-c9e7-4922-b987-d7be1455fc49"}
+09:42:23 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_state_machine.py::test_illegal_transitions_are_refused[PAID-cannot-approve]

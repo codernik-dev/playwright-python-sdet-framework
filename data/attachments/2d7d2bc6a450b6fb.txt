@@ -1,0 +1,21 @@
+09:42:22 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_state_machine.py::test_every_published_transition_is_accepted[UNDER_REVIEW-reject-REJECTED]
+09:42:22 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/policies "HTTP/1.1 200 OK"
+09:42:22 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/policies -> 200 (5 ms)
+  response: [{"id":"433046d9-54fd-4af3-b793-7e8cb15fc3dc","policy_number":"POL-1001","holder_id":"b4d06d51-257c-443e-996f-0e920c6462b7","coverage_limit":"10000.00","is_active":true},{"id":"b62d37b6-fc44-48aa-8445-861bfd5f8be5","policy_number":"POL-1002","holder_id":"b4d06d51-257c-443e-996f-0e920c6462b7","coverage_limit":"2500.00","is_active":true}]
+09:42:22 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+09:42:22 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (8 ms)
+  request : {'policy_id': '433046d9-54fd-4af3-b793-7e8cb15fc3dc', 'amount': '100.00', 'description': 'QA 00c505f9 Evening American thing computer color sea management approach.', 'incident_date': '2026-08-13'}
+  response: {"id":"940621f5-1b12-49c0-9f18-f3f5ccac3c98","reference":"CLM-94E04D8D","policy_id":"433046d9-54fd-4af3-b793-7e8cb15fc3dc","claimant_id":"b4d06d51-257c-443e-996f-0e920c6462b7","amount":"100.00","description":"QA 00c505f9 Evening American thing computer color sea management approach.","incident_date":"2026-08-13","status":"DRAFT","created_at":"2026-08-20T09:42:22.579457Z","updated_at":"2026-08-20T09:42:22.579457Z","withdrawn_at":null,"decided_by_id":null}
+09:42:22 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/940621f5-1b12-49c0-9f18-f3f5ccac3c98/transitions "HTTP/1.1 200 OK"
+09:42:22 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/940621f5-1b12-49c0-9f18-f3f5ccac3c98/transitions -> 200 (10 ms)
+  request : {'action': 'submit', 'note': None}
+  response: {"id":"940621f5-1b12-49c0-9f18-f3f5ccac3c98","reference":"CLM-94E04D8D","policy_id":"433046d9-54fd-4af3-b793-7e8cb15fc3dc","claimant_id":"b4d06d51-257c-443e-996f-0e920c6462b7","amount":"100.00","description":"QA 00c505f9 Evening American thing computer color sea management approach.","incident_date":"2026-08-13","status":"SUBMITTED","created_at":"2026-08-20T09:42:22.579457Z","updated_at":"2026-08-20T09:42:22.588749Z","withdrawn_at":null,"decided_by_id":null}
+09:42:22 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/940621f5-1b12-49c0-9f18-f3f5ccac3c98/transitions "HTTP/1.1 200 OK"
+09:42:22 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/940621f5-1b12-49c0-9f18-f3f5ccac3c98/transitions -> 200 (7 ms)
+  request : {'action': 'start_review', 'note': None}
+  response: {"id":"940621f5-1b12-49c0-9f18-f3f5ccac3c98","reference":"CLM-94E04D8D","policy_id":"433046d9-54fd-4af3-b793-7e8cb15fc3dc","claimant_id":"b4d06d51-257c-443e-996f-0e920c6462b7","amount":"100.00","description":"QA 00c505f9 Evening American thing computer color sea management approach.","incident_date":"2026-08-13","status":"UNDER_REVIEW","created_at":"2026-08-20T09:42:22.579457Z","updated_at":"2026-08-20T09:42:22.598217Z","withdrawn_at":null,"decided_by_id":null}
+09:42:22 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/940621f5-1b12-49c0-9f18-f3f5ccac3c98/transitions "HTTP/1.1 200 OK"
+09:42:22 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/940621f5-1b12-49c0-9f18-f3f5ccac3c98/transitions -> 200 (8 ms)
+  request : {'action': 'reject', 'note': None}
+  response: {"id":"940621f5-1b12-49c0-9f18-f3f5ccac3c98","reference":"CLM-94E04D8D","policy_id":"433046d9-54fd-4af3-b793-7e8cb15fc3dc","claimant_id":"b4d06d51-257c-443e-996f-0e920c6462b7","amount":"100.00","description":"QA 00c505f9 Evening American thing computer color sea management approach.","incident_date":"2026-08-13","status":"REJECTED","created_at":"2026-08-20T09:42:22.579457Z","updated_at":"2026-08-20T09:42:22.605266Z","withdrawn_at":null,"decided_by_id":"acba5cc6-c9e7-4922-b987-d7be1455fc49"}
+09:42:22 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_state_machine.py::test_every_published_transition_is_accepted[UNDER_REVIEW-reject-REJECTED]

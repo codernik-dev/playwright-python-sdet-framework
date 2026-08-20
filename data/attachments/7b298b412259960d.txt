@@ -1,0 +1,2 @@
+09:42:30 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_allure_support.py::test_environment_failures_are_recognised_by_exception_type[claimdesk_qa.core.exceptions.ServiceNotReadyError: ClaimDesk at ... not ready-True]
+09:42:30 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_allure_support.py::test_environment_failures_are_recognised_by_exception_type[claimdesk_qa.core.exceptions.ServiceNotReadyError: ClaimDesk at ... not ready-True]

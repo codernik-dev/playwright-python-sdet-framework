@@ -1,0 +1,1 @@
+09:42:30 INFO    [qa-e089ac648c] claimdesk_qa.claimdesk_qa.core.readiness: service became ready after 1.00s (3 attempt(s)): starting

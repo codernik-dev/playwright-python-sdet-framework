@@ -1,0 +1,2 @@
+21:42:30 DEBUG   [qa-07abc4b750] claimdesk_qa.tests.conftest: start tests/framework/test_logging_and_correlation.py::test_the_handler_is_removed_even_when_the_test_raises
+21:42:30 DEBUG   [qa-07abc4b750] claimdesk_qa.tests.conftest: end tests/framework/test_logging_and_correlation.py::test_the_handler_is_removed_even_when_the_test_raises

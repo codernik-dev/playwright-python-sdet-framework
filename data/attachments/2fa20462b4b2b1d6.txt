@@ -1,0 +1,2 @@
+09:42:30 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_artifacts.py::test_path_for_returns_a_file_inside_the_test_directory
+09:42:30 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_artifacts.py::test_path_for_returns_a_file_inside_the_test_directory

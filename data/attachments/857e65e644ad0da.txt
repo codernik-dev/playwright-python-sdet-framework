@@ -1,0 +1,2 @@
+09:42:30 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_allure_support.py::test_the_environment_block_is_sorted_so_two_runs_can_be_diffed
+09:42:30 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_allure_support.py::test_the_environment_block_is_sorted_so_two_runs_can_be_diffed

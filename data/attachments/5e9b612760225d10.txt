@@ -1,0 +1,2 @@
+09:42:30 DEBUG    claimdesk_qa.tests.conftest start tests/ui/test_login.py::test_an_anonymous_visitor_is_redirected_to_sign_in[chromium]
+09:42:30 DEBUG    claimdesk_qa.tests.conftest end tests/ui/test_login.py::test_an_anonymous_visitor_is_redirected_to_sign_in[chromium]

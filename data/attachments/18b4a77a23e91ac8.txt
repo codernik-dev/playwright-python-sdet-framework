@@ -1,0 +1,23 @@
+09:42:23 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_state_machine.py::test_a_refused_transition_writes_no_audit_event
+09:42:23 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/policies "HTTP/1.1 200 OK"
+09:42:23 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/policies -> 200 (8 ms)
+  response: [{"id":"433046d9-54fd-4af3-b793-7e8cb15fc3dc","policy_number":"POL-1001","holder_id":"b4d06d51-257c-443e-996f-0e920c6462b7","coverage_limit":"10000.00","is_active":true},{"id":"b62d37b6-fc44-48aa-8445-861bfd5f8be5","policy_number":"POL-1002","holder_id":"b4d06d51-257c-443e-996f-0e920c6462b7","coverage_limit":"2500.00","is_active":true}]
+09:42:23 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+09:42:23 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (10 ms)
+  request : {'policy_id': '433046d9-54fd-4af3-b793-7e8cb15fc3dc', 'amount': '300.00', 'description': 'QA 0631ab5c Material mission decade deep level.', 'incident_date': '2026-08-13'}
+  response: {"id":"72248e33-40a6-4a53-ac41-dced126b74b2","reference":"CLM-4855E913","policy_id":"433046d9-54fd-4af3-b793-7e8cb15fc3dc","claimant_id":"b4d06d51-257c-443e-996f-0e920c6462b7","amount":"300.00","description":"QA 0631ab5c Material mission decade deep level.","incident_date":"2026-08-13","status":"DRAFT","created_at":"2026-08-20T09:42:23.105320Z","updated_at":"2026-08-20T09:42:23.105320Z","withdrawn_at":null,"decided_by_id":null}
+09:42:23 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/72248e33-40a6-4a53-ac41-dced126b74b2/transitions "HTTP/1.1 200 OK"
+09:42:23 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/72248e33-40a6-4a53-ac41-dced126b74b2/transitions -> 200 (11 ms)
+  request : {'action': 'submit', 'note': None}
+  response: {"id":"72248e33-40a6-4a53-ac41-dced126b74b2","reference":"CLM-4855E913","policy_id":"433046d9-54fd-4af3-b793-7e8cb15fc3dc","claimant_id":"b4d06d51-257c-443e-996f-0e920c6462b7","amount":"300.00","description":"QA 0631ab5c Material mission decade deep level.","incident_date":"2026-08-13","status":"SUBMITTED","created_at":"2026-08-20T09:42:23.105320Z","updated_at":"2026-08-20T09:42:23.115838Z","withdrawn_at":null,"decided_by_id":null}
+09:42:23 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/claims/72248e33-40a6-4a53-ac41-dced126b74b2/events "HTTP/1.1 200 OK"
+09:42:23 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/claims/72248e33-40a6-4a53-ac41-dced126b74b2/events -> 200 (7 ms)
+  response: [{"id":"a8bbba0c-c85a-4e20-a72a-1903a2a13436","claim_id":"72248e33-40a6-4a53-ac41-dced126b74b2","actor_id":"b4d06d51-257c-443e-996f-0e920c6462b7","from_status":null,"to_status":"DRAFT","note":null,"occurred_at":"2026-08-20T09:42:23.105320Z"},{"id":"40b3f4cb-2463-41a2-aac5-28b898199450","claim_id":"72248e33-40a6-4a53-ac41-dced126b74b2","actor_id":"b4d06d51-257c-443e-996f-0e920c6462b7","from_status":"DRAFT","to_status":"SUBMITTED","note":null,"occurred_at":"2026-08-20T09:42:23.115838Z"}]
+09:42:23 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/72248e33-40a6-4a53-ac41-dced126b74b2/transitions "HTTP/1.1 409 Conflict"
+09:42:23 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/72248e33-40a6-4a53-ac41-dced126b74b2/transitions -> 409 (5 ms)
+  request : {'action': 'pay', 'note': None}
+  response: {"detail":"Cannot pay a claim in status SUBMITTED; it must be APPROVED."}
+09:42:23 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/claims/72248e33-40a6-4a53-ac41-dced126b74b2/events "HTTP/1.1 200 OK"
+09:42:23 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/claims/72248e33-40a6-4a53-ac41-dced126b74b2/events -> 200 (4 ms)
+  response: [{"id":"a8bbba0c-c85a-4e20-a72a-1903a2a13436","claim_id":"72248e33-40a6-4a53-ac41-dced126b74b2","actor_id":"b4d06d51-257c-443e-996f-0e920c6462b7","from_status":null,"to_status":"DRAFT","note":null,"occurred_at":"2026-08-20T09:42:23.105320Z"},{"id":"40b3f4cb-2463-41a2-aac5-28b898199450","claim_id":"72248e33-40a6-4a53-ac41-dced126b74b2","actor_id":"b4d06d51-257c-443e-996f-0e920c6462b7","from_status":"DRAFT","to_status":"SUBMITTED","note":null,"occurred_at":"2026-08-20T09:42:23.115838Z"}]
+09:42:23 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_state_machine.py::test_a_refused_transition_writes_no_audit_event

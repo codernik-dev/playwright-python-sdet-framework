@@ -1,0 +1,5 @@
+09:42:22 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_claims_validation.py::test_sorting_by_an_unpermitted_field_is_rejected[unknown-field]
+09:42:22 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/claims?sort=nonexistent "HTTP/1.1 422 Unprocessable Entity"
+09:42:22 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/claims?sort=nonexistent -> 422 (5 ms)
+  response: {"detail":"Cannot sort by 'nonexistent'; allowed: ['amount', 'created_at', 'incident_date', 'reference']"}
+09:42:22 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_claims_validation.py::test_sorting_by_an_unpermitted_field_is_rejected[unknown-field]

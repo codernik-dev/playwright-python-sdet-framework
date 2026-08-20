@@ -1,0 +1,2 @@
+21:42:30 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_recording.py::test_history_is_bounded_and_says_what_it_dropped
+21:42:30 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_recording.py::test_history_is_bounded_and_says_what_it_dropped

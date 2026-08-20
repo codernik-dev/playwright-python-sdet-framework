@@ -1,0 +1,5 @@
+09:42:24 DEBUG    claimdesk_qa.tests.conftest start tests/db/test_integrity.py::test_every_claim_has_an_audit_trail
+09:42:24 DEBUG    claimdesk_qa.claimdesk_qa.db.connection Connected read-only to postgresql://claimdesk_qa_ro:***masked***@127.0.0.1:5432/claimdesk
+09:42:24 DEBUG    claimdesk_qa.claimdesk_qa.db.connection SQL: SELECT c.reference AS label, 0 AS total FROM claims c LEFT JOIN claim_events e ON e.claim_id = c.id WHERE e.id IS NULL
+  rows: 0
+09:42:24 DEBUG    claimdesk_qa.tests.conftest end tests/db/test_integrity.py::test_every_claim_has_an_audit_trail

@@ -1,0 +1,15 @@
+09:42:22 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_claims_crud.py::test_withdrawing_a_draft_moves_it_to_withdrawn_and_keeps_it_visible
+09:42:22 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/policies "HTTP/1.1 200 OK"
+09:42:22 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/policies -> 200 (5 ms)
+  response: [{"id":"433046d9-54fd-4af3-b793-7e8cb15fc3dc","policy_number":"POL-1001","holder_id":"b4d06d51-257c-443e-996f-0e920c6462b7","coverage_limit":"10000.00","is_active":true},{"id":"b62d37b6-fc44-48aa-8445-861bfd5f8be5","policy_number":"POL-1002","holder_id":"b4d06d51-257c-443e-996f-0e920c6462b7","coverage_limit":"2500.00","is_active":true}]
+09:42:22 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+09:42:22 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (10 ms)
+  request : {'policy_id': '433046d9-54fd-4af3-b793-7e8cb15fc3dc', 'amount': '250.00', 'description': 'QA ca7da273 Pretty factor game economic these fall best.', 'incident_date': '2026-08-13'}
+  response: {"id":"9402d4f2-a936-4ed8-acc1-97cb69a0b24b","reference":"CLM-48C1196E","policy_id":"433046d9-54fd-4af3-b793-7e8cb15fc3dc","claimant_id":"b4d06d51-257c-443e-996f-0e920c6462b7","amount":"250.00","description":"QA ca7da273 Pretty factor game economic these fall best.","incident_date":"2026-08-13","status":"DRAFT","created_at":"2026-08-20T09:42:22.346019Z","updated_at":"2026-08-20T09:42:22.346019Z","withdrawn_at":null,"decided_by_id":null}
+09:42:22 INFO     httpx HTTP Request: DELETE http://127.0.0.1:8000/api/v1/claims/9402d4f2-a936-4ed8-acc1-97cb69a0b24b "HTTP/1.1 204 No Content"
+09:42:22 DEBUG    claimdesk_qa.claimdesk_qa.api.client DELETE http://127.0.0.1:8000/api/v1/claims/9402d4f2-a936-4ed8-acc1-97cb69a0b24b -> 204 (5 ms)
+  response: 
+09:42:22 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/claims/9402d4f2-a936-4ed8-acc1-97cb69a0b24b "HTTP/1.1 200 OK"
+09:42:22 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/claims/9402d4f2-a936-4ed8-acc1-97cb69a0b24b -> 200 (4 ms)
+  response: {"id":"9402d4f2-a936-4ed8-acc1-97cb69a0b24b","reference":"CLM-48C1196E","policy_id":"433046d9-54fd-4af3-b793-7e8cb15fc3dc","claimant_id":"b4d06d51-257c-443e-996f-0e920c6462b7","amount":"250.00","description":"QA ca7da273 Pretty factor game economic these fall best.","incident_date":"2026-08-13","status":"WITHDRAWN","created_at":"2026-08-20T09:42:22.346019Z","updated_at":"2026-08-20T09:42:22.355833Z","withdrawn_at":"2026-08-20T09:42:22.357167Z","decided_by_id":null}
+09:42:22 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_claims_crud.py::test_withdrawing_a_draft_moves_it_to_withdrawn_and_keeps_it_visible

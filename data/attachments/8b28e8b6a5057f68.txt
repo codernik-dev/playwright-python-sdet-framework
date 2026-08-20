@@ -1,0 +1,2 @@
+09:42:20 INFO    [-] claimdesk_qa.tests.conftest: run_id=20260820-094219-59d8 worker=gw0 env=ci base_url=http://127.0.0.1:8000
+09:42:20 INFO    [-] claimdesk_qa.claimdesk_qa.core.readiness: ClaimDesk at http://127.0.0.1:8000 became ready after 0.05s (1 attempt(s)): HTTP 200

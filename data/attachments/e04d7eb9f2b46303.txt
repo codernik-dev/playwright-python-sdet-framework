@@ -1,0 +1,2 @@
+09:42:30 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_allure_support.py::test_every_pattern_can_match_across_a_multi_line_value[Wrong HTTP status]
+09:42:30 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_allure_support.py::test_every_pattern_can_match_across_a_multi_line_value[Wrong HTTP status]

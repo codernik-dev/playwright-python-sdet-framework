@@ -1,0 +1,2 @@
+21:42:30 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_flakiness.py::test_different_runs_get_different_seeds
+21:42:30 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_flakiness.py::test_different_runs_get_different_seeds

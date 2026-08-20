@@ -1,0 +1,2 @@
+21:42:30 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_logging_and_correlation.py::test_the_default_outside_any_context_is_a_placeholder
+21:42:30 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_logging_and_correlation.py::test_the_default_outside_any_context_is_a_placeholder

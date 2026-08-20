@@ -1,0 +1,6 @@
+09:42:21 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_auth.py::test_login_with_the_wrong_password_is_rejected
+09:42:21 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/auth/login "HTTP/1.1 401 Unauthorized"
+09:42:21 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/auth/login -> 401 (64 ms)
+  request : {'email': 'customer@example.com', 'password': 'definitely-not-the-password'}
+  response: {"detail":"Invalid email or password"}
+09:42:21 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_auth.py::test_login_with_the_wrong_password_is_rejected
