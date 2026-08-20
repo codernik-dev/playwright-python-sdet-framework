@@ -15,7 +15,7 @@ description = "End-to-end SDET automation framework (UI + API + DB) for the Clai
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
 license = { text = "MIT" }
-authors = [{ name = "Techsapphire" }]
+authors = [{ name = "Nikesh Walia" }]
 keywords = ["sdet", "test-automation", "playwright", "pytest", "api-testing", "database-testing"]
 
 dependencies = [
