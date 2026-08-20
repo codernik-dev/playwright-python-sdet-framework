@@ -6,6 +6,9 @@
 
 **Python · pytest · Playwright · httpx · PostgreSQL · Allure · Docker · Jenkins · GitHub Actions**
 
+**[Browse the latest test report](https://codernik-dev.github.io/playwright-python-sdet-framework/)**
+- published by the nightly cross-browser run, not a screenshot.
+
 A production-style test automation framework that exercises an insurance-claims application
 through three independent layers - **browser, REST API, and database** - with the discipline of
 a real engineering codebase: an installable package, strict typing, architecture decision

@@ -523,7 +523,8 @@ Full write-up: [phase-8-reporting.md](phase-8-reporting.md).
 | Passing tests attach nothing | ✅ **VERIFIED** |
 
 ⚠️ **NOT VERIFIED in Phase 8:** the nightly workflow's Allure publication to GitHub Pages
-- written, but it needs a push and Pages enabled.
+- written, but it needs a push and Pages enabled. *(Superseded: Pages has since been
+enabled on `gh-pages`, the nightly's publish step ran green, and the report is live.)*
 
 ### Findings
 
@@ -588,7 +589,8 @@ systemd exactly as on a server.
 | Teardown removes containers, network and volumes | ✅ **VERIFIED** |
 
 ⚠️ **NOT VERIFIED in Phase 10:** the same workflow on a **GitHub runner** - written, and
-now known to describe a working stack, but not dispatched. That needs a push.
+now known to describe a working stack, but not dispatched. That needs a push. *(Superseded:
+`docker.yml` has since run green on a GitHub-hosted runner.)*
 
 ### Findings - four defects, none visible in review
 
@@ -698,8 +700,8 @@ Full write-up: [phase-15-measurement.md](phase-15-measurement.md). Machine B: AM
 
 | # | Item | Blocks | Owner action |
 |---|---|---|---|
-| 0 | **Run the Docker workflow on a GitHub runner** | Independent confirmation only | Phase 10 is verified locally (Docker Engine 29.7.2 in WSL2, `351 passed` in the container). Push to `main`, or dispatch `docker.yml`, to have a genuinely clean machine confirm it |
-| 0b | **Enable GitHub Pages** | Nightly Allure publication | Settings → Pages → source `gh-pages`. The nightly workflow publishes there already |
+| 0 | ~~Run the Docker workflow on a GitHub runner~~ | - | ✅ Done - `docker.yml` ran green on a GitHub-hosted runner, twice, confirming on a genuinely clean machine what Phase 10 could only show locally (Docker Engine 29.7.2 in WSL2) |
+| 0b | ~~Enable GitHub Pages~~ | - | ✅ Done - source `gh-pages`. The nightly had been publishing there all along with nothing serving it; the report is now live at <https://codernik-dev.github.io/playwright-python-sdet-framework/> |
 | 1 | ~~Install Docker~~ | - | ✅ Done on **both** machines - Engine 29.7.2 inside WSL2, installed on Machine B with no elevation after the initial "impossible" assessment turned out to be wrong |
 | 2 | ~~Create the local database + roles~~ | - | ✅ Done - `scripts/local_db.ps1` builds a disposable cluster; your existing PostgreSQL service was never touched and no superuser password was needed |
 | 3 | ~~`playwright install chromium`~~ | - | ✅ Done - Chromium 114.5 MiB installed, Playwright 1.62.0 |
