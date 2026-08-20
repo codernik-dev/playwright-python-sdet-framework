@@ -1,8 +1,8 @@
-# Phase 4 — The pytest foundation
+# Phase 4 - The pytest foundation
 
 > Teaching document. This is the layer every test sits on: artefacts, correlation,
 > logging, readiness, and the fixtures and hooks that tie them together.
-> It contains no test of the application — and that is the point. Get this wrong
+> It contains no test of the application - and that is the point. Get this wrong
 > and every later phase inherits the damage.
 
 ---
@@ -14,14 +14,14 @@
 | `src/claimdesk_qa/core/artifacts.py` | Where failure evidence goes and how it is named |
 | `src/claimdesk_qa/core/correlation.py` | Identifiers that join a test to the application's logs |
 | `src/claimdesk_qa/core/logging.py` | Console, per-worker and per-test logging |
-| `src/claimdesk_qa/core/readiness.py` | Waiting for a dependency — the replacement for `sleep` |
+| `src/claimdesk_qa/core/readiness.py` | Waiting for a dependency - the replacement for `sleep` |
 | `src/claimdesk_qa/core/exceptions.py` | "The test could not run" versus "the product is wrong" |
 | `tests/conftest.py` | Session fixtures, marker enforcement, artefact policy |
 | `tests/framework/test_*.py` | 38 new unit tests for all of the above |
 
 ---
 
-## Decision 1 — `FrameworkError` is not `AssertionError`
+## Decision 1 - `FrameworkError` is not `AssertionError`
 
 ```python
 class FrameworkError(Exception):
@@ -29,7 +29,7 @@ class FrameworkError(Exception):
 ```
 
 An `AssertionError` means the application behaved incorrectly. A `FrameworkError`
-means the test never got the chance to find out — the environment was wrong, a
+means the test never got the chance to find out - the environment was wrong, a
 service never came up, configuration was missing.
 
 Conflating them is expensive in a specific way: an infrastructure outage arrives
@@ -39,7 +39,7 @@ means a database that is down reads as *a database that is down*.
 
 ---
 
-## Decision 2 — Artefacts: capture always, keep selectively
+## Decision 2 - Artefacts: capture always, keep selectively
 
 ```
 artifacts/
@@ -86,7 +86,7 @@ left exactly one directory behind.
 A parametrised node id easily exceeds Windows' 260-character path limit. The
 failure this produces is genuinely horrible: it happens inside a library, during
 teardown, while trying to save the evidence for a *different* failure. So slugs
-are truncated — and truncation appends a hash of the **full** node id:
+are truncated - and truncation appends a hash of the **full** node id:
 
 ```python
 if len(slug) > max_length:
@@ -99,22 +99,22 @@ directory and overwrite each other's evidence. There is a test for exactly that.
 
 ---
 
-## Decision 3 — Correlation identifiers, and two real bugs
+## Decision 3 - Correlation identifiers, and two real bugs
 
 Every HTTP request the framework makes will carry `X-Request-Id`. ClaimDesk echoes
 it and writes it to its own log, so one `grep` shows exactly the requests a failing
-test made — instead of guessing from timestamps.
+test made - instead of guessing from timestamps.
 
 The id is `sha256(node_id)[:10]`, which makes it **stable** (the same test yields
 the same id in every run, so you can compare today's failure with last week's),
 **short** enough to sit in a log line, and **safe** as a header value.
 
 The current id lives in a `ContextVar` rather than being threaded through every
-call. Two unrelated things need it — the log formatter and the HTTP client — and
+call. Two unrelated things need it - the log formatter and the HTTP client - and
 passing it as an argument would force every helper in between to know about
 correlation.
 
-### Bug 1 — the correlation id never reached the log file
+### Bug 1 - the correlation id never reached the log file
 
 The first implementation gave each handler its own filter holding its own default:
 
@@ -128,11 +128,11 @@ default onto the record; every later filter found the attribute already present
 and left it alone. The per-test log showed `[-]` and correlation was silently
 useless.
 
-The fix is not "order the handlers correctly" — it is to remove the ordering
+The fix is not "order the handlers correctly" - it is to remove the ordering
 dependency. All filters now read one `ContextVar`, so it no longer matters which
 runs first: they all compute the same answer.
 
-### Bug 2 — moving the filter to the logger silently deleted every log line
+### Bug 2 - moving the filter to the logger silently deleted every log line
 
 The obvious next move was to attach the filter once, to the logger:
 
@@ -141,7 +141,7 @@ logger.addFilter(RequestIdFilter())  # looks tidier. It is wrong.
 ```
 
 A logger's filters are applied **only to records logged through that logger
-directly**. A record from a child logger — `claimdesk_qa.api` — reaches the
+directly**. A record from a child logger - `claimdesk_qa.api` - reaches the
 parent's handlers through `callHandlers`, which skips the parent's filters
 entirely. So `request_id` was missing, the formatter raised `KeyError`, and
 `logging` swallowed it.
@@ -154,12 +154,12 @@ of origin. Both bugs now have named regression tests.
 > **Interview soundbite:** *"Two logging bugs, both silent. One made correlation
 > ids vanish because handler filters mutate a shared record, so ordering decided
 > the value. The other deleted log lines entirely because logger-level filters do
-> not apply to records from child loggers. Neither failed loudly — the evidence
+> not apply to records from child loggers. Neither failed loudly - the evidence
 > was just missing when I needed it. Both have regression tests now."*
 
 ---
 
-## Decision 4 — Log levels are per destination
+## Decision 4 - Log levels are per destination
 
 ```python
 logger.setLevel(logging.DEBUG)  # nothing is dropped before the handlers
@@ -169,14 +169,14 @@ file_handler.setLevel(logging.DEBUG)  # files exist for the moment it failed
 
 Getting this backwards is the third silent failure of the phase, and I hit it:
 with the **logger** at INFO, debug records are discarded before any handler sees
-them, so every per-test log file is empty. Discovered — as always — while
+them, so every per-test log file is empty. Discovered - as always - while
 triaging a real failure.
 
 The rule: filter late, at the destination, not early at the source.
 
 ---
 
-## Decision 5 — Readiness, not `sleep`
+## Decision 5 - Readiness, not `sleep`
 
 ```python
 subprocess.run(["docker", "compose", "up", "-d"])
@@ -184,7 +184,7 @@ time.sleep(10)  # "should be enough"
 ```
 
 Wrong in both directions: ten wasted seconds on every fast run, and not enough on
-a loaded CI agent — where it fails with a connection error that looks like a
+a loaded CI agent - where it fails with a connection error that looks like a
 product defect. The fix is never a bigger number.
 
 ```python
@@ -204,8 +204,8 @@ could be made because the target machine actively refused it).
 This is an environment problem, not a product defect.
 ```
 
-It names what was waited for, how hard it tried, the actual OS-level cause, and —
-explicitly — who is at fault. Someone reading a CI log at 03:00 needs all four.
+It names what was waited for, how hard it tried, the actual OS-level cause, and -
+explicitly - who is at fault. Someone reading a CI log at 03:00 needs all four.
 
 The probe, the clock and `sleep` are all **injected**, which is why the unit tests
 can prove that a 60-second timeout times out without spending 60 seconds. A suite
@@ -213,14 +213,14 @@ that is slow to test its own slowness stops being run.
 
 ---
 
-## Decision 6 — Layer markers are applied by location
+## Decision 6 - Layer markers are applied by location
 
 ```python
 _LAYER_BY_DIRECTORY = {"api": "api", "ui": "ui", "db": "db", "e2e": "e2e", "framework": "framework"}
 ```
 
 This is the only piece of magic in the framework, and it is deliberate. The
-alternative — asking every author to remember `@pytest.mark.api` — fails
+alternative - asking every author to remember `@pytest.mark.api` - fails
 **silently**: the test still runs, it simply drops out of the suite it was meant
 to belong to, and nobody notices until a release. Location is a fact that cannot
 be forgotten.
@@ -238,7 +238,7 @@ ERROR: Every test must sit in exactly one layer directory under tests/
 
 ---
 
-## Decision 7 — Database tests skip loudly, never quietly
+## Decision 7 - Database tests skip loudly, never quietly
 
 ```python
 if "db" in present and not settings.db_enabled:
@@ -258,17 +258,17 @@ this is the control that pays for it.
 
 ---
 
-## Decision 8 — Artefact paths are absolute
+## Decision 8 - Artefact paths are absolute
 
 `ARTIFACTS_DIR` is conventionally relative (`artifacts`). A relative path resolves
-against the *current* working directory — so any test that calls `chdir` (the
+against the *current* working directory - so any test that calls `chdir` (the
 framework's own tests do, to isolate themselves from `.env`) would scatter
 evidence into unrelated folders. Anchoring to `pytestconfig.rootpath` removes the
 class of problem rather than the instance.
 
 ---
 
-## Decision 9 — Faker is seeded per test, not per session
+## Decision 9 - Faker is seeded per test, not per session
 
 ```python
 node_digest = int(hashlib.sha256(request.node.nodeid.encode()).hexdigest()[:8], 16)
@@ -311,7 +311,7 @@ pytest tests/api -q                 # ServiceNotReadyError, blaming the environm
 
 ---
 
-## Verification — commands run, output observed
+## Verification - commands run, output observed
 
 | Check | Result |
 |---|---|
@@ -332,7 +332,7 @@ pytest tests/api -q                 # ServiceNotReadyError, blaming the environm
 ## Interview questions this phase earns you
 
 **Q: How do you make a parallel test run debuggable?**
-One run directory shared by every worker — the controller fixes the run id before
+One run directory shared by every worker - the controller fixes the run id before
 workers spawn, so they inherit it. One log file per worker, because concurrent
 appends to a single file interleave and lose lines. One directory per test, named
 from a sanitised node id with a hash suffix so long parametrised names cannot
@@ -351,7 +351,7 @@ the log formatter and the HTTP client can read it without threading a parameter
 through every layer.
 
 **Q: Why not just `sleep` after starting the environment?**
-Because it is wrong in both directions — wasteful when the service is up, and
+Because it is wrong in both directions - wasteful when the service is up, and
 insufficient when the agent is slow. Poll the readiness endpoint and fail with a
 message naming the service, the elapsed budget, the attempt count, the underlying
 error, and the fact that it is an environment problem.
@@ -364,12 +364,12 @@ running the tests.
 **Q: How do you stop someone forgetting a marker?**
 Do not rely on memory. Markers are applied from the test's directory, and a test
 outside a known layer directory is a collection error. A forgotten marker is a
-silent failure — the test passes while quietly leaving the suite it belonged to.
+silent failure - the test passes while quietly leaving the suite it belonged to.
 
 **Q: Tell me about a bug you found in your own framework.**
 Two, both silent. Handler-level log filters mutate a shared record, so whichever
 handler ran first decided the correlation id and the rest was `[-]`. Fixing it by
-moving the filter onto the logger made it worse — logger filters do not apply to
+moving the filter onto the logger made it worse - logger filters do not apply to
 records from child loggers, so `request_id` went missing entirely, the formatter
 raised `KeyError`, and log lines simply disappeared. Both have regression tests
 named after the failure mode.

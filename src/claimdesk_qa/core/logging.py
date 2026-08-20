@@ -2,11 +2,11 @@
 
 Three destinations, each answering a different need:
 
-* **Console** — what a developer watches while running locally.
-* **One file per xdist worker** — the full narrative of that process. Two
+* **Console** - what a developer watches while running locally.
+* **One file per xdist worker** - the full narrative of that process. Two
   processes writing to one file interleave and lose lines, so each worker gets
   its own.
-* **One file per test** — the slice a reader actually wants when triaging a single
+* **One file per test** - the slice a reader actually wants when triaging a single
   failure. This is what gets attached to the report in Phase 8.
 
 Every record carries the ``request_id`` of the test that produced it, so a test
@@ -35,7 +35,7 @@ class RequestIdFilter(logging.Filter):
 
     1. Guarantee the attribute exists. The formatter references
        ``%(request_id)s``, so a library that logs without it would otherwise raise
-       ``KeyError`` inside the handler — turning a logging statement into a test
+       ``KeyError`` inside the handler - turning a logging statement into a test
        failure. Logging must never be able to break a test.
     2. Read the value from the context variable rather than from per-handler
        state.
@@ -71,7 +71,7 @@ def configure_logging(*, level: str, worker_log: Path) -> logging.Logger:
     Levels are set per destination, which matters more than it looks:
 
     * the **logger** is set to DEBUG, because a record filtered out at the logger
-      never reaches any handler — set it to INFO and the debug detail is gone
+      never reaches any handler - set it to INFO and the debug detail is gone
       before the files ever see it;
     * the **console** is set to ``level`` (INFO by default), so watching a local
       run stays readable;
@@ -125,8 +125,8 @@ def configure_logging(*, level: str, worker_log: Path) -> logging.Logger:
 def per_test_log(path: Path, *, request_id: str, level: str = "DEBUG") -> Iterator[Path]:
     """Capture this test's log lines into their own file.
 
-    The handler is removed in a ``finally`` block, so a test that fails — or is
-    interrupted — cannot leave a handler attached and start bleeding its output
+    The handler is removed in a ``finally`` block, so a test that fails - or is
+    interrupted - cannot leave a handler attached and start bleeding its output
     into every subsequent test's file.
     """
     path.parent.mkdir(parents=True, exist_ok=True)

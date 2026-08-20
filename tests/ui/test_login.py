@@ -1,6 +1,6 @@
-"""UI-AUTH — signing in and out through the browser.
+"""UI-AUTH - signing in and out through the browser.
 
-Matrix: UI-AUTH-001 … UI-AUTH-005.
+Matrix: UI-AUTH-001 ... UI-AUTH-005.
 
 **These are the only tests that drive the login form.** Every other browser test
 starts from an injected session, because it is not testing sign-in and should not
@@ -25,7 +25,7 @@ def password(settings: Settings) -> str:
 
 @pytest.mark.smoke
 def test_a_customer_can_sign_in(anonymous_page: Page, settings: Settings, password: str) -> None:
-    """UI-AUTH-001 — the canonical happy path."""
+    """UI-AUTH-001 - the canonical happy path."""
     login = LoginPage(anonymous_page, settings).open().expect_loaded()
 
     login.sign_in(SeededAccounts.CUSTOMER, password)
@@ -58,10 +58,10 @@ def test_signing_in_with_a_wrong_password_shows_an_error(
 def test_an_unknown_account_gives_the_same_message_as_a_wrong_password(
     anonymous_page: Page, settings: Settings, password: str
 ) -> None:
-    """UI-AUTH-003 — user enumeration, checked at the interface as well as the API.
+    """UI-AUTH-003 - user enumeration, checked at the interface as well as the API.
 
     The API test proves the response bodies match. This proves the *rendered*
-    message matches too — a UI that helpfully said "no account with that email"
+    message matches too - a UI that helpfully said "no account with that email"
     would leak exactly what the API was careful not to.
     """
     login = LoginPage(anonymous_page, settings).open()
@@ -99,11 +99,11 @@ def test_signing_out_ends_the_session(customer_page: Page, settings: Settings) -
 def test_an_anonymous_visitor_is_redirected_to_sign_in(
     anonymous_page: Page, settings: Settings
 ) -> None:
-    """UI-AUTH-005 — the browser redirects where the API would return 401.
+    """UI-AUTH-005 - the browser redirects where the API would return 401.
 
     Same rule, two presentations: an API client gets a status code it can act on,
     a person gets a page they can use. Asserting the ``next`` parameter matters
-    too — losing it sends the user to the dashboard after signing in instead of
+    too - losing it sends the user to the dashboard after signing in instead of
     back to the page they actually wanted.
     """
     anonymous_page.goto(f"{settings.base_url}/claims")

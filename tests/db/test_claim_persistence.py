@@ -1,6 +1,6 @@
-"""DB-CLM — what the application actually stored.
+"""DB-CLM - what the application actually stored.
 
-Matrix: DB-CLM-001 … DB-CLM-006.
+Matrix: DB-CLM-001 ... DB-CLM-006.
 
 The pattern is always the same: **act through the application, then assert on
 storage.** A database test that only reads would be testing the seed script.
@@ -30,10 +30,10 @@ from claimdesk_qa.domain import ClaimStatus
 def test_a_claim_created_through_the_api_is_persisted(
     customer_claims: ClaimsApi, claim_factory: ClaimFactory, claims_db: ClaimQueries
 ) -> None:
-    """DB-CLM-001 — the write reached storage, with every field intact.
+    """DB-CLM-001 - the write reached storage, with every field intact.
 
     A `201` proves the API accepted the request. It does not prove a row exists,
-    and it certainly does not prove the row holds what was sent — an application
+    and it certainly does not prove the row holds what was sent - an application
     that returned the payload it was given while silently failing to commit would
     satisfy every API test in this repository.
     """
@@ -55,13 +55,13 @@ def test_a_claim_created_through_the_api_is_persisted(
 def test_money_is_stored_exactly(
     customer_claims: ClaimsApi, claim_factory: ClaimFactory, claims_db: ClaimQueries
 ) -> None:
-    """DB-CLM-002 — exact equality on a Decimal, all the way to storage.
+    """DB-CLM-002 - exact equality on a Decimal, all the way to storage.
 
     ``0.1 + 0.2 != 0.3`` stops being a curiosity when the value is a payout. This
     asserts equality rather than closeness, which is only possible because the
     column is NUMERIC and psycopg returns Decimal. The moment anything in the
     chain becomes a float, the strongest available assertion drops to "close
-    enough" — and a cent-per-claim discrepancy becomes invisible.
+    enough" - and a cent-per-claim discrepancy becomes invisible.
     """
     awkward = "1234.57"  # not representable exactly in binary floating point
 
@@ -77,7 +77,7 @@ def test_money_is_stored_exactly(
 def test_updating_a_draft_is_persisted(
     customer_claims: ClaimsApi, claim_factory: ClaimFactory, claims_db: ClaimQueries
 ) -> None:
-    """DB-CLM-003 — and the update timestamp moves."""
+    """DB-CLM-003 - and the update timestamp moves."""
     claim = customer_claims.create_claim(claim_factory.payload(amount="500.00"))
     before = claims_db.by_id(claim.id)
     assert before is not None
@@ -95,7 +95,7 @@ def test_updating_a_draft_is_persisted(
 def test_withdrawing_a_claim_is_a_soft_delete(
     customer_claims: ClaimsApi, claim_factory: ClaimFactory, claims_db: ClaimQueries
 ) -> None:
-    """DB-CLM-004 — the assertion only the database can make.
+    """DB-CLM-004 - the assertion only the database can make.
 
     The API test proves a withdrawn claim reports ``WITHDRAWN``. It cannot prove
     the row was not physically deleted and re-created, nor that a hard delete did
@@ -120,7 +120,7 @@ def test_the_approving_actor_is_recorded_against_the_claim(
     claims_db: ClaimQueries,
     users_db: UserQueries,
 ) -> None:
-    """DB-CLM-005 — the decision is attributable to a real person.
+    """DB-CLM-005 - the decision is attributable to a real person.
 
     ``decided_by_id`` is resolved back to a user row rather than merely checked
     for non-null: a foreign key that pointed at a deleted or wrong user would pass
@@ -140,7 +140,7 @@ def test_the_approving_actor_is_recorded_against_the_claim(
 def test_a_rejected_write_leaves_no_row(
     customer_claims: ClaimsApi, claim_factory: ClaimFactory, claims_db: ClaimQueries
 ) -> None:
-    """DB-CLM-006 — a 422 must not leave a partial record behind.
+    """DB-CLM-006 - a 422 must not leave a partial record behind.
 
     The failure mode being guarded against is a handler that inserts first and
     validates second. The API would still return an error, so no API test could
@@ -153,7 +153,7 @@ def test_a_rejected_write_leaves_no_row(
     do with this test.
 
     That is the same error as the Phase 6 pagination flake, made again in a new
-    layer — which is the argument for stating the rule as a rule rather than
+    layer - which is the argument for stating the rule as a rule rather than
     fixing instances of it. **A test may assert on an invariant globally, because
     an invariant holds no matter who else is writing. It may never assert on an
     aggregate globally, because an aggregate is a fact about the whole database
@@ -176,7 +176,7 @@ def test_a_rejected_write_leaves_no_row(
 def test_passwords_are_never_stored_in_plaintext(
     users_db: UserQueries, integrity_db: IntegrityQueries, settings: Settings
 ) -> None:
-    """DB-SEC-001 — one query, and it catches hashing being disabled entirely.
+    """DB-SEC-001 - one query, and it catches hashing being disabled entirely.
 
     Checked two ways: the seeded password appears in no ``password_hash``, and the
     stored value carries a bcrypt prefix. The first catches a no-op hash; the

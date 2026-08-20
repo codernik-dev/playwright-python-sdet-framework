@@ -2,7 +2,7 @@
 
 The problem this solves
 -----------------------
-When a suite goes red at 03:00, the question is never "which assertion failed" —
+When a suite goes red at 03:00, the question is never "which assertion failed" -
 the report already says that. It is **"what actually happened before it?"** The
 HTTP exchanges and the SQL that ran are the answer, and by the time anyone reads
 the report the process that knew them has exited.
@@ -14,15 +14,15 @@ customer, an adjuster and an admin) plus a database connection, and a reader
 wants **one timeline**, not four fragments they have to interleave by hand.
 
 So there is one recorder per test, and the objects push into whichever recorder is
-active. A ``ContextVar`` carries it — the same mechanism the correlation id uses —
+active. A ``ContextVar`` carries it - the same mechanism the correlation id uses -
 which keeps the clients free of any parameter for something they should not have
 to know about.
 
 Two properties matter more than the feature itself:
 
 * **Recording never fails a test.** With no recorder active every call is a
-  no-op, so a client built outside a test — in a script, in a REPL, in the
-  readiness probe — behaves exactly as before.
+  no-op, so a client built outside a test - in a script, in a REPL, in the
+  readiness probe - behaves exactly as before.
 * **It is bounded.** A parametrised test that makes a thousand requests must not
   turn its own evidence into a memory problem, so each stream keeps the most
   recent :data:`MAX_RECORDED_ENTRIES` and says how many it dropped.
@@ -45,8 +45,8 @@ class Renderable(Protocol):
     """Anything that can describe itself for a human reading a failure.
 
     A structural type rather than a base class, deliberately: ``core`` must not
-    import ``api`` or ``db`` — the dependency arrows in this framework point one
-    way — and a Protocol lets those layers hand their own value objects over
+    import ``api`` or ``db`` - the dependency arrows in this framework point one
+    way - and a Protocol lets those layers hand their own value objects over
     without either side importing the other.
     """
 
@@ -69,7 +69,7 @@ class Stream:
         """Render immediately rather than keeping the object.
 
         Rendering now costs a string; keeping the object would keep whatever it
-        references alive — a response body, a connection — for the rest of the
+        references alive - a response body, a connection - for the rest of the
         test.
         """
         if len(self._entries) == MAX_RECORDED_ENTRIES:
@@ -135,7 +135,7 @@ def recording() -> Iterator[Recording]:
     """Make a fresh recorder current for the duration of one test.
 
     The token is reset in a ``finally`` block, so a test that raises cannot leave
-    its recorder attached and start collecting the *next* test's traffic — which
+    its recorder attached and start collecting the *next* test's traffic - which
     would be worse than collecting nothing, because the evidence would look
     genuine while describing the wrong test.
     """

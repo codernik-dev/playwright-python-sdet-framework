@@ -1,6 +1,6 @@
-"""UI-CLM — the claims table: filtering, searching and sorting.
+"""UI-CLM - the claims table: filtering, searching and sorting.
 
-Matrix: UI-CLM-001 … UI-CLM-006.
+Matrix: UI-CLM-001 ... UI-CLM-006.
 
 Every test here arranges its data **through the API** and then asserts on the
 browser. That is a scoping decision, not a shortcut: a test about the table should
@@ -28,7 +28,7 @@ def test_a_claim_created_through_the_api_appears_in_the_table(
     customer_claims: ClaimsApi,
     claim_factory: ClaimFactory,
 ) -> None:
-    """UI-CLM-001 — the read path, end to end.
+    """UI-CLM-001 - the read path, end to end.
 
     Searching for the claim's own reference rather than scanning the whole table:
     the table holds the seeded corpus plus whatever other workers are creating at
@@ -51,10 +51,10 @@ def test_searching_narrows_the_table_to_one_claim(
     customer_claims: ClaimsApi,
     claim_factory: ClaimFactory,
 ) -> None:
-    """UI-CLM-002 — asynchronous filtering, with no sleep anywhere.
+    """UI-CLM-002 - asynchronous filtering, with no sleep anywhere.
 
     The page fetches a partial and swaps it in. The page object waits on
-    ``aria-busy`` flipping back to ``false`` — a state the application publishes,
+    ``aria-busy`` flipping back to ``false`` - a state the application publishes,
     not a duration someone guessed.
     """
     description = claim_factory.description()
@@ -87,7 +87,7 @@ def test_a_search_matching_nothing_shows_the_empty_state(
 def test_filtering_by_status_shows_only_that_status(
     customer_page: Page, settings: Settings
 ) -> None:
-    """UI-CLM-004 — every visible chip must match the selected filter."""
+    """UI-CLM-004 - every visible chip must match the selected filter."""
     claims = ClaimsListPage(customer_page, settings).open().expect_loaded()
 
     claims.filter_by_status(ClaimStatus.PAID.value)
@@ -120,7 +120,7 @@ def test_sorting_by_amount_orders_the_visible_rows(customer_page: Page, settings
     """UI-CLM-005.
 
     The rendered values are read back and compared against their own sorted order,
-    rather than spot-checking the first and last row — a spot check passes happily
+    rather than spot-checking the first and last row - a spot check passes happily
     on a list that is wrong in the middle.
     """
     claims = ClaimsListPage(customer_page, settings).open().expect_loaded()
@@ -133,7 +133,7 @@ def test_sorting_by_amount_orders_the_visible_rows(customer_page: Page, settings
 
 
 def test_the_table_paginates(customer_page: Page, settings: Settings) -> None:
-    """UI-CLM-006 — page two holds different claims from page one.
+    """UI-CLM-006 - page two holds different claims from page one.
 
     **Scoped to the seeded corpus on purpose, and this test taught me why.**
 
@@ -168,7 +168,7 @@ def test_opening_a_claim_from_the_table_navigates_to_its_detail_page(
     customer_claims: ClaimsApi,
     claim_factory: ClaimFactory,
 ) -> None:
-    """The link between two pages — the thing a UI test is uniquely able to prove."""
+    """The link between two pages - the thing a UI test is uniquely able to prove."""
     claim = customer_claims.create_claim(claim_factory.payload())
 
     claims = ClaimsListPage(customer_page, settings).open().expect_loaded()

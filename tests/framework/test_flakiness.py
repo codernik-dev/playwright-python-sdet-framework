@@ -18,8 +18,8 @@ def test_api_and_database_tests_are_never_retried(layer: str) -> None:
 
     A browser shares a machine with a compositor and a renderer, so a retry
     there answers a real question. An API or database test that fails
-    intermittently is not flaky, it is **wrong** — a race, a shared-state
-    assumption, a real product defect — and retrying it deletes the evidence.
+    intermittently is not flaky, it is **wrong** - a race, a shared-state
+    assumption, a real product defect - and retrying it deletes the evidence.
     """
     assert reruns_for({layer}, is_ci=True) == 0
     assert reruns_for({layer}, is_ci=False) == 0
@@ -27,7 +27,7 @@ def test_api_and_database_tests_are_never_retried(layer: str) -> None:
 
 @pytest.mark.parametrize("layer", ["ui", "e2e"])
 def test_browser_tests_are_retried_once_in_ci_only(layer: str) -> None:
-    """Locally a flake should be reproduced — the developer is right there."""
+    """Locally a flake should be reproduced - the developer is right there."""
     assert reruns_for({layer}, is_ci=True) == MAX_RERUNS
     assert reruns_for({layer}, is_ci=False) == 0
 

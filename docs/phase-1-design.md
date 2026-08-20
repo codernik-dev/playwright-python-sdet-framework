@@ -1,6 +1,6 @@
-# PHASE 1 — Project Design & Architecture
+# PHASE 1 - Project Design & Architecture
 
-> Status: **DESIGN ONLY — nothing implemented yet.** No results, timings, pass rates or
+> Status: **DESIGN ONLY - nothing implemented yet.** No results, timings, pass rates or
 > coverage numbers appear in this document because none have been measured.
 > Anything requiring execution is marked `NOT VERIFIED`.
 
@@ -11,9 +11,9 @@
 | Thing | Name | Notes |
 |---|---|---|
 | GitHub repository | **`playwright-python-sdet-framework`** | Keyword-forward for recruiter/ATS search: tool + language + role + artefact type |
-| Framework (README title) | **ClaimDesk QA — End-to-End SDET Automation Framework** | Python · Playwright · pytest · PostgreSQL · Docker · Jenkins |
+| Framework (README title) | **ClaimDesk QA - End-to-End SDET Automation Framework** | Python · Playwright · pytest · PostgreSQL · Docker · Jenkins |
 | System Under Test (SUT) | **ClaimDesk** | A small containerised insurance-claims portal. A *fixture*, not the achievement |
-| Python package | `claimdesk_qa` | Installed with `pip install -e .` — no `sys.path` hacks |
+| Python package | `claimdesk_qa` | Installed with `pip install -e .` - no `sys.path` hacks |
 
 ---
 
@@ -22,7 +22,7 @@
 ClaimDesk QA is a production-style test automation framework for **ClaimDesk**, a containerised
 insurance claims intake and adjudication portal. The framework exercises the application the way a
 real quality engineer would: through the browser (Playwright), through the public REST API (httpx),
-and against the PostgreSQL database (read-only SQL) — never by importing application code. It is
+and against the PostgreSQL database (read-only SQL) - never by importing application code. It is
 organised as an installable Python package with a layered architecture (config → clients → domain
 objects → assertions → tests), runs in Docker for environment parity, executes in parallel under
 pytest-xdist, publishes Allure and JUnit reports, captures Playwright traces/videos/screenshots and
@@ -49,15 +49,15 @@ cross-browser regression) and a runnable Jenkins declarative pipeline.
 
 **Business rules (these are what the tests actually prove)**
 
-1. `0 < claim.amount <= policy.coverage_limit` — otherwise rejected with `422`.
+1. `0 < claim.amount <= policy.coverage_limit` - otherwise rejected with `422`.
 2. Adjuster approval limit = **5000.00**. Above that, only `ADMIN` may approve → `403`.
 3. Status machine: `DRAFT → SUBMITTED → UNDER_REVIEW → (APPROVED | REJECTED)`, and `APPROVED → PAID`.
    Any other transition → `409 Conflict`.
 4. `PAID` and `REJECTED` claims are immutable.
 5. Every status change writes exactly one `claim_events` row (`actor_id`, `from_status`, `to_status`, `occurred_at`).
 6. Reaching `PAID` creates exactly one `payouts` row whose amount equals the approved claim amount.
-7. A customer may only see their own claims — cross-tenant access returns `404` (not `403`, to avoid resource enumeration).
-8. Money is `NUMERIC(12,2)` — never a float.
+7. A customer may only see their own claims - cross-tenant access returns `404` (not `403`, to avoid resource enumeration).
+8. Money is `NUMERIC(12,2)` - never a float.
 
 ### Why this domain (and not a to-do app / e-commerce demo)
 
@@ -65,7 +65,7 @@ cross-browser regression) and a runnable Jenkins declarative pipeline.
   machine, monetary boundary values, an audit trail, search/filter/sort/pagination, form validation,
   data tables, and multi-role workflows. Nothing has to be bolted on artificially.
 - **It creates genuine reasons to validate the database.** A UI that shows "Approved" proves nothing
-  about whether the payout ledger row was written — that is exactly the class of defect DB validation
+  about whether the payout ledger row was written - that is exactly the class of defect DB validation
   exists to catch, and it is a real production failure mode (money moved twice / never).
 - **It is recruiter-legible.** Insurance / fintech / claims domains dominate enterprise QA job
   postings; the vocabulary transfers directly into interview conversation.
@@ -81,9 +81,9 @@ cross-browser regression) and a runnable Jenkins declarative pipeline.
 | Black-box boundary | Tests reach the SUT **only** over HTTP and SQL. The framework never imports `app/`. This is the real constraint an SDET works under and it is enforced by a lint rule in CI. |
 | Real, runnable environment | `docker compose up` gives Postgres + app with deterministic seed data. No dependency on a flaky public demo site that changes without notice. |
 | Layered coverage matches industry practice | Most coverage at the API layer, DB checks for state integrity, a thin high-value UI layer, few cross-layer journeys. |
-| Two CI systems for two real reasons | GitHub Actions is the CI that actually runs on the public repo; Jenkins is what most enterprises actually use — and the Jenkinsfile is executable against a local Jenkins container, not decorative. |
+| Two CI systems for two real reasons | GitHub Actions is the CI that actually runs on the public repo; Jenkins is what most enterprises actually use - and the Jenkinsfile is executable against a local Jenkins container, not decorative. |
 | Honest engineering artefacts | ADRs, a test matrix, a documented flaky-test policy, a debugging runbook, `.env.example`, no secrets in git. |
-| Windows-first developer experience | You develop on Windows 11; scripts and docs are written for PowerShell **and** bash, and CI runs Linux — the drift is acknowledged, not hidden. |
+| Windows-first developer experience | You develop on Windows 11; scripts and docs are written for PowerShell **and** bash, and CI runs Linux - the drift is acknowledged, not hidden. |
 
 ### Why NOT a public demo application
 
@@ -92,7 +92,7 @@ I evaluated the usual candidates before choosing to containerise a local SUT:
 | Candidate | Why rejected |
 |---|---|
 | SauceDemo | No API, no DB access, no roles beyond canned users, no CRUD. Cannot demonstrate half the required skills. |
-| OrangeHRM demo / DemoQA | Shared public state — other people's data mutates under your tests. Instant flakiness, unfixable. |
+| OrangeHRM demo / DemoQA | Shared public state - other people's data mutates under your tests. Instant flakiness, unfixable. |
 | ParaBank | Shared state, unstable uptime, SOAP-era API, no DB access. |
 | restful-booker | API only, resets periodically, no UI, no DB. |
 | RealWorld/Conduit | Genuinely good API+UI+DB, but the reference stacks drift across implementations and add a Node build chain. High setup cost, low marginal demonstration value. |
@@ -103,7 +103,7 @@ that supports the full UI + API + DB story *and* is reproducible on a clean mach
 
 **The credibility risk of "you tested your own app" is mitigated explicitly:**
 
-1. The framework never imports application code — enforced by a CI lint rule.
+1. The framework never imports application code - enforced by a CI lint rule.
 2. The SUT lives in `app/`, is documented as a fixture, and has its own separate minimal unit tests.
 3. The README states this in the first screen: *"The application is a fixture. The framework is the deliverable."*
 4. The SUT is intentionally left with realistic rough edges (a real state machine, real validation
@@ -115,16 +115,16 @@ that supports the full UI + API + DB story *and* is reproducible on a clean mach
 
 This maps 1:1 to what you will claim in interviews.
 
-1. **Test strategy** — deciding what is tested at which layer and why; owning the test matrix.
-2. **Framework architecture** — a maintainable, layered, installable codebase other engineers can extend.
-3. **Coverage across layers** — UI, API, DB, and cross-layer journeys.
-4. **Test data ownership** — deterministic seed data, per-test data creation, isolation under parallelism.
-5. **Environment engineering** — containerised, reproducible, configuration-driven, secret-free.
-6. **CI/CD integration** — what runs on a PR vs nightly, artefact retention, gating policy.
-7. **Diagnosability** — when CI goes red at 03:00, an engineer must diagnose it from artefacts alone.
-8. **Flake management** — measuring, quarantining, and fixing flakiness rather than hiding it behind retries.
-9. **Quality signals to the team** — reports that answer "what broke, where, in which environment, why".
-10. **Framework quality itself** — the framework has its own unit tests, linting, and type checking.
+1. **Test strategy** - deciding what is tested at which layer and why; owning the test matrix.
+2. **Framework architecture** - a maintainable, layered, installable codebase other engineers can extend.
+3. **Coverage across layers** - UI, API, DB, and cross-layer journeys.
+4. **Test data ownership** - deterministic seed data, per-test data creation, isolation under parallelism.
+5. **Environment engineering** - containerised, reproducible, configuration-driven, secret-free.
+6. **CI/CD integration** - what runs on a PR vs nightly, artefact retention, gating policy.
+7. **Diagnosability** - when CI goes red at 03:00, an engineer must diagnose it from artefacts alone.
+8. **Flake management** - measuring, quarantining, and fixing flakiness rather than hiding it behind retries.
+9. **Quality signals to the team** - reports that answer "what broke, where, in which environment, why".
+10. **Framework quality itself** - the framework has its own unit tests, linting, and type checking.
 
 ---
 
@@ -186,8 +186,8 @@ flowchart TB
 
 ```mermaid
 flowchart TD
-    T["tests/ — intent only, no plumbing"]
-    A["assertions/ — domain assertion helpers"]
+    T["tests/ - intent only, no plumbing"]
+    A["assertions/ - domain assertion helpers"]
     DOM["domain objects<br/>pages + components | api services | db queries"]
     CL["clients<br/>ApiClient httpx | DbClient psycopg | Playwright fixtures"]
     CORE["core<br/>settings, logging, correlation-id, artifacts"]
@@ -226,18 +226,18 @@ Every transition that is **not** on this diagram is a negative test expecting `4
 |---|---|---|
 | Language | **Python 3.11 local / 3.12 in container** | You already work in Python. Avoiding 3.14 locally is deliberate: it is newer than most plugin ecosystems are tested against, and the Playwright container ships 3.12. `requires-python = ">=3.11,<3.14"` = the range we will actually test. |
 | Test runner | **pytest** | Fixtures give real dependency injection with scopes and finalisation; markers give selective execution; parametrisation is first-class; the plugin ecosystem (xdist, rerunfailures, allure) is unmatched. Alternatives (unittest, robot) trade power for ceremony. |
-| UI automation | **Playwright + `pytest-playwright`** | Auto-waiting actionability checks, browser contexts (fast, isolated sessions), `storage_state` reuse, and the trace viewer — the best CI-failure debugging tool available. `pytest-playwright` supplies `page`/`context`/`browser` fixtures and CLI flags for trace/video/screenshot policy; we layer our own fixtures on top rather than re-inventing them. |
-| API automation | **httpx** (sync client) | Same ergonomics as `requests`, plus a reusable pooled `Client`, mandatory timeouts by design, HTTP/2 capable, typed and actively maintained. `requests` would also work — this is a preference, recorded in an ADR, not a religion. |
+| UI automation | **Playwright + `pytest-playwright`** | Auto-waiting actionability checks, browser contexts (fast, isolated sessions), `storage_state` reuse, and the trace viewer - the best CI-failure debugging tool available. `pytest-playwright` supplies `page`/`context`/`browser` fixtures and CLI flags for trace/video/screenshot policy; we layer our own fixtures on top rather than re-inventing them. |
+| API automation | **httpx** (sync client) | Same ergonomics as `requests`, plus a reusable pooled `Client`, mandatory timeouts by design, HTTP/2 capable, typed and actively maintained. `requests` would also work - this is a preference, recorded in an ADR, not a religion. |
 | Response contracts | **pydantic v2 models** | One typed definition serves as schema validation *and* as an ergonomic object in assertions. Avoids maintaining separate JSON-Schema files that drift. |
 | Database access | **psycopg 3**, raw parameterised SQL | Deliberately **no ORM**. The framework must verify what is *actually in the tables*, independent of the application's own models. An ORM would let the app's mapping bugs hide from the test. |
 | DB safety | dedicated **read-only Postgres role** | A test can never mutate state via SQL, only observe it. All writes go through the application, exactly like production. |
 | Config | **pydantic-settings** + `.env` + env vars | Validated at session start, fails fast with a readable error, secrets never hardcoded, one object injected as a fixture. |
 | Test data | seeded reference data + **API factories** + faker | See §11. |
-| Parallelism | **pytest-xdist** | With an explicit isolation strategy and a `serial` marker — not a blind `-n auto`. See §12. |
+| Parallelism | **pytest-xdist** | With an explicit isolation strategy and a `serial` marker - not a blind `-n auto`. See §12. |
 | Retries | **pytest-rerunfailures**, restricted policy | UI only, CI only, 1 retry, reruns counted and reported. Never on API/DB tests. See §13. |
 | Reporting | **Allure** (human) + **JUnit XML** (machine) | See §10. |
 | Containers | **Docker + docker compose** | Environment parity, one-command setup, CI reuse. |
-| SUT stack | FastAPI + SQLAlchemy + Jinja2 + ~~HTMX~~ + PostgreSQL 18 | FastAPI gives a real OpenAPI surface and real 422 validation errors. Jinja2 plus a small amount of plain JavaScript gives genuinely asynchronous UI behaviour (partial table refresh with `aria-busy`) **with no Node build step**. **Superseded in Phase 3:** HTMX was dropped — about 25 lines of `fetch` do the same job with no vendored library and no CDN dependency, and adding a dependency that a few lines replace would contradict this project's own rule about unjustified technology. PostgreSQL 18 rather than 16, to match the version installed on the build machine. |
+| SUT stack | FastAPI + SQLAlchemy + Jinja2 + ~~HTMX~~ + PostgreSQL 18 | FastAPI gives a real OpenAPI surface and real 422 validation errors. Jinja2 plus a small amount of plain JavaScript gives genuinely asynchronous UI behaviour (partial table refresh with `aria-busy`) **with no Node build step**. **Superseded in Phase 3:** HTMX was dropped - about 25 lines of `fetch` do the same job with no vendored library and no CDN dependency, and adding a dependency that a few lines replace would contradict this project's own rule about unjustified technology. PostgreSQL 18 rather than 16, to match the version installed on the build machine. |
 | Lint/format | **Ruff** (lint + format) | Replaces flake8 + black + isort + pyupgrade with one fast tool and one config block. Fewer moving parts, identical outcome. |
 | Types | **mypy** on `src/`, relaxed on `tests/` | Type errors in shared framework code are expensive; in test bodies they are noise. |
 | Hooks | **pre-commit** | Catches formatting and secrets before they reach CI. |
@@ -255,7 +255,7 @@ pytest fixtures beat base classes) or adds operational weight with no reviewer v
 
 ### One addition beyond the listed stack (justified)
 
-**GitHub Pages publication of the nightly Allure report.** Not a new technology — it is the GitHub
+**GitHub Pages publication of the nightly Allure report.** Not a new technology - it is the GitHub
 Actions run you already have plus a static site. Value: a recruiter or interviewer clicks a link in
 the README and sees a real generated report with history instead of taking your word for it.
 Cost: ~15 lines of YAML.
@@ -268,11 +268,11 @@ Cost: ~15 lines of YAML.
 
 ```mermaid
 flowchart TB
-    E["E2E cross-layer journeys — target ~5%<br/>UI to API to DB, business-critical only"]
-    U["UI functional — target ~20%<br/>only what only the browser can prove"]
-    D["DB validation — target ~15%<br/>state, audit trail, integrity, money"]
-    A["API functional + contract — target ~60%<br/>fast, stable, deterministic"]
-    F["Framework unit tests — milliseconds, no SUT required"]
+    E["E2E cross-layer journeys - target ~5%<br/>UI to API to DB, business-critical only"]
+    U["UI functional - target ~20%<br/>only what only the browser can prove"]
+    D["DB validation - target ~15%<br/>state, audit trail, integrity, money"]
+    A["API functional + contract - target ~60%<br/>fast, stable, deterministic"]
+    F["Framework unit tests - milliseconds, no SUT required"]
     E --> U --> D --> A --> F
 ```
 
@@ -281,11 +281,11 @@ flowchart TB
 
 **Reasoning.** We do not own the application's unit tests, so our pyramid starts one level up. The
 cheapest reliable place to assert behaviour is the API: no rendering, no browser, milliseconds per
-test, minimal flake surface. The UI layer therefore only covers what the API cannot prove —
+test, minimal flake surface. The UI layer therefore only covers what the API cannot prove -
 rendering, interaction, client-side validation, role-based visibility, and the workflows a human
 actually performs. DB validation covers what neither can prove: that persisted state is correct.
 
-### 8.2 Layer responsibilities — the rule I will defend in an interview
+### 8.2 Layer responsibilities - the rule I will defend in an interview
 
 | Question | Layer that answers it |
 |---|---|
@@ -312,9 +312,9 @@ Claiming these without doing them is the fastest way to fail an interview.
 ### 8.4 Test matrix
 
 Priority: **P1** = blocks release / runs on every PR · **P2** = regression · **P3** = nice to have.
-Automation status is `Planned` for everything — nothing is built yet.
+Automation status is `Planned` for everything - nothing is built yet.
 
-#### API — Authentication & session
+#### API - Authentication & session
 
 | ID | Type | Scenario | Pri | Expected | Status |
 |---|---|---|---|---|---|
@@ -328,7 +328,7 @@ Automation status is `Planned` for everything — nothing is built yet.
 | API-AUTH-008 | integration | Token of a user deactivated mid-session | P1 | `401` on next call | Planned |
 | API-AUTH-009 | smoke | `GET /auth/me` returns caller identity + role | P1 | `200`, schema valid | Planned |
 
-#### API — Claims CRUD, search, validation
+#### API - Claims CRUD, search, validation
 
 | ID | Type | Scenario | Pri | Expected | Status |
 |---|---|---|---|---|---|
@@ -340,23 +340,23 @@ Automation status is `Planned` for everything — nothing is built yet.
 | API-CLM-006 | functional | Filter by amount range | P2 | Only in-range amounts | Planned |
 | API-CLM-007 | functional | Sort by amount desc / asc (parametrised) | P2 | Order verified in Python, not trusted | Planned |
 | API-CLM-008 | functional | Update draft claim description (PATCH) | P1 | `200`, changed field only | Planned |
-| API-CLM-009 | functional | Withdraw a draft claim (DELETE) | P2 | `204`, then `GET` → `200` with `status=WITHDRAWN` (**corrected in Phase 5** — the original `404` contradicted the list endpoint, which returns withdrawn claims and filters on that status) | Implemented |
+| API-CLM-009 | functional | Withdraw a draft claim (DELETE) | P2 | `204`, then `GET` → `200` with `status=WITHDRAWN` (**corrected in Phase 5** - the original `404` contradicted the list endpoint, which returns withdrawn claims and filters on that status) | Implemented |
 | API-CLM-010 | negative | amount = 0 | P1 | `422` | Planned |
 | API-CLM-011 | negative | amount negative | P1 | `422` | Planned |
 | API-CLM-012 | boundary | amount = coverage_limit | P1 | `201` (inclusive upper bound) | Planned |
 | API-CLM-013 | boundary | amount = coverage_limit + 0.01 | P1 | `422` | Planned |
 | API-CLM-014 | boundary | amount = 0.01 (minimum valid) | P2 | `201` | Planned |
-| API-CLM-015 | boundary | amount with 3 decimal places | P2 | `422` or documented rounding — asserted deterministically | Planned |
+| API-CLM-015 | boundary | amount with 3 decimal places | P2 | `422` or documented rounding - asserted deterministically | Planned |
 | API-CLM-016 | boundary | description at max length / max+1 (parametrised) | P2 | `201` / `422` | Planned |
 | API-CLM-017 | negative | Unknown `policy_id` | P2 | `404` | Planned |
 | API-CLM-018 | negative | Malformed UUID in path | P2 | `422` | Planned |
 | API-CLM-019 | negative | Non-existent but well-formed id | P2 | `404` | Planned |
 | API-CLM-020 | negative | Invalid `incident_date` format / future date | P2 | `422` | Planned |
-| API-CLM-021 | negative | Unknown extra fields in payload | P3 | Ignored or `422` — asserted, not assumed | Planned |
+| API-CLM-021 | negative | Unknown extra fields in payload | P3 | Ignored or `422` - asserted, not assumed | Planned |
 | API-CLM-022 | contract | Response headers: `content-type`, correlation id echoed, no server banner leak | P3 | Header assertions | Planned |
 | API-CLM-023 | perf-lite | Claims list responds under an agreed threshold | P3 | Soft assertion, threshold configurable | Planned |
 
-#### API — Authorisation (RBAC)
+#### API - Authorisation (RBAC)
 
 | ID | Type | Scenario | Pri | Expected | Status |
 |---|---|---|---|---|---|
@@ -368,7 +368,7 @@ Automation status is `Planned` for everything — nothing is built yet.
 | API-AUTHZ-006 | authz | Admin approves at 5000.01 | P1 | `200` | Planned |
 | API-AUTHZ-007 | authz | Adjuster edits another user's account | P2 | `403` | Planned |
 
-#### API — State machine
+#### API - State machine
 
 | ID | Type | Scenario | Pri | Expected | Status |
 |---|---|---|---|---|---|
@@ -434,7 +434,7 @@ Automation status is `Planned` for everything — nothing is built yet.
 - Every permutation of every filter combination (combinatorial explosion, near-zero marginal value).
 - The same rule at every layer (see 8.2).
 - Pixel-level styling, animations, toast timing.
-- The application's own internal unit-level logic — that belongs to the app's developers.
+- The application's own internal unit-level logic - that belongs to the app's developers.
 - Exploratory scenarios that are cheaper to run manually once.
 
 ---
@@ -445,11 +445,11 @@ Automation status is `Planned` for everything — nothing is built yet.
 
 | Trigger | Suite | Browser | Parallelism | Target |
 |---|---|---|---|---|
-| Every push / PR | Lint + type check + framework unit tests | — | — | Seconds |
-| Every push / PR | `-m "smoke and not ui"` (API + DB smoke) | — | `-n auto` | Fast feedback |
+| Every push / PR | Lint + type check + framework unit tests | - | - | Seconds |
+| Every push / PR | `-m "smoke and not ui"` (API + DB smoke) | - | `-n auto` | Fast feedback |
 | Every push / PR | `-m "smoke and ui"` | Chromium only | `-n 2` | Keeps the gate short |
 | Nightly (cron) + manual | Full regression, all layers | Chromium **and** Firefox **and** WebKit (matrix) | `-n auto` + serial pass | Depth |
-| Nightly | Allure report with history → GitHub Pages | — | — | Public evidence |
+| Nightly | Allure report with history → GitHub Pages | - | - | Public evidence |
 | Manual dispatch | Any marker expression, any browser, any env | Parameterised | Parameterised | Debugging |
 
 **Browser policy rationale:** cross-browser bugs are real but rare, and running three browsers on
@@ -458,20 +458,20 @@ regressions; the nightly matrix catches engine-specific ones while nobody is wai
 
 ### 9.2 GitHub Actions (the CI that actually runs)
 
-- `.github/workflows/pr-checks.yml` — quality gate + smoke, uploads artefacts, publishes a job
+- `.github/workflows/pr-checks.yml` - quality gate + smoke, uploads artefacts, publishes a job
   summary from JUnit XML.
-- `.github/workflows/nightly.yml` — `schedule:` cron + `workflow_dispatch:` with inputs (browser,
+- `.github/workflows/nightly.yml` - `schedule:` cron + `workflow_dispatch:` with inputs (browser,
   marker, workers); browser matrix; Allure history restored from the `gh-pages` branch so trends
   accumulate; publishes the report.
 - Secrets via GitHub encrypted secrets, injected as env vars. Nothing in the repo.
 
-### 9.3 Jenkins (the enterprise demonstration — and it must be real)
+### 9.3 Jenkins (the enterprise demonstration - and it must be real)
 
 Declarative `Jenkinsfile` with:
 
-- `parameters {}` — `ENVIRONMENT`, `SUITE` (marker expression), `BROWSER`, `WORKERS`, `RERUNS`
-- `options {}` — `timeout`, `buildDiscarder`, `timestamps`, `disableConcurrentBuilds`
-- `environment {}` — `credentials()` binding for the DB password (never inline)
+- `parameters {}` - `ENVIRONMENT`, `SUITE` (marker expression), `BROWSER`, `WORKERS`, `RERUNS`
+- `options {}` - `timeout`, `buildDiscarder`, `timestamps`, `disableConcurrentBuilds`
+- `environment {}` - `credentials()` binding for the DB password (never inline)
 - Stages: Checkout → Environment info → Build test image → Start SUT (compose, health-gated) →
   Lint & type check → Framework unit tests → **parallel { API+DB | UI }** → Generate reports →
   Publish JUnit → Publish Allure → Archive traces/videos/logs →
@@ -479,19 +479,19 @@ Declarative `Jenkinsfile` with:
 - `docker/jenkins/docker-compose.yml` so a real Jenkins can be run locally, pointed at the repo, and
   screenshotted for the README.
 
-`NOT VERIFIED — requires local execution.` The pipeline will be written to be runnable, and Phase 11
+`NOT VERIFIED - requires local execution.` The pipeline will be written to be runnable, and Phase 11
 includes the step-by-step. I will not claim it passes until you run it.
 
-### 9.4 Jenkins vs GitHub Actions — the interview answer
+### 9.4 Jenkins vs GitHub Actions - the interview answer
 
 | | GitHub Actions | Jenkins |
 |---|---|---|
 | Hosting | SaaS, ephemeral runners | Self-hosted controller + agents |
 | Config | YAML, marketplace actions | Groovy DSL, plugin ecosystem |
-| Environment | Clean VM every run | Persistent agents — needs deliberate cleanup |
+| Environment | Clean VM every run | Persistent agents - needs deliberate cleanup |
 | Secrets | Encrypted repo/org secrets, OIDC | Credentials plugin / vault integration |
 | Best at | OSS, cloud-native repos, fast setup | On-prem, network-isolated systems, device labs, complex legacy orchestration |
-| Why both here | It is the CI that genuinely runs this public repo | It is what most enterprise QA orgs actually use — and you will be asked about it |
+| Why both here | It is the CI that genuinely runs this public repo | It is what most enterprise QA orgs actually use - and you will be asked about it |
 
 ---
 
@@ -504,7 +504,7 @@ includes the step-by-step. I will not claim it passes until you run it.
 | **Allure** | Steps, attachments (screenshot/trace/logs/SQL), severity, categories, history & trends, environment block, filtering by marker | Needs Java + the Allure CLI to render; results are a folder, not a file | **Adopt as primary.** Java 25 is already installed; Jenkins has a first-class Allure plugin; CI publishes to Pages |
 | **JUnit XML** | Understood natively by Jenkins `junit`, GitHub Actions reporters, and every other CI; enables per-test history in the CI UI | No rich content | **Adopt.** One flag, high value |
 | pytest-html | Single self-contained file, no Java | Weaker than Allure in every other respect | **Optional extra** (`pip install -e ".[html]"`), documented as the no-Java fallback |
-| Playwright HTML report | Excellent — but it is a feature of the **JavaScript** Playwright test runner | Does not exist for Python | **Correction to the original brief:** in Python, Playwright provides *artefacts* (trace/video/screenshot), not an HTML report. The report layer is pytest's job. |
+| Playwright HTML report | Excellent - but it is a feature of the **JavaScript** Playwright test runner | Does not exist for Python | **Correction to the original brief:** in Python, Playwright provides *artefacts* (trace/video/screenshot), not an HTML report. The report layer is pytest's job. |
 
 **The report must answer, without anyone asking:** how many ran/passed/failed/skipped/rerun · which
 tests failed · the assertion and diff · the environment, base URL, browser, commit SHA and worker ·
@@ -516,15 +516,15 @@ the test category · and one click to the screenshot, trace, logs and SQL for th
 
 Four tiers, each with a rule:
 
-1. **Reference data** — roles, policies, seed users, and a corpus of ~25 claims across statuses for
+1. **Reference data** - roles, policies, seed users, and a corpus of ~25 claims across statuses for
    filter/sort/pagination tests. Loaded deterministically by SQL in the Postgres container's
    `docker-entrypoint-initdb.d`. **Rule: read-only. No test ever mutates seed data.**
-2. **Test-owned transactional data** — created per test **through the API** (never by SQL INSERT), so
+2. **Test-owned transactional data** - created per test **through the API** (never by SQL INSERT), so
    the application's own validation and side effects apply. Every record carries a unique key
    (`CLM-<uuid4[:8]>`, `qa+<uuid>@example.test`). **Rule: a test asserts only on data it created.**
-3. **Static parametrisation data** — invalid payloads, boundary tables, invalid transition pairs, in
+3. **Static parametrisation data** - invalid payloads, boundary tables, invalid transition pairs, in
    YAML under `tests/data/`, loaded by a typed loader. **Rule: data files hold values, never logic.**
-4. **Generated data** — faker, seeded **per xdist worker** so parallel workers cannot generate
+4. **Generated data** - faker, seeded **per xdist worker** so parallel workers cannot generate
    colliding values and a failing run is reproducible from the seed printed in the report.
 
 **Cleanup:** prefer disposable, uniquely-keyed data over teardown. Where cleanup is genuinely needed,
@@ -540,7 +540,7 @@ gitignored; CI injects real values from secret stores. Seeded passwords are obvi
 
 ## 12. Parallel execution strategy
 
-**Safe to parallelise:** anything that creates its own data and asserts only on it — which, by
+**Safe to parallelise:** anything that creates its own data and asserts only on it - which, by
 design, is nearly the whole API, DB and UI suite. Playwright gives each test a fresh browser context,
 so sessions, cookies and storage are already isolated.
 
@@ -550,12 +550,12 @@ so sessions, cookies and storage are already isolated.
 |---|---|
 | Assertions on unfiltered global counts or "the first row in the table" | Always filter by the test's own unique key; if genuinely impossible → `@pytest.mark.serial` |
 | Tests that deactivate or mutate a **shared seeded** user | Create a throwaway user instead; if not possible, `serial` |
-| Tests that change application-wide settings | `serial` — run in a second pass without xdist |
+| Tests that change application-wide settings | `serial` - run in a second pass without xdist |
 | Same-name faker values colliding across workers | Seed faker with the worker id |
 | Artefact files clobbering each other | Artefact paths include `PYTEST_XDIST_WORKER` |
 | DB connection exhaustion | One pooled read-only connection per worker, closed in a session finaliser |
 
-**Execution model:** `pytest -m "not serial" -n auto` then `pytest -m serial` — two passes,
+**Execution model:** `pytest -m "not serial" -n auto` then `pytest -m serial` - two passes,
 documented in `scripts/` and in CI.
 
 **Benchmarking (to be measured, not claimed):** Phase 15 records wall-clock for `-n 0` vs `-n auto`
@@ -567,10 +567,10 @@ then the README says *"parallel execution is implemented; benchmark pending."*
 ## 13. Flaky-test policy (written down, because this is what separates SDETs from scripters)
 
 1. **Retries are diagnostics, not a cure.** `--reruns 1` is enabled **only** for UI tests **only** in
-   CI. API and DB tests never retry — if they are flaky, they are wrong.
+   CI. API and DB tests never retry - if they are flaky, they are wrong.
 2. Any test that passes on rerun is **reported as flaky**, not silently green.
 3. A test that flakes twice in a week moves to `@pytest.mark.quarantine`, is excluded from the gate,
-   and is tracked as a bug against the test — with a deadline, not indefinitely.
+   and is tracked as a bug against the test - with a deadline, not indefinitely.
 4. Root causes are fixed, not slept away: no `time.sleep`, no `wait_for_timeout` as a fix, no
    `try/except` around assertions. Playwright's `expect()` auto-retries; readiness comes from
    healthchecks and web-first assertions.
@@ -593,11 +593,11 @@ then the README says *"parallel execution is implemented; benchmark pending."*
 | Executed SQL + result snapshot | kept in memory | attached on failure |
 
 Capturing traces for passing tests would multiply run time and artefact size for zero diagnostic
-value — that trade-off is the point.
+value - that trade-off is the point.
 
 **Correlation:** every API call the framework makes carries an `X-Request-Id` derived from the test's
 node id. The application logs it. When a test fails you can join the test log, the HTTP exchange and
-the application log with one grep — a genuinely senior touch that costs about 20 lines of code.
+the application log with one grep - a genuinely senior touch that costs about 20 lines of code.
 
 **Documented debugging runbook (`docs/debugging.md`):**
 Open Allure → find the failed test → read the assertion diff → open the attached screenshot for the
@@ -622,7 +622,7 @@ snapshot to decide **application bug vs test bug** → reproduce locally with th
   report **with secrets masked**, so every report states which environment produced it.
 - **DB tests degrade gracefully:** if `DB_ENABLED=false` or the database is unreachable, DB-marked
   tests `skip` with an explicit reason instead of erroring. In many real jobs the SDET has no DB
-  access in some environments — the suite must still be runnable there.
+  access in some environments - the suite must still be runnable there.
 
 ---
 
@@ -631,7 +631,7 @@ snapshot to decide **application bug vs test bug** → reproduce locally with th
 ```text
 playwright-python-sdet-framework/
 │
-├── app/                              # SYSTEM UNDER TEST — a fixture, not the achievement
+├── app/                              # SYSTEM UNDER TEST - a fixture, not the achievement
 │   ├── claimdesk/                    #   FastAPI app
 │   │   ├── api/                      #     REST endpoints (/api/v1/...)
 │   │   ├── web/                      #     Jinja2 + HTMX pages
@@ -642,7 +642,7 @@ playwright-python-sdet-framework/
 │   ├── Dockerfile
 │   └── README.md                     #   "why this app exists and why it is not the deliverable"
 │
-├── src/claimdesk_qa/                 # THE FRAMEWORK — installable package (pip install -e .)
+├── src/claimdesk_qa/                 # THE FRAMEWORK - installable package (pip install -e .)
 │   ├── config/                       #   pydantic-settings, environment resolution
 │   ├── core/                         #   logging, correlation ids, artefact paths, exceptions, timing
 │   ├── api/
@@ -653,7 +653,7 @@ playwright-python-sdet-framework/
 │   │   ├── connection.py             #   read-only psycopg connection factory
 │   │   └── queries/                  #   ClaimQueries, UserQueries, AuditQueries (parameterised SQL)
 │   ├── ui/
-│   │   ├── base_page.py              #   navigation + shared waits only — deliberately thin
+│   │   ├── base_page.py              #   navigation + shared waits only - deliberately thin
 │   │   ├── pages/                    #   LoginPage, DashboardPage, ClaimsListPage, ClaimFormPage, ...
 │   │   └── components/               #   NavBar, DataTable, Toast, Modal, FilterBar (Component Object)
 │   ├── data/                         #   factories, faker providers, YAML loaders
@@ -665,7 +665,7 @@ playwright-python-sdet-framework/
 │   ├── db/           (+ conftest.py)
 │   ├── ui/           (+ conftest.py) #   browser/context/storage_state fixtures live here
 │   ├── e2e/
-│   ├── framework/                    #   unit tests for the framework itself — "who tests the tests"
+│   ├── framework/                    #   unit tests for the framework itself - "who tests the tests"
 │   └── data/                         #   YAML parametrisation data
 │
 ├── docs/
@@ -682,7 +682,7 @@ playwright-python-sdet-framework/
 │   ├── docker-compose.ci.yml         #   CI overrides
 │   └── jenkins/docker-compose.yml    #   local Jenkins so the pipeline is provably real
 │
-├── artifacts/                        #   GITIGNORED — allure-results, junit, traces, videos, screenshots, logs
+├── artifacts/                        #   GITIGNORED - allure-results, junit, traces, videos, screenshots, logs
 ├── .github/
 │   ├── workflows/{pr-checks,nightly}.yml
 │   └── ISSUE_TEMPLATE/, pull_request_template.md
@@ -698,7 +698,7 @@ playwright-python-sdet-framework/
 
 | Brief | This design | Reason |
 |---|---|---|
-| `pages/`, `api/`, `db/`, `utils/` at the repo root | All inside `src/claimdesk_qa/` | An installable package removes `sys.path` manipulation and `conftest.py` import hacks, and prevents the framework's `api/` colliding with the app's `api/`. It also makes the framework importable by other repos — how real shared frameworks work. |
+| `pages/`, `api/`, `db/`, `utils/` at the repo root | All inside `src/claimdesk_qa/` | An installable package removes `sys.path` manipulation and `conftest.py` import hacks, and prevents the framework's `api/` colliding with the app's `api/`. It also makes the framework importable by other repos - how real shared frameworks work. |
 | `reports/`, `screenshots/`, `traces/`, `logs/` as four root folders | One gitignored `artifacts/<run-id>/` | One thing to ignore, one thing to archive in CI, one thing to delete. Four half-empty root folders is clutter a reviewer notices. |
 | `utils/` | `core/` + `assertions/` + `data/` | `utils` is where dead code goes to hide. Named modules force each helper to justify its home. |
 | `config/` folder of files | `config/` **package** + `.env` + env vars | Configuration is code that validates itself; loose YAML files invite silent typos. |
@@ -711,16 +711,16 @@ playwright-python-sdet-framework/
 
 | Pattern | Where | Why | Where it must **not** be used |
 |---|---|---|---|
-| **Page Object Model** | `ui/pages/` | Isolates selectors from intent so a UI change is a one-file fix | Not for API or DB layers — there is no "page". Not as a god-object: no `ApplicationPage` with 200 methods |
+| **Page Object Model** | `ui/pages/` | Isolates selectors from intent so a UI change is a one-file fix | Not for API or DB layers - there is no "page". Not as a god-object: no `ApplicationPage` with 200 methods |
 | **Component Object** | `ui/components/` | Nav bar, data table, toast and modal appear on many pages; they are objects, not page methods | Not for one-off elements |
-| **Service Object** | `api/services/` | `claims_api.create(...)` reads as intent; HTTP details stay in one place | Not a full SDK — only what the tests need |
+| **Service Object** | `api/services/` | `claims_api.create(...)` reads as intent; HTTP details stay in one place | Not a full SDK - only what the tests need |
 | **Query Object** | `db/queries/` | Named, parameterised SQL with typed returns | Never string-formatted SQL. Never writes |
 | **Factory** | `data/factories.py` | Valid-by-default objects with per-test overrides | Not a metaprogramming fixture generator |
-| **Fixture-based DI** | `conftest.py` | Composable, scoped, auto-finalised setup | Replaces `BaseTest` inheritance entirely — no test base classes |
-| **Strategy** | auth fixtures | UI login vs API login + `storage_state` injection | — |
-| **Facade** | `ApiClient` | One place for timeouts, auth, retries, correlation ids and recording | — |
+| **Fixture-based DI** | `conftest.py` | Composable, scoped, auto-finalised setup | Replaces `BaseTest` inheritance entirely - no test base classes |
+| **Strategy** | auth fixtures | UI login vs API login + `storage_state` injection | - |
+| **Facade** | `ApiClient` | One place for timeouts, auth, retries, correlation ids and recording | - |
 
-**Explicitly rejected:** BDD/Gherkin (no non-technical consumer here — pure ceremony), a custom
+**Explicitly rejected:** BDD/Gherkin (no non-technical consumer here - pure ceremony), a custom
 assertion DSL (pytest + Playwright `expect` are better), a data-driven "keyword" engine, and any
 `BaseTest` class hierarchy.
 
@@ -736,7 +736,7 @@ assertion DSL (pytest + Playwright `expect` are better), a data-driven "keyword"
 | 4 | No real staging environment or production traffic | Medium | No performance/load claims are made; response-time checks are labelled smoke-level only |
 | 5 | Allure requires Java to render | Low | Java 25 already installed; CI installs it; nightly report published to Pages; optional pytest-html fallback |
 | 6 | Jenkins is not continuously running | Medium | Local Jenkins compose + documented steps + screenshot; honestly labelled a demonstration |
-| 7 | Container start-up races cause flakes | Medium | Compose healthchecks + `depends_on: service_healthy` + explicit readiness poll — never `sleep` |
+| 7 | Container start-up races cause flakes | Medium | Compose healthchecks + `depends_on: service_healthy` + explicit readiness poll - never `sleep` |
 | 8 | Tests share one database instance under xdist | Medium | Unique-key data per test; `serial` marker for the few that cannot be isolated; full DB teardown per CI run |
 | 9 | Local Python 3.11 vs container Python 3.12 | Low | Pure-Python framework; range pinned and exercised in both; CI is the source of truth |
 | 10 | No security/accessibility/performance depth | Low | Explicitly out of scope in the README, listed under Future Improvements |
@@ -744,40 +744,40 @@ assertion DSL (pytest + Playwright `expect` are better), a data-driven "keyword"
 
 ---
 
-## 19. Prerequisite decision — Docker
+## 19. Prerequisite decision - Docker
 
 `docker` is not on your PATH (verified on 2026-08-19). This affects Phases 3, 10, 11 and 12.
 
 **Recommended:** install **Docker Desktop for Windows** with the WSL2 backend. It is required for
-Postgres, the SUT, the containerised runner and the local Jenkins demo — and "runs anywhere with one
+Postgres, the SUT, the containerised runner and the local Jenkins demo - and "runs anywhere with one
 command" is a large part of what makes this project credible.
 
 **Fallback if Docker is genuinely not possible** (say so and I will re-plan): run PostgreSQL natively
-on Windows and the FastAPI app with `uvicorn` on the host. Everything except Phases 10–11 still
+on Windows and the FastAPI app with `uvicorn` on the host. Everything except Phases 10-11 still
 works; the Dockerfile, compose files and Jenkinsfile are still written and reviewed, but they are
-labelled `NOT VERIFIED — requires Docker` and the CV/LinkedIn claims are adjusted accordingly.
+labelled `NOT VERIFIED - requires Docker` and the CV/LinkedIn claims are adjusted accordingly.
 I will not claim Docker works if it was never run.
 
 ---
 
 ## 20. Senior-reviewer self-critique
 
-*"Would a senior SDET reviewer consider this a realistic automation framework?"* — the objections I
+*"Would a senior SDET reviewer consider this a realistic automation framework?"* - the objections I
 expect, and the design's answer.
 
 | Likely objection | Answer built into the design |
 |---|---|
-| "You tested an app you wrote — of course it passes." | Black-box only, no app imports (CI-enforced), app has separate tests, README is explicit, business rules are non-trivial |
+| "You tested an app you wrote - of course it passes." | Black-box only, no app imports (CI-enforced), app has separate tests, README is explicit, business rules are non-trivial |
 | "Where is the test strategy? Anyone can write 200 asserts." | A written matrix with IDs and priorities, an explicit layer-responsibility rule, and a documented list of what is *not* automated and why |
 | "Retries everywhere to hide flakes." | Written flake policy: no retries on API/DB, one CI-only UI retry, flaky results reported not hidden, quarantine with a deadline |
 | "`-n auto` will collide." | Isolation strategy documented per hazard, `serial` marker, per-worker faker seeding and artefact paths |
-| "The Jenkinsfile is decoration." | Parameterised, credential-bound, parallel stages, real publishers — plus a local Jenkins compose so it can actually be run |
+| "The Jenkinsfile is decoration." | Parameterised, credential-bound, parallel stages, real publishers - plus a local Jenkins compose so it can actually be run |
 | "The POM is a god object." | Thin `BasePage`, component objects, one class per page, no cross-page methods |
 | "Why is there an ORM in the test code?" | There isn't. Raw parameterised SQL on a read-only role, deliberately independent of the app's mapping |
 | "Fake metrics on the CV." | Nothing is claimed until measured; §22 lists the exact commands that produce each number |
-| "It's over-engineered." | The rejected-technology list with reasons is part of the README — judgement is shown by what was left out |
+| "It's over-engineered." | The rejected-technology list with reasons is part of the README - judgement is shown by what was left out |
 
-**Verdict: yes — with one condition.** The framework must stay *small enough to read*. If framework
+**Verdict: yes - with one condition.** The framework must stay *small enough to read*. If framework
 code grows past roughly 3,000 lines it stops being reviewable and becomes a liability. Discipline
 over volume, at every phase.
 
@@ -790,41 +790,41 @@ Effort figures are **estimates**, not measurements.
 | Phase | Deliverable | Done when | Est. |
 |---|---|---|---|
 | 1 | This design | You approve it | complete |
-| 2 | Repo skeleton, `pyproject.toml`, ruff/mypy/pre-commit, `.env.example`, `.gitignore`, git init + first commits | `pip install -e ".[dev]"` succeeds; `ruff check` passes | 1–2 h |
-| 3 | ClaimDesk SUT + Postgres schema/roles/seed + compose + healthchecks | `docker compose up` → login works in a browser; `/health/ready` green | 4–6 h |
-| 4 | pytest foundation: settings, logging, correlation ids, artefact manager, root fixtures, markers, `tests/framework/` unit tests | `pytest tests/framework` green with no SUT running | 3–4 h |
-| 5 | API client + service objects + contracts + the API suite | `pytest -m api` green against compose | 5–6 h |
-| 6 | Playwright layer: base page, components, pages, auth strategies (`storage_state`), UI suite | `pytest -m ui` green on Chromium | 6–8 h |
-| 7 | DB layer: read-only connection, query objects, DB suite, cross-layer E2E tests | `pytest -m "db or e2e"` green | 3–4 h |
-| 8 | Allure + JUnit, environment block, categories, failure attachments, trace/video/screenshot policy | A deliberately broken test produces a report with every artefact attached | 3–4 h |
-| 9 | Markers finalised, xdist isolation, `serial` pass, rerun policy, seed reporting | Two-pass run green; benchmark script exists | 2–3 h |
-| 10 | `Dockerfile.tests`, compose profiles, CI overrides | `docker compose run --rm tests` green from a clean clone | 2–3 h |
-| 11 | `Jenkinsfile` + local Jenkins compose + run instructions | A real build runs and publishes Allure + JUnit (screenshot captured) | 3–5 h |
-| 12 | GitHub Actions PR gate + nightly matrix + Pages publication | Green checks on a PR; nightly report URL live | 2–4 h |
-| 13 | Refactor pass, dead-code removal, type coverage, ADRs written | ruff, mypy, pre-commit all clean; no TODOs left | 2–3 h |
-| 14 | README + Mermaid diagrams + screenshots + debugging runbook | A non-QA reader understands the project in 3 minutes | 2–3 h |
-| 15 | Full execution, flake hunt, **measurement** of counts and timings | Numbers recorded from real runs and written into the README | 2–4 h |
+| 2 | Repo skeleton, `pyproject.toml`, ruff/mypy/pre-commit, `.env.example`, `.gitignore`, git init + first commits | `pip install -e ".[dev]"` succeeds; `ruff check` passes | 1-2 h |
+| 3 | ClaimDesk SUT + Postgres schema/roles/seed + compose + healthchecks | `docker compose up` → login works in a browser; `/health/ready` green | 4-6 h |
+| 4 | pytest foundation: settings, logging, correlation ids, artefact manager, root fixtures, markers, `tests/framework/` unit tests | `pytest tests/framework` green with no SUT running | 3-4 h |
+| 5 | API client + service objects + contracts + the API suite | `pytest -m api` green against compose | 5-6 h |
+| 6 | Playwright layer: base page, components, pages, auth strategies (`storage_state`), UI suite | `pytest -m ui` green on Chromium | 6-8 h |
+| 7 | DB layer: read-only connection, query objects, DB suite, cross-layer E2E tests | `pytest -m "db or e2e"` green | 3-4 h |
+| 8 | Allure + JUnit, environment block, categories, failure attachments, trace/video/screenshot policy | A deliberately broken test produces a report with every artefact attached | 3-4 h |
+| 9 | Markers finalised, xdist isolation, `serial` pass, rerun policy, seed reporting | Two-pass run green; benchmark script exists | 2-3 h |
+| 10 | `Dockerfile.tests`, compose profiles, CI overrides | `docker compose run --rm tests` green from a clean clone | 2-3 h |
+| 11 | `Jenkinsfile` + local Jenkins compose + run instructions | A real build runs and publishes Allure + JUnit (screenshot captured) | 3-5 h |
+| 12 | GitHub Actions PR gate + nightly matrix + Pages publication | Green checks on a PR; nightly report URL live | 2-4 h |
+| 13 | Refactor pass, dead-code removal, type coverage, ADRs written | ruff, mypy, pre-commit all clean; no TODOs left | 2-3 h |
+| 14 | README + Mermaid diagrams + screenshots + debugging runbook | A non-QA reader understands the project in 3 minutes | 2-3 h |
+| 15 | Full execution, flake hunt, **measurement** of counts and timings | Numbers recorded from real runs and written into the README | 2-4 h |
 | 16 | Repo presentation: description, topics, templates, tidy commit history | The repo looks professional at first glance | 1 h |
 | 17 | LinkedIn: project section, featured, announcement post | Drafts ready to publish | 1 h |
 | 18 | Interview prep: 24 answers, whiteboard walkthrough, weak-spot drilling | You can defend every decision unaided | 2 h |
 
-**Estimated total: roughly 45–65 focused hours.** Phases 2–7 are the core; everything after is
+**Estimated total: roughly 45-65 focused hours.** Phases 2-7 are the core; everything after is
 packaging and proof.
 
 **Commit strategy:** conventional commits (`feat(api): add claims service object`), one logical
-change per commit, phases as small PRs into `main` so the repo shows a real, reviewable history —
+change per commit, phases as small PRs into `main` so the repo shows a real, reviewable history -
 recruiters and engineers both look at the commit list.
 
 ---
 
 ## 22. What you will be able to claim on your CV (after completion, with honest metrics)
 
-> **Measured in Phase 15.** Every placeholder below has since been filled from a real run —
+> **Measured in Phase 15.** Every placeholder below has since been filled from a real run -
 > see [phase-15-measurement.md](phase-15-measurement.md) for the numbers and the machine, and
 > [presentation.md](presentation.md) for the final wording. This section is left as written so
 > the discipline is visible: the bullets existed with holes in them for fourteen phases.
 
-**Draft bullets — placeholders stay until measured:**
+**Draft bullets - placeholders stay until measured:**
 
 1. Designed and built an end-to-end test automation framework in Python (Playwright, pytest, httpx,
    PostgreSQL) covering UI, REST API, database-state and cross-layer integration testing against a
@@ -839,7 +839,7 @@ recruiters and engineers both look at the commit list.
 4. Reduced full-suite wall-clock from `[A]` to `[B]` using pytest-xdist with an explicit data-isolation
    strategy (unique-key test data, per-worker seeding, a `serial` marker for non-isolatable tests).
 5. Cut failure-triage effort by capturing Playwright traces, screenshots, correlated request/response
-   logs and DB snapshots **on failure only**, published through Allure with history — documented in a
+   logs and DB snapshots **on failure only**, published through Allure with history - documented in a
    debugging runbook.
 
 **Exactly how to measure each placeholder (Phase 15):**
@@ -848,7 +848,7 @@ recruiters and engineers both look at the commit list.
 |---|---|
 | `[N]` total tests | `pytest --collect-only -q` and read the final count line |
 | `[X] [Y] [Z] [E]` per layer | `pytest -m api --collect-only -q` (repeat per marker) |
-| `[A]` serial wall-clock | `pytest -m "not serial" --durations=0` — record total time, 3 runs, report the median |
+| `[A]` serial wall-clock | `pytest -m "not serial" --durations=0` - record total time, 3 runs, report the median |
 | `[B]` parallel wall-clock | Same suite with `-n auto` on the **same machine**, 3 runs, median. Record the CPU count in the README |
 | Slowest tests | `pytest --durations=20` |
 | Flake rate | Run the suite 10× nightly; flake rate = tests that changed outcome ÷ total |
@@ -861,14 +861,14 @@ first thing a good interviewer asks is *"how did you measure that?"*
 
 ---
 
-## 23. Open decisions — needed before Phase 2
+## 23. Open decisions - needed before Phase 2
 
 | # | Decision | Recommendation |
 |---|---|---|
-| 1 | **Docker Desktop** — will you install it? | Yes. It unlocks Phases 3/10/11/12 and the whole reproducibility story |
-| 2 | Domain: insurance claims (ClaimDesk) | Keep — richest boundary/authz/audit material, recruiter-legible |
-| 3 | Repo name: `playwright-python-sdet-framework` | Keep — best keyword coverage of the three candidates |
-| 4 | Monorepo (SUT + framework together) vs two repos | Monorepo — one clone, one command, far better reviewer experience |
-| 5 | Reporting: Allure + JUnit XML | Keep both — different audiences |
-| 6 | Local Python 3.11 (already installed) | Yes — avoid 3.14 for plugin-ecosystem safety |
-| 7 | Suite size ceiling ~69 planned cases | Keep — depth over volume; a bloated suite reads as padding |
+| 1 | **Docker Desktop** - will you install it? | Yes. It unlocks Phases 3/10/11/12 and the whole reproducibility story |
+| 2 | Domain: insurance claims (ClaimDesk) | Keep - richest boundary/authz/audit material, recruiter-legible |
+| 3 | Repo name: `playwright-python-sdet-framework` | Keep - best keyword coverage of the three candidates |
+| 4 | Monorepo (SUT + framework together) vs two repos | Monorepo - one clone, one command, far better reviewer experience |
+| 5 | Reporting: Allure + JUnit XML | Keep both - different audiences |
+| 6 | Local Python 3.11 (already installed) | Yes - avoid 3.14 for plugin-ecosystem safety |
+| 7 | Suite size ceiling ~69 planned cases | Keep - depth over volume; a bloated suite reads as padding |

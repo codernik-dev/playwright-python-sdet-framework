@@ -3,18 +3,18 @@
 A facade over ``httpx`` with five responsibilities, each of which would otherwise
 be repeated in every test:
 
-1. **Authentication** — one identity per client, sent as a bearer header.
-2. **No cookie jar** — see :class:`ApiClient` and ADR 0007. This one is a
+1. **Authentication** - one identity per client, sent as a bearer header.
+2. **No cookie jar** - see :class:`ApiClient` and ADR 0007. This one is a
    correctness control, not a convenience.
-3. **Correlation** — every request carries the current test's ``X-Request-Id``.
-4. **Timeouts** — mandatory, so a hung dependency fails a test instead of a job.
-5. **Recording** — the last N exchanges are kept in memory and attached to the
+3. **Correlation** - every request carries the current test's ``X-Request-Id``.
+4. **Timeouts** - mandatory, so a hung dependency fails a test instead of a job.
+5. **Recording** - the last N exchanges are kept in memory and attached to the
    report when a test fails, so a CI failure can be diagnosed without a rerun.
 
 The response wrapper exists for one reason: assertion messages. A bare
 ``assert response.status_code == 201`` tells you a number was wrong. The wrapper's
 message tells you the method, the URL, the expected and actual status, the
-correlation id and the response body — which is usually the whole diagnosis.
+correlation id and the response body - which is usually the whole diagnosis.
 """
 
 from __future__ import annotations
@@ -159,7 +159,7 @@ class ApiClient:
     authenticated it anyway, and the assertion "anonymous requests are rejected"
     passed while testing an authenticated request.
 
-    That is the worst class of test defect — it does not fail, it passes for the
+    That is the worst class of test defect - it does not fail, it passes for the
     wrong reason, and it would keep passing with authentication removed entirely.
     So cookies are discarded after every response and each identity gets its own
     client. See ``docs/adr/0007-no-shared-cookie-jar.md``.
@@ -287,7 +287,7 @@ def _clean_params(params: dict[str, Any] | None) -> dict[str, Any] | None:
     """Drop ``None`` values so an unset filter is absent rather than ``"None"``.
 
     Without this, ``params={"status": None}`` sends ``?status=None`` and the API
-    rejects it — a confusing 422 caused entirely by the test.
+    rejects it - a confusing 422 caused entirely by the test.
     """
     if params is None:
         return None

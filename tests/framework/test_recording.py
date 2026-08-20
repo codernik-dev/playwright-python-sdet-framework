@@ -49,14 +49,14 @@ def outside_any_test(scenario: Callable[[], T]) -> T:
     Needed because of a genuinely confusing detail: this suite's own autouse
     ``_recorded_evidence`` fixture activates a recorder for **every** test,
     including these. Three tests here originally asserted
-    ``active_recording() is None`` and failed — not because the recorder was
+    ``active_recording() is None`` and failed - not because the recorder was
     broken, but because a test can never observe "no test is running" from
     inside a test.
 
     ``contextvars.Context()`` is a genuinely empty context, so every ContextVar
     reads its default inside ``run``. That reproduces the real situation being
-    described — a client used by a script, or by the readiness probe, with no
-    test around it — using public API and without reaching into module privates.
+    described - a client used by a script, or by the readiness probe, with no
+    test around it - using public API and without reaching into module privates.
     """
     return contextvars.Context().run(scenario)
 

@@ -2,7 +2,7 @@
 
 Boring-looking code that is worth testing carefully: when this is wrong, it fails
 inside an unrelated test's teardown while trying to save the evidence for a
-*different* failure — which is one of the most confusing debugging experiences
+*different* failure - which is one of the most confusing debugging experiences
 there is.
 """
 
@@ -59,7 +59,7 @@ def test_long_node_ids_are_truncated_but_stay_unique() -> None:
     """Two ids sharing a long prefix must not collapse onto one directory.
 
     Parametrised tests routinely produce node ids longer than the Windows path
-    limit. Truncating alone would let two tests overwrite each other's evidence —
+    limit. Truncating alone would let two tests overwrite each other's evidence -
     so truncation carries a hash of the full id.
     """
     base = "tests/api/test_claims.py::test_" + "x" * 200

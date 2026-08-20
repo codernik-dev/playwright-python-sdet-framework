@@ -9,7 +9,7 @@ change into a passing test.
 Money is ``Decimal``. PostgreSQL ``NUMERIC`` maps to ``Decimal`` in psycopg, and
 keeping it that way through the whole stack is what allows an exact-equality
 assertion on a monetary value. The moment anything converts to ``float``, the
-strongest assertion available becomes "close enough" — which is precisely the
+strongest assertion available becomes "close enough" - which is precisely the
 defect these tests exist to catch.
 """
 

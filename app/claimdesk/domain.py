@@ -130,7 +130,7 @@ def resolve_transition(
 
     Order of checks matters and is deliberate: the status is validated *before*
     authority. A customer trying to approve an already-paid claim gets ``409``,
-    not ``403`` — the claim's state is a fact about the resource, while authority
+    not ``403`` - the claim's state is a fact about the resource, while authority
     is a fact about the caller, and leaking "you could have done this if you had
     the right role" is more informative than it needs to be.
 

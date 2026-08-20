@@ -2,7 +2,7 @@
 
 This is a regression test for a defect that had not failed yet. Both the
 application and the framework used ``date.today()``, they ran on the same
-machine, and the boundary tests passed — right up until Phase 10 put the
+machine, and the boundary tests passed - right up until Phase 10 put the
 application in a UTC container while the runner stayed in IST, at which point
 one of a matched pair of boundary tests would fail every day between 00:00 and
 05:30 and pass for the rest of the day.
@@ -54,7 +54,7 @@ def test_the_answer_does_not_move_with_the_process_timezone(
     application-versus-runner mismatch would be back.
 
     ``time.tzset`` does not exist on Windows, so the strict form of this check
-    only runs where the platform can actually change zones — and it is asserted
+    only runs where the platform can actually change zones - and it is asserted
     rather than skipped silently, because a test that quietly does nothing is
     worse than one that is not there.
     """

@@ -1,6 +1,6 @@
 """Where failure evidence goes, and how it is named.
 
-One gitignored root — ``artifacts/`` — holding one directory per run and one
+One gitignored root - ``artifacts/`` - holding one directory per run and one
 directory per test inside it:
 
 ```
@@ -23,8 +23,8 @@ Three problems this solves that a flat ``screenshots/`` folder does not:
 3. **CI archives one directory.** One path to upload, one path to delete.
 
 Windows path limits are handled explicitly: a heavily parametrised node id can
-easily exceed 260 characters, and the resulting failure — deep inside a library,
-while trying to save a screenshot for an unrelated failure — is genuinely awful to
+easily exceed 260 characters, and the resulting failure - deep inside a library,
+while trying to save a screenshot for an unrelated failure - is genuinely awful to
 diagnose. Long names are truncated and given a hash suffix so they stay unique.
 """
 
@@ -150,7 +150,7 @@ class ArtifactManager:
         """Delete empty per-test directories left by tests that produced no evidence.
 
         Returns the number removed. Keeps ``artifacts/<run>/`` containing only the
-        tests that actually have something to look at — which is the difference
+        tests that actually have something to look at - which is the difference
         between a useful evidence folder and a haystack.
 
         **Concurrency-tolerant by necessity.** Under xdist every worker runs its
@@ -161,8 +161,8 @@ class ArtifactManager:
         directory between another worker's emptiness check and its removal, giving
         ``OSError: directory not empty``.
 
-        Both outcomes are correct — the directory is gone, or it has evidence and
-        should stay — so each one is skipped rather than raised. Cleanup must
+        Both outcomes are correct - the directory is gone, or it has evidence and
+        should stay - so each one is skipped rather than raised. Cleanup must
         never be able to fail a run: an error here would report a *passing* suite
         as broken, purely because two processes tidied up at once.
 

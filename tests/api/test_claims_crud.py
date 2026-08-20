@@ -1,6 +1,6 @@
-"""API-CLM — claim creation, retrieval, update, withdrawal, search and paging.
+"""API-CLM - claim creation, retrieval, update, withdrawal, search and paging.
 
-Matrix: API-CLM-001 … API-CLM-009 in docs/phase-1-design.md §8.4.
+Matrix: API-CLM-001 ... API-CLM-009 in docs/phase-1-design.md §8.4.
 
 Every test creates the data it asserts on and identifies it by a unique key, which
 is what makes the whole file safe to run in parallel against one shared database.
@@ -32,7 +32,7 @@ def test_creating_a_claim_returns_the_full_contract(
     """API-CLM-001.
 
     Validating against ClaimModel checks every documented field's presence, type
-    and name in one line — and, because the model forbids extras, fails if an
+    and name in one line - and, because the model forbids extras, fails if an
     undocumented field appears.
     """
     payload = claim_factory.payload(amount="1250.50")
@@ -94,7 +94,7 @@ def test_updating_a_draft_changes_only_the_field_sent(
 def test_withdrawing_a_draft_moves_it_to_withdrawn_and_keeps_it_visible(
     customer_claims: ClaimsApi, claim_factory: ClaimFactory
 ) -> None:
-    """API-CLM-009 — **specification corrected by this test.**
+    """API-CLM-009 - **specification corrected by this test.**
 
     The Phase 1 matrix originally specified ``DELETE -> 204, then GET -> 404``.
     The application returns ``200`` with ``status=WITHDRAWN``, and on
@@ -105,7 +105,7 @@ def test_withdrawing_a_draft_moves_it_to_withdrawn_and_keeps_it_visible(
 
     A detail endpoint returning 404 for a resource the list endpoint happily
     returns is incoherent, and it would also hide a claim from the customer who
-    withdrew it. Withdrawal is a state transition, not a deletion — so the row
+    withdrew it. Withdrawal is a state transition, not a deletion - so the row
     stays, the audit trail records it, and the resource stays readable.
 
     The soft delete itself is proven by DB-CLM-004, because only the database can
@@ -246,7 +246,7 @@ def test_filtering_by_amount_range_excludes_values_outside_it(
 def test_searching_finds_a_claim_the_test_created_itself(
     customer_claims: ClaimsApi, claim_factory: ClaimFactory
 ) -> None:
-    """API-CLM-005 — and a demonstration of parallel-safe searching.
+    """API-CLM-005 - and a demonstration of parallel-safe searching.
 
     The search term is the unique marker embedded in this test's own description,
     so the assertion "exactly one result" holds no matter what other workers are
@@ -299,7 +299,7 @@ def test_sorting_orders_the_results(
     """API-CLM-007.
 
     The order is recomputed in Python and compared, rather than spot-checking the
-    first and last rows — a spot check passes on a list that is wrong in the
+    first and last rows - a spot check passes on a list that is wrong in the
     middle.
     """
     page = customer_claims.list(sort=sort, size=50).expect_status(200).model(Page[ClaimModel])

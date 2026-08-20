@@ -1,4 +1,4 @@
-"""Claim endpoints — the service object the majority of tests use."""
+"""Claim endpoints - the service object the majority of tests use."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ class ClaimsApi:
 
     Methods return :class:`ApiResponse` rather than parsed models, so a positive
     and a negative test call exactly the same method. A service that parsed and
-    raised would force every negative test to reach around it — and a framework
+    raised would force every negative test to reach around it - and a framework
     people work around is a framework nobody trusts.
     """
 
@@ -110,7 +110,7 @@ class ClaimsApi:
         Reaching a state by writing rows would be faster and would also be a lie:
         it skips the audit trail and the payout side effects that the database
         tests then assert on. The framework's database role holds SELECT only, so
-        this is the only route available — by design.
+        this is the only route available - by design.
 
         Args:
             staff: the adjuster's or administrator's service object. Review,

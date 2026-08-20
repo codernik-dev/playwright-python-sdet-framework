@@ -1,7 +1,7 @@
 """The claims table, with its asynchronous filter.
 
 The most interesting page in the suite, because it is the only one that updates
-without a navigation. That is exactly where hand-rolled waits normally appear —
+without a navigation. That is exactly where hand-rolled waits normally appear -
 and exactly where they are least necessary.
 """
 
@@ -81,7 +81,7 @@ class ClaimsListPage(BasePage):
         """Type a search term and apply it, waiting for the refresh to finish.
 
         The wait is on ``aria-busy``, which the page sets around its fetch. That
-        is a **state**, not a duration — the difference between a test that is
+        is a **state**, not a duration - the difference between a test that is
         correct on a loaded CI agent and one that merely usually passes.
 
         Waiting on ``aria-busy`` rather than a private class name is deliberate

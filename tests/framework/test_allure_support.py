@@ -40,7 +40,7 @@ def test_the_environment_block_is_sorted_so_two_runs_can_be_diffed() -> None:
 def test_windows_paths_survive_the_properties_format() -> None:
     r"""A backslash is an escape character in .properties, so it must be doubled.
 
-    Without this, ``C:\repo\artifacts`` renders as ``C:repoartifacts`` — a value
+    Without this, ``C:\repo\artifacts`` renders as ``C:repoartifacts`` - a value
     that looks like a path, is not one, and gives no clue that anything was lost.
     """
     rendered = render_environment_properties({"artifacts": r"C:\repo\artifacts"})
@@ -68,7 +68,7 @@ def test_booleans_render_the_way_a_reader_expects() -> None:
 
 
 def test_the_categories_file_is_valid_json_and_every_regex_compiles() -> None:
-    """A malformed regex here disables triage silently — Allure just stops matching."""
+    """A malformed regex here disables triage silently - Allure just stops matching."""
     parsed = json.loads(render_categories())
 
     assert parsed
@@ -85,7 +85,7 @@ def test_the_catch_all_categories_come_last() -> None:
 
     "Product defect" matching every failure is correct only once the specific
     causes above it have been ruled out. If it moved up the list, every
-    environment outage would be filed as a product bug — the exact mistake this
+    environment outage would be filed as a product bug - the exact mistake this
     ordering exists to prevent.
     """
     names = [category["name"] for category in CATEGORIES]
@@ -104,7 +104,7 @@ def _as_traceback(exception_line: str) -> str:
 
     The first version of this helper did not exist and the cases below were
     single-line strings. They passed against a pattern that matched nothing in
-    production — see :data:`~claimdesk_qa.reporting.allure_support._DOTALL`. A
+    production - see :data:`~claimdesk_qa.reporting.allure_support._DOTALL`. A
     test that feeds a regex simpler input than reality does is not a test, it is
     a rehearsal.
     """
@@ -147,7 +147,7 @@ def test_every_pattern_can_match_across_a_multi_line_value(category: dict[str, o
 
     Asserted for every pattern rather than for the one that was found broken:
     the next category somebody adds will be written by copying one of these, and
-    a missing ``(?s)`` fails silently — the report keeps rendering, it simply
+    a missing ``(?s)`` fails silently - the report keeps rendering, it simply
     stops classifying anything.
     """
     for key in ("messageRegex", "traceRegex"):

@@ -1,6 +1,6 @@
-"""DB-INT — whole-database invariants and assertions about the schema itself.
+"""DB-INT - whole-database invariants and assertions about the schema itself.
 
-Matrix: DB-INT-001 … DB-INT-007.
+Matrix: DB-INT-001 ... DB-INT-007.
 
 Two kinds of check live here, and neither is possible from any other layer.
 
@@ -11,7 +11,7 @@ a *relationship* rather than a value.
 
 **Schema assertions** check the storage itself. A column holding correct values
 today but declared `double precision` is a defect waiting for the first value that
-cannot be represented exactly — and no amount of testing rows will ever find it.
+cannot be represented exactly - and no amount of testing rows will ever find it.
 """
 
 from __future__ import annotations
@@ -33,7 +33,7 @@ pytestmark = pytest.mark.integrity
 def test_no_audit_row_points_at_a_missing_claim(integrity_db: IntegrityQueries) -> None:
     """DB-INT-001.
 
-    A foreign key should make this impossible — which is exactly why it is worth
+    A foreign key should make this impossible - which is exactly why it is worth
     asserting. "There is a constraint" and "the constraint is valid and enforced"
     are different statements, and a migration that dropped one would go unnoticed
     until the data was already wrong.
@@ -42,13 +42,13 @@ def test_no_audit_row_points_at_a_missing_claim(integrity_db: IntegrityQueries) 
 
 
 def test_no_payout_points_at_a_missing_claim(integrity_db: IntegrityQueries) -> None:
-    """DB-INT-002 — an orphaned payout is money attached to nothing."""
+    """DB-INT-002 - an orphaned payout is money attached to nothing."""
     assert integrity_db.orphaned_payout_count() == 0
 
 
 @pytest.mark.smoke
 def test_no_claim_has_ever_been_paid_twice(integrity_db: IntegrityQueries) -> None:
-    """DB-INT-003 — checked across every claim in the database.
+    """DB-INT-003 - checked across every claim in the database.
 
     The per-claim test proves one claim was not double-paid. This proves *none*
     were, including every claim every other test in this run created. It costs one
@@ -60,7 +60,7 @@ def test_no_claim_has_ever_been_paid_twice(integrity_db: IntegrityQueries) -> No
 
 
 def test_every_paid_claim_has_a_payout(integrity_db: IntegrityQueries) -> None:
-    """DB-INT-004 — the opposite failure: money owed and never recorded.
+    """DB-INT-004 - the opposite failure: money owed and never recorded.
 
     Paired with the previous test on purpose. Together they say the PAID status and
     the payout ledger agree in both directions, which neither says alone.
@@ -71,7 +71,7 @@ def test_every_paid_claim_has_a_payout(integrity_db: IntegrityQueries) -> None:
 
 
 def test_no_payout_disagrees_with_its_claim(integrity_db: IntegrityQueries) -> None:
-    """DB-INT-005 — the amount paid equals the amount approved.
+    """DB-INT-005 - the amount paid equals the amount approved.
 
     A payout that drifted from its claim is the shape a rounding bug takes once it
     reaches production.
@@ -82,7 +82,7 @@ def test_no_payout_disagrees_with_its_claim(integrity_db: IntegrityQueries) -> N
 
 
 def test_every_claim_has_an_audit_trail(integrity_db: IntegrityQueries) -> None:
-    """DB-INT-006 — a claim with no history cannot be explained to anyone."""
+    """DB-INT-006 - a claim with no history cannot be explained to anyone."""
     silent = integrity_db.claims_with_no_audit_trail()
 
     assert silent == [], f"claims with no audit rows: {silent}"
@@ -97,11 +97,11 @@ def test_every_claim_has_an_audit_trail(integrity_db: IntegrityQueries) -> None:
 def test_money_is_stored_as_exact_numeric_not_floating_point(
     integrity_db: IntegrityQueries,
 ) -> None:
-    """DB-INT-007 — asserted against ``information_schema``, not against rows.
+    """DB-INT-007 - asserted against ``information_schema``, not against rows.
 
     This is the test that catches the defect *before* it produces a wrong value.
     A column declared ``double precision`` behaves correctly for most amounts and
-    then, one day, cannot represent one — by which point the wrong number is
+    then, one day, cannot represent one - by which point the wrong number is
     already in the ledger.
 
     Scale is asserted too: ``NUMERIC`` without a scale would accept three decimal
@@ -175,7 +175,7 @@ def test_the_qa_role_cannot_modify_anything(
 
     Every claim this framework makes about not writing to the database rests on
     this. An untested safety control is a belief, and beliefs about permissions
-    are wrong surprisingly often — a well-meaning ``GRANT ALL`` during an incident
+    are wrong surprisingly often - a well-meaning ``GRANT ALL`` during an incident
     is all it takes.
 
     The failure is raised as a ``DatabaseError``, not an ``AssertionError``,

@@ -2,7 +2,7 @@
 
 The problem they solve is duplication with a twist. Without a factory, every test
 that creates a claim spells out four fields, so when the API adds a fifth required
-field, forty tests break at once — and worse, forty tests each contain a slightly
+field, forty tests break at once - and worse, forty tests each contain a slightly
 different idea of what a "normal" claim looks like.
 
 With a factory, tests state only what they care about:
@@ -56,7 +56,7 @@ class ClaimFactory:
         """A valid payload, with any field replaced by an override.
 
         Overrides are applied last and are not validated, so a test can pass
-        deliberately invalid values — which is exactly what the negative and
+        deliberately invalid values - which is exactly what the negative and
         boundary tests need.
         """
         base: dict[str, Any] = {
@@ -85,7 +85,7 @@ class ClaimFactory:
     def recent_date(self, *, days_ago: int = 7) -> date:
         """A date in the past. The API rejects future incident dates.
 
-        UTC, not the runner's local date — see :mod:`claimdesk_qa.core.clock`.
+        UTC, not the runner's local date - see :mod:`claimdesk_qa.core.clock`.
         With ``days_ago=0`` this is the boundary value itself, and a local date
         would make that assertion depend on the timezone of whichever machine
         happened to run it.

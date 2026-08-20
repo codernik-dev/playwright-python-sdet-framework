@@ -7,8 +7,8 @@ and the signal that something is wrong has been deliberately deleted.
 
 So the policy here is narrow and written down:
 
-1. **Retries are diagnostics, not a cure.** A rerun answers one question — "is
-   this reproducible?" — and nothing else.
+1. **Retries are diagnostics, not a cure.** A rerun answers one question - "is
+   this reproducible?" - and nothing else.
 2. **UI and end-to-end only.** A browser genuinely shares a machine with a
    compositor, a renderer and a network stack. An API or database test that
    fails twice out of ten is not flaky, it is **wrong**, and retrying it hides a
@@ -18,7 +18,7 @@ So the policy here is narrow and written down:
 4. **One retry.** If one is not enough to decide whether it reproduces, the
    answer is not two.
 5. **A test that passes on retry is reported as FLAKY, never as green.** This is
-   the part that makes the other four honest — see
+   the part that makes the other four honest - see
    ``pytest_terminal_summary`` in ``tests/conftest.py``.
 
 The seed lives here for the same reason: a flake nobody can reproduce is a flake
@@ -56,7 +56,7 @@ def reruns_for(marker_names: Iterable[str], *, is_ci: bool) -> int:
 
 
 def effective_seed(configured: int | None, run_id: str) -> int:
-    """The seed this run actually used — never ``None``.
+    """The seed this run actually used - never ``None``.
 
     Reporting ``faker_seed=None`` when none was configured is technically true
     and practically useless: a seed *was* used, it was simply derived rather than

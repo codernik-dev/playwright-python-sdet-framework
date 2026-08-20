@@ -2,7 +2,7 @@
 
 Deliberately plain: forms, tables and links, with a small amount of JavaScript for
 the asynchronous claim filter. No front-end build step, so the repository stays
-Python-only and the container image stays small — while still giving the browser
+Python-only and the container image stays small - while still giving the browser
 tests genuinely asynchronous behaviour to wait on.
 """
 
@@ -357,7 +357,7 @@ def _action_is_offered(
 ) -> bool:
     """Whether to render a button for this action.
 
-    Only the source status and the role are considered — the approval limit is
+    Only the source status and the role are considered - the approval limit is
     deliberately **not** applied here. An adjuster still sees the Approve button on
     an over-limit claim and is refused on submit, which is what UI-CLM-011 asserts.
     Hiding the button would make the rule untestable through the interface and

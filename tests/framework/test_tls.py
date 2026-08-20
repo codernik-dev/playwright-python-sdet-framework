@@ -2,7 +2,7 @@
 
 Two properties, and the second is the reason this file exists.
 
-Sharing the context is a **performance** fix — building one costs ~355 ms and the
+Sharing the context is a **performance** fix - building one costs ~355 ms and the
 suite builds a client per identity per test. The tempting way to make that number
 go away is ``verify=False``, which is invisible today because every URL in this
 project is ``http://``, and becomes a silent security regression the first time
@@ -22,7 +22,7 @@ from claimdesk_qa.core.tls import shared_ssl_context
 def test_the_context_is_built_once_and_reused() -> None:
     """The whole point: one context, not one per client.
 
-    Identity, not equality — two distinct-but-equivalent contexts would still pay
+    Identity, not equality - two distinct-but-equivalent contexts would still pay
     the construction cost this exists to avoid.
     """
     assert shared_ssl_context() is shared_ssl_context()
@@ -52,7 +52,7 @@ def test_the_shared_context_refuses_obsolete_protocols() -> None:
         assert <TLSVersion.MINIMUM_SUPPORTED: -2> >= <TLSVersion.TLSv1_2: 771>
 
     Both environments are secure. ``MINIMUM_SUPPORTED`` means "whatever this
-    OpenSSL build's system policy allows", which on Ubuntu 24.04 is TLS 1.2 —
+    OpenSSL build's system policy allows", which on Ubuntu 24.04 is TLS 1.2 -
     the platform simply expresses the same guarantee with a different value.
 
     So the original test was asserting a **platform default**, not a property of

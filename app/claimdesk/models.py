@@ -1,4 +1,4 @@
-"""SQLAlchemy models — the single source of truth for the ClaimDesk schema.
+"""SQLAlchemy models - the single source of truth for the ClaimDesk schema.
 
 Design notes that the database tests depend on:
 

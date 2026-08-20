@@ -3,7 +3,7 @@
 Why a module exists for four lines of code
 ------------------------------------------
 ``httpx.Client()`` builds a fresh :class:`ssl.SSLContext` for every instance, and
-building one means reading and parsing the certifi CA bundle — several hundred
+building one means reading and parsing the certifi CA bundle - several hundred
 kilobytes of PEM, every time. The framework creates a client per identity per
 test, so that cost is paid on almost every test in the suite.
 
@@ -22,13 +22,13 @@ application performance problem is never that evenly spread. Uniform overhead
 belongs to the harness, not to the product.
 
 Sharing the context does **not** weaken verification. It is the same
-fully-verifying context ``httpx`` would have constructed — certificates are still
+fully-verifying context ``httpx`` would have constructed - certificates are still
 checked, hostnames are still matched. The only thing removed is building it
 repeatedly. An ``SSLContext`` is designed to be shared across connections; that is
 how connection pools use it.
 
 Deliberately *not* ``verify=False``. Every URL in this project is ``http://``
-today, so disabling verification would be invisible and free — right up to the
+today, so disabling verification would be invisible and free - right up to the
 day someone points ``BASE_URL`` at an HTTPS staging environment and the suite
 quietly stops checking certificates. A performance fix must not become a security
 regression the first time the configuration changes.

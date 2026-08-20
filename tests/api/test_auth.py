@@ -1,6 +1,6 @@
-"""API-AUTH — authentication and session handling.
+"""API-AUTH - authentication and session handling.
 
-Matrix: API-AUTH-001 … API-AUTH-009 in docs/phase-1-design.md §8.4.
+Matrix: API-AUTH-001 ... API-AUTH-009 in docs/phase-1-design.md §8.4.
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ def password(settings: Settings) -> str:
 
 
 # --------------------------------------------------------------------------- #
-# API-AUTH-001 / 009 — the happy path
+# API-AUTH-001 / 009 - the happy path
 # --------------------------------------------------------------------------- #
 
 
@@ -60,7 +60,7 @@ def test_the_login_response_does_not_leak_the_password_hash(
 
 
 # --------------------------------------------------------------------------- #
-# API-AUTH-002 / 003 — failures must be indistinguishable
+# API-AUTH-002 / 003 - failures must be indistinguishable
 # --------------------------------------------------------------------------- #
 
 
@@ -76,7 +76,7 @@ def test_login_with_the_wrong_password_is_rejected(
 def test_unknown_user_and_wrong_password_are_indistinguishable(
     anonymous_auth: AuthApi, password: str
 ) -> None:
-    """API-AUTH-003 — a user-enumeration check.
+    """API-AUTH-003 - a user-enumeration check.
 
     If "no such account" and "wrong password" produce different responses, anyone
     can discover which email addresses are registered by watching the difference.
@@ -115,7 +115,7 @@ def test_malformed_login_payloads_are_rejected_by_field(
 
 
 # --------------------------------------------------------------------------- #
-# API-AUTH-005 / 006 — missing and malformed credentials
+# API-AUTH-005 / 006 - missing and malformed credentials
 # --------------------------------------------------------------------------- #
 
 
@@ -160,7 +160,7 @@ def test_malformed_authorization_headers_are_rejected(
 def test_a_token_signed_with_the_wrong_key_is_rejected(anonymous_client: ApiClient) -> None:
     """A structurally valid JWT with a bad signature must not be accepted.
 
-    This is the check that would catch signature verification being disabled — a
+    This is the check that would catch signature verification being disabled - a
     real and catastrophic misconfiguration that a "malformed string" test misses
     entirely, because a malformed string fails parsing long before verification.
     """

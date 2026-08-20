@@ -8,11 +8,11 @@ survive being left to the author of each individual test:
 1. **It must be read-only.** The database role holds ``SELECT`` and nothing else
    (ADR 0003), and this layer sets ``read_only`` on the connection as well. Two
    independent controls, because the dangerous version of database testing is a
-   suite that quietly writes rows to reach a state faster — and then asserts
+   suite that quietly writes rows to reach a state faster - and then asserts
    against data the application could never have produced.
 2. **It must be parameterised.** Never string interpolation. Not only because of
-   injection — that is a real risk even in test code that runs against a shared
-   environment — but because interpolation silently mangles types. A ``Decimal``
+   injection - that is a real risk even in test code that runs against a shared
+   environment - but because interpolation silently mangles types. A ``Decimal``
    formatted into SQL becomes a float literal, and the test that was supposed to
    prove money is exact starts comparing rounded values.
 3. **It must be recordable.** When an assertion about database state fails, the
@@ -21,7 +21,7 @@ survive being left to the author of each individual test:
 
 Connections are opened per test rather than pooled. A pool would be faster, and it
 would also let one test's open transaction hold a snapshot that hides another
-test's committed writes — which is exactly the confusion this layer exists to
+test's committed writes - which is exactly the confusion this layer exists to
 avoid.
 """
 
@@ -191,8 +191,8 @@ class Database:
         """Run a query expected to match at most one row.
 
         Returns ``None`` when nothing matched, rather than raising. "The row is
-        absent" is a legitimate and frequently asserted outcome — a deleted claim,
-        a payout that should not exist — and forcing every caller to catch an
+        absent" is a legitimate and frequently asserted outcome - a deleted claim,
+        a payout that should not exist - and forcing every caller to catch an
         exception for the normal case makes those tests unreadable.
         """
         rows = self.fetch_all(sql, params, model=model)

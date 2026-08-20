@@ -2,7 +2,7 @@
 
 The application is deliberately not installed as a package (see
 ``docs/adr/0002-black-box-boundary.md``), so its own tests put its directory on
-``sys.path`` here. This is scoped to ``app/tests`` only — the automation framework
+``sys.path`` here. This is scoped to ``app/tests`` only - the automation framework
 never gets this path, and the ruff import ban blocks it regardless.
 """
 

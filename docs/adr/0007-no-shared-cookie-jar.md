@@ -1,4 +1,4 @@
-# ADR 0007 — The API client must never share a cookie jar between identities
+# ADR 0007 - The API client must never share a cookie jar between identities
 
 **Status:** Accepted · **Date:** 2026-08-19 · **Phase:** 3 (applies to the Phase 5 API client)
 
@@ -19,7 +19,7 @@ with httpx.Client() as client:
 ```
 
 The check "an unauthenticated request is rejected" was silently exercising an *authenticated*
-request. A direct `curl` confirmed the application was correct — it returns `401`, and `303` for the
+request. A direct `curl` confirmed the application was correct - it returns `401`, and `303` for the
 anonymous HTML route. The framework was wrong, not the application.
 
 This is the most dangerous category of test defect. It does not fail; it passes for the wrong reason,
@@ -38,8 +38,8 @@ and it would keep passing if authentication were removed from the endpoint entir
 ## Consequences
 
 * Slightly more construction: one client per identity instead of one shared client.
-* Authorisation tests become trustworthy — a `401`/`403` assertion cannot pass because of a stale
+* Authorisation tests become trustworthy - a `401`/`403` assertion cannot pass because of a stale
   cookie from a previous test.
 * This is a strong interview answer to *"how do you know your negative tests are actually testing
-  what they claim?"* — the honest answer is that one of mine was not, and here is the control that
+  what they claim?"* - the honest answer is that one of mine was not, and here is the control that
   now prevents it.

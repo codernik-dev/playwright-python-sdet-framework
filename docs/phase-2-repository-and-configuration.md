@@ -1,11 +1,11 @@
-# Phase 2 — Repository structure and configuration
+# Phase 2 - Repository structure and configuration
 
 > Teaching document. For each component: the problem it solves, the design decision, what the code
 > does, how to run it, how to prove it works, and the interview questions it earns you.
 
 ---
 
-## Component 1 — `pyproject.toml`: one file instead of five
+## Component 1 - `pyproject.toml`: one file instead of five
 
 ### The problem it solves
 
@@ -32,7 +32,7 @@ app = ["fastapi", "uvicorn[standard]", "sqlalchemy", "jinja2", "pyjwt", "bcrypt"
 
 The application under test is an **optional extra**. CI installs the framework without it. That
 makes the black-box boundary visible in the dependency manifest itself, not just in a policy
-document — a reviewer sees it in the first file they open.
+document - a reviewer sees it in the first file they open.
 
 **Version ranges, not exact pins:**
 
@@ -53,10 +53,10 @@ addopts = ["-ra", "--strict-markers", "--strict-config", "--import-mode=importli
 
 | Flag | Why it is there |
 |---|---|
-| `--strict-markers` | `@pytest.mark.smoek` currently does nothing at all — the test silently drops out of the smoke suite. With this flag it is a hard error. This one flag prevents an entire class of "we thought it was covered". |
+| `--strict-markers` | `@pytest.mark.smoek` currently does nothing at all - the test silently drops out of the smoke suite. With this flag it is a hard error. This one flag prevents an entire class of "we thought it was covered". |
 | `--strict-config` | The same protection for typos in `pyproject.toml` itself |
 | `--import-mode=importlib` | Modern import semantics that work with the `src` layout and behave identically in an IDE, a terminal and CI |
-| `-ra` | A summary of every non-passing outcome, including the *reason* for each skip — so a skipped database suite is visible, not invisible |
+| `-ra` | A summary of every non-passing outcome, including the *reason* for each skip - so a skipped database suite is visible, not invisible |
 | `--showlocals` | Local variables in the traceback. This is why secrets must be `SecretStr` |
 
 **Warnings are errors:**
@@ -85,7 +85,7 @@ pytest --collect-only -q    # what would run, without running it
 
 ---
 
-## Component 2 — The black-box boundary, enforced by the linter
+## Component 2 - The black-box boundary, enforced by the linter
 
 ### The problem it solves
 
@@ -117,14 +117,14 @@ Runs in pre-commit and in the CI gate. A violation cannot be merged.
 
 Status names and the approval limit are now duplicated between the application and the tests. That
 duplication is **the point**. The test's copy is the *specification*; the application's copy is the
-*implementation*. When they diverge, a test fails — which is the entire purpose of the exercise.
+*implementation*. When they diverge, a test fails - which is the entire purpose of the exercise.
 
 > **Interview soundbite:** *"Sharing constants between the tests and the application converts every
 > contract regression into a silent pass. I duplicate deliberately and let the linter enforce it."*
 
 ---
 
-## Component 3 — `src/` layout and an installable package
+## Component 3 - `src/` layout and an installable package
 
 ### The problem it solves
 
@@ -145,14 +145,14 @@ success, but hatchling had nothing to map, so no import hook was written and `im
 failed at test collection. **An editable install is a build; a build of nothing produces nothing.**
 Reinstalling after the package had content fixed it.
 
-Then the install failed a second time with `metadata-generation-failed` — because `pyproject.toml`
+Then the install failed a second time with `metadata-generation-failed` - because `pyproject.toml`
 declared `readme = "README.md"` and that file did not exist yet. The error pointed at pip. The cause
 was five lines up in my own manifest. That gap between *where an error is reported* and *where it is
 caused* is the single most useful thing to internalise about debugging build tooling.
 
 ---
 
-## Component 4 — `Settings`: configuration as a validated object
+## Component 4 - `Settings`: configuration as a validated object
 
 ### The problem it solves
 
@@ -171,7 +171,7 @@ bug and costs an afternoon.
 ### The decision
 
 One frozen, validated `Settings` object built at session start. Precedence: **real environment
-variables > `.env` file > defaults** — which is precisely what lets the identical code run locally
+variables > `.env` file > defaults** - which is precisely what lets the identical code run locally
 from a file and in CI from injected secrets, with no branching.
 
 ### The five design decisions worth defending
@@ -196,7 +196,7 @@ everywhere, and `masked()` produces the report block:
 {"environment": "local", "base_url": "...", "database": "postgresql://claimdesk_qa_ro:***masked***@localhost:5432/claimdesk", ...}
 ```
 
-Note that secrets are **replaced, not truncated** — a truncated secret is still a leak.
+Note that secrets are **replaced, not truncated** - a truncated secret is still a leak.
 
 **3. Derive rather than duplicate.** `api_url` defaults to `{base_url}/api/v1`. One value to
 configure means two values can never disagree. Override it only when the API genuinely lives
@@ -214,7 +214,7 @@ if self.env is Environment.CI and not self.headless:
 ```
 
 A headed browser on a CI agent waits forever for a display that will never exist. The job does not
-fail — it *hangs* until the pipeline timeout, which is a far worse outcome than a clear error.
+fail - it *hangs* until the pipeline timeout, which is a far worse outcome than a clear error.
 
 **6. Frozen.** Configuration cannot drift mid-run, so the environment block in the report is
 guaranteed to describe the run that actually happened.
@@ -222,7 +222,7 @@ guaranteed to describe the run that actually happened.
 ### The design flaw the tests caught
 
 `DB_ENABLED` originally defaulted to `true`. Eleven unit tests failed instantly, because a fresh
-clone with no `.env` could not even *load* the configuration — validation rejected the empty
+clone with no `.env` could not even *load* the configuration - validation rejected the empty
 password before a single test ran.
 
 The tests were right and the design was wrong. Database validation is now opt-in
@@ -230,7 +230,7 @@ The tests were right and the design was wrong. Database validation is now opt-in
 run can never be mistaken for one that validated the database.
 
 > **Interview soundbite:** *"My own framework unit tests rejected my first configuration design. I
-> changed the design, not the tests — and wrote down why in an ADR."*
+> changed the design, not the tests - and wrote down why in an ADR."*
 
 ### How to run and prove it
 
@@ -253,18 +253,18 @@ between a five-second fix and a Slack thread.
 
 ---
 
-## Component 5 — Tests for the test framework
+## Component 5 - Tests for the test framework
 
 `tests/framework/` contains unit tests for framework code. They need no application, no database and
 no browser, and run in well under a second.
 
 ### Why this exists at all
 
-Framework code is shared by every test in the suite. A silent bug in it — a URL built wrong, a secret
-leaked into a report, a value read from the wrong variable — corrupts every result the suite
+Framework code is shared by every test in the suite. A silent bug in it - a URL built wrong, a secret
+leaked into a report, a value read from the wrong variable - corrupts every result the suite
 produces. Everything else in the pyramid rests on this layer being correct.
 
-It is also the cleanest possible answer to *"who tests the tests?"* — a question good interviewers
+It is also the cleanest possible answer to *"who tests the tests?"* - a question good interviewers
 ask and most candidates have never considered.
 
 ### The isolation fixture, and why it is autouse
@@ -277,7 +277,7 @@ def isolated_env(monkeypatch):
 ```
 
 Without it, a developer with `BASE_URL` set in their shell gets different results from CI. That is
-exactly the environment-dependent flakiness this framework exists to demonstrate how to avoid — so it
+exactly the environment-dependent flakiness this framework exists to demonstrate how to avoid - so it
 would be indefensible to allow it in the framework's own tests. `autouse` because remembering to
 request it is a rule that will eventually be forgotten.
 
@@ -299,7 +299,7 @@ repository, and reviewers notice.
 
 ---
 
-## Component 6 — Secret hygiene
+## Component 6 - Secret hygiene
 
 | Control | Mechanism |
 |---|---|
@@ -315,13 +315,13 @@ real credentials the same way would be negligence. Knowing which is which is the
 
 ---
 
-## Component 7 — Scripts instead of a Makefile
+## Component 7 - Scripts instead of a Makefile
 
 `make` is not present on a default Windows install. Since the development machine is Windows and CI
 is Linux, the repository ships:
 
-* `scripts/bootstrap.ps1` — one-command setup for a fresh clone, idempotent by design
-* `scripts/quality.ps1` / `scripts/quality.sh` — the **exact** CI gate, runnable locally
+* `scripts/bootstrap.ps1` - one-command setup for a fresh clone, idempotent by design
+* `scripts/quality.ps1` / `scripts/quality.sh` - the **exact** CI gate, runnable locally
 
 The second matters more than it looks: any divergence between the local script and the CI workflow is
 a bug in one of them. A developer must never learn about a lint failure from a pipeline.
@@ -347,7 +347,7 @@ turns that into a hard error. It is one line and it prevents a whole class of fa
 
 **Q: How does your framework handle configuration across environments?**
 One frozen, validated pydantic-settings object. Precedence is real environment variables, then
-`.env`, then defaults — which is why the same code runs locally from a file and in CI from injected
+`.env`, then defaults - which is why the same code runs locally from a file and in CI from injected
 secrets with no branching. Everything is range-checked at session start, so misconfiguration fails
 immediately with an actionable message instead of as a mystery failure mid-run.
 
@@ -363,7 +363,7 @@ silenced by module, never globally.
 
 **Q: Why is database validation opt-in? Isn't that hiding coverage?**
 It would be, if the skip were quiet. A fresh clone must load with zero configuration, and in real
-organisations an SDET often has database access in one environment and not another — the suite must
+organisations an SDET often has database access in one environment and not another - the suite must
 still run there. The safeguards are that the skip carries a reason, the report's environment block
 says `database: disabled`, and every CI workflow enables it explicitly, so a disabled database in CI
 is a visible diff rather than an invisible default.
@@ -371,7 +371,7 @@ is a visible diff rather than an invisible default.
 **Q: What did you get wrong in this phase?**
 Three things, all recorded in `docs/progress.md`: an editable install built before the package
 existed, a manifest referencing a README that did not exist, and a default configuration that was
-invalid — caught by my own unit tests. I changed the design rather than the tests and wrote an ADR
+invalid - caught by my own unit tests. I changed the design rather than the tests and wrote an ADR
 explaining why.
 
 ---

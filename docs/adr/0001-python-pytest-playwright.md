@@ -1,4 +1,4 @@
-# ADR 0001 — Python + pytest + Playwright as the core stack
+# ADR 0001 - Python + pytest + Playwright as the core stack
 
 **Status:** Accepted · **Date:** 2026-08-19 · **Phase:** 2
 
@@ -13,7 +13,7 @@ Python 3.11 (local) / 3.12 (container), pytest as the runner, Playwright for the
 
 ## Why pytest rather than unittest or Robot Framework
 
-* **Fixtures are real dependency injection** — scoped, composable, and finalised even when a test
+* **Fixtures are real dependency injection** - scoped, composable, and finalised even when a test
   fails. This removes the need for `setUp`/`tearDown` inheritance hierarchies entirely.
 * **Parametrisation is first-class**, which is what makes boundary and negative testing cheap.
 * **Markers** give free-form suite selection (`-m "smoke and not ui"`) with no extra tooling.
@@ -27,7 +27,7 @@ There is no non-programmer consumer of these tests, so the trade is a loss.
 * **Auto-waiting actionability checks.** Playwright waits for an element to be attached, visible,
   stable, enabled and able to receive events before acting. Most Selenium flakiness is a missing
   explicit wait; Playwright removes the category rather than the individual bugs.
-* **Browser contexts** are isolated sessions inside one browser process — far cheaper than a browser
+* **Browser contexts** are isolated sessions inside one browser process - far cheaper than a browser
   per test, which is what makes parallel UI runs affordable.
 * **`storage_state`** lets us authenticate once via the API and inject the session, so UI tests do
   not pay for a login they are not testing.
@@ -37,7 +37,7 @@ There is no non-programmer consumer of these tests, so the trade is a loss.
 
 ## When Selenium would still be the right answer
 
-* A large existing Selenium estate — rewriting working tests is rarely a good use of budget.
+* A large existing Selenium estate - rewriting working tests is rarely a good use of budget.
 * Real device clouds / Selenium Grid infrastructure already paid for.
 * Browsers or versions Playwright does not support (legacy Internet Explorer, some embedded engines).
 * A team whose entire skill set is Selenium, where the migration cost exceeds the flakiness cost.

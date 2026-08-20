@@ -1,4 +1,4 @@
-# Phase 3 — The application under test and its database
+# Phase 3 - The application under test and its database
 
 > Teaching document. The application is a **fixture**; the framework is the deliverable. This phase
 > is therefore judged by one question: *does it give the automation something genuinely worth
@@ -10,7 +10,7 @@
 
 | Area | Files | What it provides the test suite |
 |---|---|---|
-| Domain rules | `app/claimdesk/domain.py` | A status machine, an approval limit, and ownership rules — the specification the framework tests from the outside |
+| Domain rules | `app/claimdesk/domain.py` | A status machine, an approval limit, and ownership rules - the specification the framework tests from the outside |
 | Persistence | `app/claimdesk/models.py` | `NUMERIC(12,2)` money, a unique payout per claim, an append-only audit trail |
 | Services | `app/claimdesk/services.py` | Shared logic so the API and the browser cannot drift apart |
 | REST API | `app/claimdesk/api/` | 16 endpoints under `/api/v1`, plus liveness and readiness probes |
@@ -21,7 +21,7 @@
 
 ---
 
-## Decision 1 — A disposable, project-local database
+## Decision 1 - A disposable, project-local database
 
 ### The problem
 
@@ -31,7 +31,7 @@ The framework needs PostgreSQL. Three ways to get one:
 |---|---|
 | Use the PostgreSQL service already on the machine | Needs the superuser password; risks colliding with existing databases; state carries over between runs |
 | Docker | Not installed on this machine yet, and disk space is tight |
-| A project-owned cluster | — |
+| A project-owned cluster | - |
 
 ### The decision
 
@@ -40,7 +40,7 @@ already installed, and manages it with `start` / `stop` / `status` / `reset` / `
 
 * No administrator rights, no superuser password from the machine's existing server.
 * Cannot collide with anything on 5432.
-* `reset` destroys and rebuilds it in seconds — which is what makes a run reproducible.
+* `reset` destroys and rebuilds it in seconds - which is what makes a run reproducible.
 * It mirrors what Docker compose will do in Phase 10, so both paths behave the same way.
 
 ### The bug found while building it
@@ -54,7 +54,7 @@ Cause: on Windows the server process inherits the parent's stdout handle, so a p
 Fix: `Start-Process ... -RedirectStandardOutput` detaches the handles.
 
 > This is worth remembering as a general shape: **"the thing hung" is often the wrapper, not the
-> thing.** The log said the server was ready — reading it first would have saved ten minutes. Read
+> thing.** The log said the server was ready - reading it first would have saved ten minutes. Read
 > the log before theorising.
 
 ### The two roles
@@ -76,7 +76,7 @@ physically cannot mutate state through SQL. ([ADR 0003](adr/0003-read-only-db-ro
 
 ---
 
-## Decision 2 — Business rules that are worth testing
+## Decision 2 - Business rules that are worth testing
 
 A to-do application gives you `create` and `delete`. This one gives the framework real material:
 
@@ -121,12 +121,12 @@ def _illegal_pairs():
 ```
 
 35 negative cases from four lines. More importantly, **adding a new status automatically adds its
-negative cases** — a hand-written list would silently fail to cover the new value, which is how
+negative cases** - a hand-written list would silently fail to cover the new value, which is how
 coverage quietly rots.
 
 ---
 
-## Decision 3 — Two transports, one token
+## Decision 3 - Two transports, one token
 
 The same JWT is accepted from an `Authorization: Bearer` header *and* from a `session` cookie.
 
@@ -138,7 +138,7 @@ It also produced the most valuable bug of the phase.
 
 ---
 
-## The false pass — the most important thing in this phase
+## The false pass - the most important thing in this phase
 
 The verification script contained this check:
 
@@ -174,7 +174,7 @@ The rule is now recorded in [ADR 0007](adr/0007-no-shared-cookie-jar.md): the AP
 cookie persistence, each identity gets its own client, and unauthenticated tests use a client that has
 never logged in.
 
-> **Interview soundbite:** *"One of my negative tests passed for the wrong reason — a shared HTTP
+> **Interview soundbite:** *"One of my negative tests passed for the wrong reason - a shared HTTP
 > client's cookie jar was authenticating a request that was supposed to be anonymous. I proved the
 > application was right with curl, fixed the framework, and wrote the isolation rule into an ADR.
 > Now every authorisation test uses a per-identity client."*
@@ -185,7 +185,7 @@ never logged in.
 
 | # | Finding | Why it mattered |
 |---|---|---|
-| 1 | `.env.example` shipped `FAKER_SEED=` (empty), which fails `int` parsing | The documented first step — copy the template — produced a framework that could not start. Fixed with a `mode="before"` validator, and a test now loads `.env.example` itself so the template can never break again |
+| 1 | `.env.example` shipped `FAKER_SEED=` (empty), which fails `int` parsing | The documented first step - copy the template - produced a framework that could not start. Fixed with a `mode="before"` validator, and a test now loads `.env.example` itself so the template can never break again |
 | 2 | Framework unit tests were not hermetic against the `.env` **file** | Clearing environment variables was only half the isolation. Tests now `chdir` to a temp directory, so a developer's real `.env` cannot change a unit-test result |
 | 3 | Seed emails used `@claimdesk.test` | `email-validator` rejects the RFC 2606 `.test` TLD as a special-use name, so every login returned `422`. Moved to `example.com` |
 | 4 | Two `assert` statements used for control flow | `python -O` strips `assert`, turning the guard into a silent `None` dereference. Replaced with explicit raises |
@@ -213,14 +213,14 @@ curl http://localhost:8000/health/ready    # {"status":"ready","database":"reach
 # 4. Open http://localhost:8000/login and sign in
 ```
 
-Seeded accounts — all with password `Passw0rd!seed`:
+Seeded accounts - all with password `Passw0rd!seed`:
 
 | Email | Role |
 |---|---|
 | `admin@example.com` | ADMIN |
 | `adjuster@example.com` | ADJUSTER |
 | `customer@example.com` | CUSTOMER (holds POL-1001 and POL-1002, owns the 24 seeded claims) |
-| `other.customer@example.com` | CUSTOMER (holds POL-2001 — used for cross-tenant tests) |
+| `other.customer@example.com` | CUSTOMER (holds POL-2001 - used for cross-tenant tests) |
 
 Useful commands:
 
@@ -231,7 +231,7 @@ Useful commands:
 .\.venv\Scripts\python.exe -m pytest app/tests -q   # the application's own tests
 ```
 
-Interactive API documentation is at <http://localhost:8000/docs>, generated from the code — which is
+Interactive API documentation is at <http://localhost:8000/docs>, generated from the code - which is
 also how you confirm the endpoint list without reading the routers.
 
 ---
@@ -240,14 +240,14 @@ also how you confirm the endpoint list without reading the routers.
 
 **Q: You wrote the application you are testing. Why should I trust the tests?**
 Because the framework cannot see the application. It reaches it only over HTTP and read-only SQL, and
-a ruff rule blocks the import — I proved the rule fires by adding a violating file and watching the
+a ruff rule blocks the import - I proved the rule fires by adding a violating file and watching the
 linter reject it. The database role the tests use holds `SELECT` and nothing else, so tests cannot
 manufacture state that the application would never produce.
 
 **Q: Why a separate read-only database role?**
 So the tests physically cannot take shortcuts. The dangerous version of database testing writes rows
 to reach a state quickly, and then asserts against data the application never created. With
-`SELECT`-only, reaching `PAID` requires driving the real workflow — which also produces the audit rows
+`SELECT`-only, reaching `PAID` requires driving the real workflow - which also produces the audit rows
 the test then verifies.
 
 **Q: Why is `ALTER DEFAULT PRIVILEGES` needed?**
@@ -257,18 +257,18 @@ nothing. Default privileges apply to tables created later by the owning role.
 **Q: How do you test a state machine without writing dozens of tests by hand?**
 Generate the negative matrix from the transition table: every `(action, status)` pair that is not a
 legal edge must return `409`. Four lines produce 35 cases, and adding a new status automatically adds
-its negative cases — a hand-written list would silently miss them.
+its negative cases - a hand-written list would silently miss them.
 
 **Q: What is the hardest kind of test bug to find?**
 The one that passes. In this phase a negative authentication check returned 200 because a shared HTTP
-client had a session cookie from an earlier login. It did not fail — it passed for the wrong reason,
+client had a session cookie from an earlier login. It did not fail - it passed for the wrong reason,
 and would have kept passing with authentication removed entirely. The fix was a per-identity client
 with cookie persistence disabled, recorded as ADR 0007.
 
 **Q: Why does the UI still show the Approve button on an over-limit claim?**
 Because hiding it would move authorisation into the template and make the rule untestable through the
 interface. The button is offered based on status and role; the approval limit is enforced on submit.
-That is what UI-CLM-011 asserts — the user sees an error and the status does not change.
+That is what UI-CLM-011 asserts - the user sees an error and the status does not change.
 
 **Q: Why does a customer get 404 rather than 403 for someone else's claim?**
 `403` confirms the resource exists, which lets an attacker enumerate valid identifiers. `404` reveals

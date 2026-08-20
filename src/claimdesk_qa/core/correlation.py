@@ -3,18 +3,18 @@
 Every HTTP request the framework makes carries ``X-Request-Id``. The application
 echoes it in the response and writes it to its log. When a test fails in CI you
 can therefore grep the application log for one identifier and see exactly the
-requests that test made — instead of guessing from timestamps.
+requests that test made - instead of guessing from timestamps.
 
 The identifier is derived from the test's node id by hashing, which makes it:
 
-* **stable** — the same test produces the same id in every run, so you can compare
+* **stable** - the same test produces the same id in every run, so you can compare
   a failure today against the same test's requests last week;
-* **short** — it appears in log lines and must stay readable;
-* **safe** — node ids contain characters that do not belong in an HTTP header.
+* **short** - it appears in log lines and must stay readable;
+* **safe** - node ids contain characters that do not belong in an HTTP header.
 
 The *current* id lives in a :class:`~contextvars.ContextVar` rather than being
-passed through every call. Two things need it — the log formatter and the HTTP
-client — and threading an argument through both would mean every helper in
+passed through every call. Two things need it - the log formatter and the HTTP
+client - and threading an argument through both would mean every helper in
 between had to know about correlation. A context variable also behaves correctly
 under threads and async, where a module-level global would not.
 """

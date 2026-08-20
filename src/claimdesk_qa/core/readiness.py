@@ -1,4 +1,4 @@
-"""Wait for a dependency to become ready — the replacement for ``sleep``.
+"""Wait for a dependency to become ready - the replacement for ``sleep``.
 
 Why this module exists at all
 -----------------------------
@@ -11,7 +11,7 @@ time.sleep(10)          # "should be enough"
 
 It is wrong in both directions. On a fast machine it wastes ten seconds on every
 run. On a loaded CI agent it is not enough, and the suite fails with a connection
-error that looks like a product defect. The fix is not a bigger number — it is to
+error that looks like a product defect. The fix is not a bigger number - it is to
 **ask the service whether it is ready** and to fail with a message that says what
 was being waited for.
 
@@ -84,7 +84,7 @@ def wait_until_ready(
 
     Raises:
         ServiceNotReadyError: with the number of attempts, the elapsed time and
-            the last detail seen — everything needed to diagnose it from a CI log
+            the last detail seen - everything needed to diagnose it from a CI log
             without reproducing the failure.
     """
     started = monotonic()

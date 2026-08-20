@@ -1,6 +1,6 @@
-# Phase 12 — GitHub Actions
+# Phase 12 - GitHub Actions
 
-> Teaching document. Two workflows, verified against real runs — not YAML that
+> Teaching document. Two workflows, verified against real runs - not YAML that
 > was written, pushed, and assumed to work.
 
 ---
@@ -15,7 +15,7 @@
 
 ---
 
-## Decision 1 — Two jobs, so failures arrive in the right order
+## Decision 1 - Two jobs, so failures arrive in the right order
 
 ```
 quality  →  suite
@@ -24,7 +24,7 @@ quality  →  suite
 `quality` runs lint, types and the framework's own unit tests with **no services,
 no browser, no database**. It finishes in about 45 seconds. If the framework
 itself is unsound there is no point starting a database and a browser to test
-against it — and the person waiting gets their answer in under a minute instead
+against it - and the person waiting gets their answer in under a minute instead
 of twelve.
 
 `suite` then runs the API, database, browser and end-to-end tests against a real
@@ -35,7 +35,7 @@ at 45 seconds and arriving at 13 minutes.
 
 ---
 
-## Decision 2 — Credentials are generated, not stored
+## Decision 2 - Credentials are generated, not stored
 
 ```yaml
 - name: Generate ephemeral credentials
@@ -47,7 +47,7 @@ at 45 seconds and arriving at 13 minutes.
 
 Deliberately **not** GitHub secrets. The database exists for a few minutes inside
 one runner and is destroyed with it, so a stored secret would be a long-lived
-credential protecting something that does not outlive the job — and a value nobody
+credential protecting something that does not outlive the job - and a value nobody
 can read is safer than a value somebody must remember to rotate.
 
 Real environments get real secrets. Disposable ones get disposable credentials.
@@ -64,7 +64,7 @@ the read-only role could `SELECT` from a table and was refused an `INSERT` with
 
 ---
 
-## Decision 3 — No `sleep` before the tests
+## Decision 3 - No `sleep` before the tests
 
 ```yaml
 - name: Start ClaimDesk
@@ -83,7 +83,7 @@ number.
 
 ## The two failures, and what they taught
 
-### Failure 1 — `Permission denied`, exit code 126
+### Failure 1 - `Permission denied`, exit code 126
 
 The first run failed instantly on `./scripts/setup_ci_db.sh`.
 
@@ -96,9 +96,9 @@ git update-index --chmod=+x scripts/setup_ci_db.sh
 ```
 
 A pure Windows-to-Linux crossing bug, and one that no amount of local testing
-would ever surface — the script runs fine locally through `bash script.sh`.
+would ever surface - the script runs fine locally through `bash script.sh`.
 
-### Failure 2 — a red X that was not the real failure
+### Failure 2 - a red X that was not the real failure
 
 When the database step failed, the application never started, so the
 `Application log` step failed too on a missing file. Two red X's, one real
@@ -127,7 +127,7 @@ The first green run took **752 seconds**, of which the tests were **21**.
 Optimising from there would have been guesswork, because `playwright install
 --with-deps chromium` does two unrelated things: it downloads a browser (~120 MB,
 identical every run, cacheable) and it apt-installs system libraries into the
-runner image (not cacheable — the image is discarded).
+runner image (not cacheable - the image is discarded).
 
 Splitting them into separate steps made each cost visible:
 
@@ -183,24 +183,24 @@ worth measuring; neither is worth assuming.
 
 ## Verified runs
 
-Not "the YAML looks right" — actual runs, watched to completion.
+Not "the YAML looks right" - actual runs, watched to completion.
 
 | Run | Outcome |
 |---|---|
-| First attempt | ❌ `Permission denied` (exit 126) — executable bit not in the commit |
-| Second attempt | ✅ `quality` 43 s, `suite` 12 m 32 s — **`293 passed in 18.55s`** |
+| First attempt | ❌ `Permission denied` (exit 126) - executable bit not in the commit |
+| Second attempt | ✅ `quality` 43 s, `suite` 12 m 32 s - **`293 passed in 18.55s`** |
 | Third attempt | ✅ **343 s** job after splitting the browser install |
-| Fourth attempt | ✅ **78 s** job — but see the variance caveat above |
+| Fourth attempt | ✅ **78 s** job - but see the variance caveat above |
 | Nightly (dispatched) | ✅ **all three engines green**: Chromium `293 passed in 17.98s`, Firefox `293 passed in 21.62s`, WebKit `293 passed in 26.60s` |
 
-Artefacts published by the green run: `test-results` (1.5 MB — JUnit XML plus
+Artefacts published by the green run: `test-results` (1.5 MB - JUnit XML plus
 Allure results) and `junit-quality`. On failure, `failure-artefacts` carries the
-Playwright traces, screenshots, page HTML and per-test logs — so a CI failure can
+Playwright traces, screenshots, page HTML and per-test logs - so a CI failure can
 be replayed with `playwright show-trace` instead of reproduced.
 
 ---
 
-## Decision 4 — Nightly is a matrix that does not fail fast
+## Decision 4 - Nightly is a matrix that does not fail fast
 
 ```yaml
 strategy:
@@ -210,7 +210,7 @@ strategy:
 ```
 
 `fail-fast: false` is the whole point. Knowing that a change breaks **WebKit only**
-is far more useful than knowing it broke "a browser" — and with fail-fast enabled
+is far more useful than knowing it broke "a browser" - and with fail-fast enabled
 the other two engines are cancelled the moment one fails, destroying exactly the
 information you need.
 
@@ -223,7 +223,7 @@ to be thorough, because nobody is waiting on it.
 ## Interview questions this phase earns you
 
 **Q: What runs on a pull request versus nightly, and why?**
-On a PR: lint, types and framework unit tests first — under a minute, no services —
+On a PR: lint, types and framework unit tests first - under a minute, no services -
 then the full suite on Chromium only. Nightly: the same suite across Chromium,
 Firefox and WebKit with `fail-fast: false`. A gate people wait twelve minutes for
 is a gate they learn to bypass; a nightly run can be thorough because nobody is
@@ -232,20 +232,20 @@ blocked on it.
 **Q: How do you handle secrets in CI?**
 By first asking whether the thing needs a secret at all. My CI database lives for
 minutes inside one runner, so its credentials are generated per run with
-`openssl rand` and never stored — a value nobody can read beats a value somebody
+`openssl rand` and never stored - a value nobody can read beats a value somebody
 must remember to rotate. A real environment gets a real secret store; reaching for
 one reflexively is habit, not security.
 
 **Q: Your CI is slow. What do you do?**
 Measure before changing anything. Mine was 752 seconds with 21 seconds of testing,
-and one step was 91% of it — but that step did two unrelated things. Splitting it
+and one step was 91% of it - but that step did two unrelated things. Splitting it
 showed the browser download was 11 seconds and apt was 249. I had already added a
 cache for the download, which turned out to cost 28 seconds to write to save 11.
 The measurement told me to consider removing my own optimisation.
 
 **Q: What broke first when you set up CI?**
 `Permission denied`, exit 126. `chmod +x` locally changes the filesystem, not the
-commit — Git on Windows does not record the executable bit, so the runner checked
+commit - Git on Windows does not record the executable bit, so the runner checked
 out a non-executable script. Fixed with `git update-index --chmod=+x`. It is a
 Windows-to-Linux crossing bug that local testing cannot surface.
 

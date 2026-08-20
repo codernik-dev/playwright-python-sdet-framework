@@ -1,4 +1,4 @@
-# Phase 5 — The API automation layer
+# Phase 5 - The API automation layer
 
 > Teaching document. This is where the framework starts testing the application.
 > 157 API tests, all passing, all safe to run in parallel.
@@ -11,14 +11,14 @@
 |---|---|
 | `src/claimdesk_qa/domain.py` | The framework's **own copy** of the business vocabulary and transition table |
 | `src/claimdesk_qa/api/client.py` | `ApiClient` (one per identity) and `ApiResponse` (assertions that explain themselves) |
-| `src/claimdesk_qa/api/models.py` | Response contracts — strict, `Decimal` money, no extra fields |
+| `src/claimdesk_qa/api/models.py` | Response contracts - strict, `Decimal` money, no extra fields |
 | `src/claimdesk_qa/api/services/` | `AuthApi`, `ClaimsApi`, `UsersApi`, `PoliciesApi` |
 | `src/claimdesk_qa/data/` | `ClaimFactory`, `UserFactory`, seeded-account constants |
 | `tests/api/` | 157 tests across auth, CRUD, validation, authorisation and the state machine |
 
 ---
 
-## Decision 1 — The client carries the ADR 0007 control
+## Decision 1 - The client carries the ADR 0007 control
 
 ```python
 response = self._client.request(...)
@@ -30,7 +30,7 @@ In Phase 3 that combination made an unauthenticated check **pass while testing a
 authenticated request**. Now:
 
 * cookies are discarded after every response;
-* each identity gets its own client (`customer_client`, `adjuster_client`, …);
+* each identity gets its own client (`customer_client`, `adjuster_client`, ...);
 * `anonymous_client` has never logged in at all.
 
 `test_a_protected_endpoint_rejects_an_anonymous_request` is the same assertion
@@ -43,7 +43,7 @@ attaching to a failing test's report in Phase 8.
 
 ---
 
-## Decision 2 — Assertion messages are a feature
+## Decision 2 - Assertion messages are a feature
 
 A bare assertion tells you a number was wrong:
 
@@ -70,7 +70,7 @@ one.
 
 ---
 
-## Decision 3 — Contracts forbid extra fields
+## Decision 3 - Contracts forbid extra fields
 
 ```python
 class StrictModel(BaseModel):
@@ -86,13 +86,13 @@ Money is `Decimal`, never `float`. A model that parsed money as a float would
 quietly hide the exact defect the database tests exist to catch.
 
 One line of `response.model(ClaimModel)` checks every documented field's presence,
-type and name — coverage a hand-written
+type and name - coverage a hand-written
 `assert body["status"] == "DRAFT"` never approaches, because it only looks at the
 field the author happened to think about.
 
 ---
 
-## Decision 4 — Service objects return responses, not parsed models
+## Decision 4 - Service objects return responses, not parsed models
 
 ```python
 claims.transition(claim.id, ClaimAction.APPROVE).expect_status(403)
@@ -100,7 +100,7 @@ claims.create(payload).expect_status(201).model(ClaimModel)
 ```
 
 A service that parsed and raised on error would force every negative test to reach
-around it — and in a suite where negative tests outnumber positive ones, that is
+around it - and in a suite where negative tests outnumber positive ones, that is
 most of the suite. **A framework people work around is a framework nobody trusts.**
 
 The one exception is `create_claim`, which asserts, because it is used for
@@ -109,7 +109,7 @@ not produce a baffling failure three steps later.
 
 ---
 
-## Decision 5 — The negative matrix is generated
+## Decision 5 - The negative matrix is generated
 
 ```python
 def illegal_transitions():
@@ -122,7 +122,7 @@ def illegal_transitions():
 ```
 
 30 negative cases from the published transition table. The positive tests are
-driven from the *same* table, so the two sets cannot drift apart — and adding a
+driven from the *same* table, so the two sets cannot drift apart - and adding a
 status automatically adds its negative cases. A hand-written list silently fails
 to cover new values, which is how negative coverage rots without anyone noticing.
 
@@ -136,7 +136,7 @@ Two details that make these tests trustworthy:
 
 ---
 
-## Decision 6 — Every refusal is paired with a permission
+## Decision 6 - Every refusal is paired with a permission
 
 ```python
 def test_a_customer_cannot_list_users(...):   # 403
@@ -157,10 +157,10 @@ Note also the deliberate difference between the two refusal codes:
 
 ## Findings
 
-### 1. The suite was ~35× slower than it needed to be — and the application was innocent
+### 1. The suite was ~35× slower than it needed to be - and the application was innocent
 
 The first full auth run took **48.17 s** for 21 tests. Every call took ~2.1 s,
-uniformly — which immediately rules out the application, because a real
+uniformly - which immediately rules out the application, because a real
 performance problem is never that evenly distributed.
 
 Measured directly:
@@ -180,8 +180,8 @@ request stalled on the IPv6 attempt before falling back.
 **Measured result of changing one configuration value: 48.17 s → 1.36 s.**
 
 Worth noting for its own sake: a *test framework* problem that looked exactly like
-an *application* problem. The instinct to profile before optimising — and to
-suspect the harness before the product when the overhead is uniform — is the
+an *application* problem. The instinct to profile before optimising - and to
+suspect the harness before the product when the overhead is uniform - is the
 transferable lesson.
 
 ### 2. A specification/implementation mismatch, and the specification lost
@@ -199,11 +199,11 @@ is incoherent, and it would hide a claim from the customer who withdrew it.
 and the test now asserts the coherent behaviour plus the audit event.
 
 > **Interview soundbite:** *"A test failed against my own written spec. Before
-> changing either side I checked whether the spec was internally consistent — it
+> changing either side I checked whether the spec was internally consistent - it
 > wasn't, because the same status was filterable on the list endpoint. I corrected
 > the specification, not the application, and recorded why."*
 
-### 3. Non-ASCII digits are accepted — assessed, documented, not 'fixed'
+### 3. Non-ASCII digits are accepted - assessed, documented, not 'fixed'
 
 `Decimal` accepts any Unicode `Nd` character, so full-width `１２３` and
 Arabic-Indic `١٢٣` both become `123.00`.
@@ -214,7 +214,7 @@ would invent a requirement and refuse legitimate input from some keyboards.
 
 It is now a **characterisation test** that pins the part which would matter: if
 the API accepts the input, the stored value must be exactly what the characters
-mean — never a truncation, never a different number.
+mean - never a truncation, never a different number.
 
 Not every finding is a bug. Knowing which is which, and writing down the
 reasoning, is the actual skill.
@@ -223,16 +223,16 @@ reasoning, is the actual skill.
 
 `Authorization: "Bearer "` (trailing space) could not be tested: httpx refuses to
 send it, because trailing whitespace in a header value is illegal per RFC 9110. It
-was removed with a comment explaining why — a deleted test with a reason is
+was removed with a comment explaining why - a deleted test with a reason is
 honest; a quietly deleted test is not.
 
 ### 5. Two bugs in my own test code
 
-* `zip(events, events[1:], strict=True)` — offset slices always differ in length
+* `zip(events, events[1:], strict=True)` - offset slices always differ in length
   by one, so `strict=True` raises every time. Replaced with `itertools.pairwise`,
   which ruff had already suggested.
 * **A race under `-n 4`**: every xdist worker prunes the same shared run directory
-  at session end, so two interleave — A lists a directory, B removes it, A's
+  at session end, so two interleave - A lists a directory, B removes it, A's
   `rmdir` raises `FileNotFoundError`. It appeared once and did not reproduce in
   the next three runs. Pruning is now concurrency-tolerant, with two regression
   tests. **Cleanup must never be able to fail a run**: reporting a passing suite
@@ -244,7 +244,7 @@ honest; a quietly deleted test is not.
 ## Measurements
 
 Recorded from real runs on this machine (Windows 11, Python 3.11.4). These are
-observations, not claims — Phase 15 repeats them properly with medians.
+observations, not claims - Phase 15 repeats them properly with medians.
 
 | Run | Result |
 |---|---|
@@ -253,7 +253,7 @@ observations, not claims — Phase 15 repeats them properly with medians.
 | Auth suite before the `localhost` fix | 21 passed in **48.17 s** |
 | Auth suite after | 21 passed in **1.36 s** |
 
-Test counts: **229 total — 72 framework, 157 API.**
+Test counts: **229 total - 72 framework, 157 API.**
 
 Parallel safety is not asserted, it is demonstrated: the API suite creates every
 record it asserts on, keys it with a `uuid4` fragment, and never asserts on a
@@ -286,7 +286,7 @@ per identity with cookie persistence disabled, written up as ADR 0007.
 **Q: How do you validate an API response properly?**
 Against a typed contract, not field by field. One `model(ClaimModel)` call checks
 every documented field's presence, type and name, and because the model forbids
-extra fields it also fails when an undocumented field appears — which is how data
+extra fields it also fails when an undocumented field appears - which is how data
 leaks and breaking changes usually ship.
 
 **Q: Why should service objects return raw responses instead of parsed models?**
@@ -295,20 +295,20 @@ forces every negative test to work around the framework, and a framework people
 work around is one nobody trusts. Asserting variants exist only for arrangement.
 
 **Q: How do you test a state machine thoroughly without writing dozens of tests?**
-Generate the negative matrix from the published transition table — 30 cases from
-one comprehension — and drive the positive tests from the same table so they
+Generate the negative matrix from the published transition table - 30 cases from
+one comprehension - and drive the positive tests from the same table so they
 cannot drift apart. Use a privileged actor for the illegal-transition tests so a
 refusal can only be about state, and always assert the resource did not move.
 
 **Q: A test fails and you suspect the spec, not the code. What do you do?**
 Check whether the spec is internally consistent first. Mine said a withdrawn claim
-should 404 on GET, but the same status was filterable on the list endpoint — so
+should 404 on GET, but the same status was filterable on the list endpoint - so
 the spec contradicted itself, and I corrected the spec rather than the product,
 with the reasoning recorded in the test's docstring.
 
 **Q: Your suite is slow. Where do you start?**
 Measure before changing anything. Mine took 48 seconds for 21 tests, but the cost
-was *uniform* across every request — which rules out the application, because real
+was *uniform* across every request - which rules out the application, because real
 performance problems are lumpy. It was IPv6 fallback on `localhost`; one
 configuration change took it to 1.36 seconds.
 

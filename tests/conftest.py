@@ -3,7 +3,7 @@
 Everything here exists to make one of three promises true:
 
 1. **A run describes itself.** The report header states the environment, the URL,
-   the database, the browser policy and the seed — so a result can never be
+   the database, the browser policy and the seed - so a result can never be
    misattributed to the wrong environment.
 2. **A failure leaves evidence, a pass leaves nothing.** Per-test artefacts are
    captured during every test and discarded when it passes.
@@ -158,8 +158,8 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
     """Apply layer markers by directory and skip database tests when disabled.
 
     Auto-marking is a deliberate piece of magic, and it is the *only* magic in
-    this framework. The alternative — asking every author to remember
-    ``@pytest.mark.api`` — fails silently: the test still runs, it simply drops
+    this framework. The alternative - asking every author to remember
+    ``@pytest.mark.api`` - fails silently: the test still runs, it simply drops
     out of the suite it was supposed to belong to, and nobody notices until a
     release. Location is a fact that cannot be forgotten.
     """
@@ -214,7 +214,7 @@ def pytest_terminal_summary(
 
     Without this the retry policy is a lie. pytest-rerunfailures reports a test
     that failed once and passed once as **passed**, the suite is green, and the
-    single most valuable signal in the run — "this is not deterministic" — is
+    single most valuable signal in the run - "this is not deterministic" - is
     discarded silently.
 
     A flake that nobody sees is a flake that nobody fixes, and six months later
@@ -253,7 +253,7 @@ def pytest_runtest_makereport(
     """Record each phase's report on the item.
 
     Fixtures cannot otherwise see whether the test they are tearing down passed or
-    failed — which is exactly what the artefact policy needs to know.
+    failed - which is exactly what the artefact policy needs to know.
     """
     report = yield
     item.stash.setdefault(_phase_reports, {})[report.when] = report
@@ -282,7 +282,7 @@ def artifacts(settings: Settings, pytestconfig: pytest.Config) -> ArtifactManage
     """Artefact paths for this run, always anchored to an absolute location.
 
     ``ARTIFACTS_DIR`` is conventionally relative (``artifacts``), and a relative
-    path is resolved against the *current* working directory — so any test that
+    path is resolved against the *current* working directory - so any test that
     changes directory would silently scatter evidence into unrelated folders.
     Anchoring to the pytest rootdir removes the whole class of problem.
     """
@@ -320,7 +320,7 @@ def session_seed(settings: Settings) -> int:
     report. Either way the run is reproducible from something a reader can see.
 
     The derivation lives in ``core.flakiness`` rather than here, because the run
-    header prints it too — and a seed that the header and the fixture computed
+    header prints it too - and a seed that the header and the fixture computed
     separately is a seed that can disagree with itself, which is worse than not
     printing one at all.
     """
@@ -331,7 +331,7 @@ def session_seed(settings: Settings) -> int:
 def app_ready(settings: Settings) -> float:
     """Block until the application answers its readiness probe.
 
-    Requested by the API, UI and end-to-end suites — never by the framework's own
+    Requested by the API, UI and end-to-end suites - never by the framework's own
     unit tests, which must run with nothing else alive.
 
     This is the replacement for ``sleep 10`` after starting the environment: it is
@@ -371,7 +371,7 @@ def faker_seed(request: pytest.FixtureRequest, session_seed: int) -> int:
     distinct while remaining fully reproducible: same run seed plus same test
     equals the same data.
 
-    Note that reproducibility is not uniqueness — for values that must never
+    Note that reproducibility is not uniqueness - for values that must never
     collide across parallel workers, use the ``unique_id`` fixture.
     """
     node_digest = int(hashlib.sha256(request.node.nodeid.encode()).hexdigest()[:8], 16)
@@ -406,7 +406,7 @@ def _test_log(
     """Capture this test's log lines, then throw them away if the test passed.
 
     Capture always, keep selectively. Deciding up front to log only failures is
-    impossible — you do not know a test will fail until it has already run. So the
+    impossible - you do not know a test will fail until it has already run. So the
     evidence is gathered for everyone and discarded for the tests that did not
     need it, which keeps ``artifacts/`` a list of problems rather than a haystack.
     """
@@ -433,7 +433,7 @@ def _report_severity(request: pytest.FixtureRequest) -> None:
     Severity only. This fixture originally emitted **tags** as well, and the
     report showed every one of them twice: allure-pytest already converts pytest
     markers into tags by itself. Verified by running the same test with and
-    without the loop — two ``tag=framework`` labels became one. The duplicate
+    without the loop - two ``tag=framework`` labels became one. The duplicate
     half was deleted rather than kept, because a feature the library already
     provides is not a feature, it is a maintenance cost with a bug in it.
 
@@ -488,7 +488,7 @@ def attach_file(
     Attachment failures are swallowed on purpose. Reporting is a **description**
     of a test run, and a description must never be able to change what it
     describes: a screenshot that could not be read must not turn a clean product
-    failure into a confusing framework error stacked on top of it — the reader
+    failure into a confusing framework error stacked on top of it - the reader
     would then be debugging the reporter instead of the defect.
 
     Exported rather than private because the browser fixtures attach traces and

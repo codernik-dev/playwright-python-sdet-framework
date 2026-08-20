@@ -1,4 +1,4 @@
-# ADR 0005 — Allure for humans, JUnit XML for machines
+# ADR 0005 - Allure for humans, JUnit XML for machines
 
 **Status:** Accepted · **Date:** 2026-08-19 · **Phase:** 2 (implemented in Phase 8)
 
@@ -23,12 +23,12 @@ Emit both.
 
 ## Rejected alternatives
 
-* **Playwright's HTML report** — does not exist for Python. It is a feature of the JavaScript
+* **Playwright's HTML report** - does not exist for Python. It is a feature of the JavaScript
   Playwright *test runner*. In Python, Playwright provides artefacts (trace, video, screenshot); the
   report layer is pytest's job. Assuming otherwise is a common and revealing mistake.
-* **pytest-html only** — a single self-contained file with no Java requirement, but no attachments
+* **pytest-html only** - a single self-contained file with no Java requirement, but no attachments
   model, no history, and no trends. Kept as an optional `[html]` extra for machines without a JVM.
-* **Allure only** — leaves the CI system unable to tabulate results natively.
+* **Allure only** - leaves the CI system unable to tabulate results natively.
 
 ## Consequences
 

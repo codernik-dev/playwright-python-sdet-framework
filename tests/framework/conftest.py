@@ -42,7 +42,7 @@ def isolated_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     Clearing the environment variables is only half the job: ``Settings`` also
     reads a ``.env`` file from the working directory. Running the suite from the
     repository root, where a developer's real ``.env`` lives, would otherwise feed
-    real values into unit tests — which is precisely how a suite starts passing or
+    real values into unit tests - which is precisely how a suite starts passing or
     failing depending on whose machine it runs on.
 
     Autouse, because a rule that has to be remembered will eventually be forgotten.

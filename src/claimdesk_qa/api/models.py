@@ -2,13 +2,13 @@
 
 Every model here is an assertion. Validating a response against one checks, in a
 single line, that every documented field is present, correctly typed and correctly
-named — the kind of regression that a hand-written
+named - the kind of regression that a hand-written
 ``assert response.json()["status"] == "DRAFT"`` sails straight past, because it
 only looks at the one field the author happened to think about.
 
 Two deliberate choices:
 
-* ``extra="forbid"`` — an **undocumented extra field fails the test**. That sounds
+* ``extra="forbid"`` - an **undocumented extra field fails the test**. That sounds
   aggressive, and it is the point: a field appearing in a response is how personal
   data leaks into an API, and how a breaking change ships unnoticed. If a new
   field is intended, adding it here is a one-line, reviewable diff.
@@ -110,7 +110,7 @@ class ErrorResponse(BaseModel):
     """FastAPI's error shape.
 
     ``detail`` is a string for application errors and a list of field errors for
-    validation failures, so it is typed loosely on purpose — this model exists to
+    validation failures, so it is typed loosely on purpose - this model exists to
     read an error, not to police one.
     """
 
@@ -122,7 +122,7 @@ class ErrorResponse(BaseModel):
         """Fields named by a 422 validation response.
 
         Lets a test assert *which* field was rejected rather than merely that
-        something was — the difference between "it 422'd" and "it 422'd for the
+        something was - the difference between "it 422'd" and "it 422'd for the
         reason I intended".
         """
         if isinstance(self.detail, str):

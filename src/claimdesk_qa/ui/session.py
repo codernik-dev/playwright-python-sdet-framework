@@ -4,7 +4,7 @@ The problem
 -----------
 Almost every UI test needs to be signed in, and almost none of them are *about*
 signing in. Driving the login form in each one means every test pays for a page
-load, two field fills, a form post, a redirect and a bcrypt verification — and,
+load, two field fills, a form post, a redirect and a bcrypt verification - and,
 worse, every one of those tests now fails when login breaks. One defect, fifty red
 tests, and the actual cause buried among them.
 
@@ -17,7 +17,7 @@ resulting cookie as a ``storage_state``. The browser starts already signed in.
 
 What this trades away, and why it is acceptable
 -----------------------------------------------
-Nothing then exercises the login form — so the login tests do it explicitly, and
+Nothing then exercises the login form - so the login tests do it explicitly, and
 they are the only tests that do. That is the correct split: sign-in is covered
 once, deliberately, by tests that are about sign-in, and everything else starts
 from the state it actually wants to test.
@@ -44,8 +44,8 @@ def storage_state_for_token(token: str, base_url: str) -> dict[str, Any]:
         base_url: the application's base URL, used to derive the cookie domain.
 
     The domain must match how the browser will address the application. A cookie
-    scoped to ``localhost`` is simply not sent to ``127.0.0.1`` — the browser
-    treats them as different hosts — and the symptom is a silent redirect back to
+    scoped to ``localhost`` is simply not sent to ``127.0.0.1`` - the browser
+    treats them as different hosts - and the symptom is a silent redirect back to
     the login page that looks like a broken session rather than a wrong domain.
     """
     host = urlparse(base_url).hostname or "127.0.0.1"

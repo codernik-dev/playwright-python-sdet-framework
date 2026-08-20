@@ -23,8 +23,8 @@ test fails with a detached-node error that looks like a product bug.
 Playwright already waits for an element to be attached, visible, stable, enabled
 and able to receive events before acting on it. A sleep is either redundant (the
 common case) or hiding a real race that will surface on a slower CI agent. If
-something genuinely needs waiting for, wait for *that thing* — a URL, a state, a
-count — never for a duration.
+something genuinely needs waiting for, wait for *that thing* - a URL, a state, a
+count - never for a duration.
 """
 
 from __future__ import annotations
@@ -43,7 +43,7 @@ class BasePage:
     """Shared navigation, waiting and assertion helpers.
 
     Deliberately small. A base class that accumulates every convenience becomes
-    the god-object that page objects exist to avoid — the temptation is to put
+    the god-object that page objects exist to avoid - the temptation is to put
     "just one more" claim-specific helper here, and three of those later every
     page depends on claim logic it never uses.
     """
@@ -69,7 +69,7 @@ class BasePage:
         """The underlying Playwright page.
 
         Exposed so a test can do something genuinely one-off without a new page
-        object method — but reaching for it repeatedly is a signal that the page
+        object method - but reaching for it repeatedly is a signal that the page
         object is missing a method.
         """
         return self._page
@@ -82,7 +82,7 @@ class BasePage:
 
         Deep-linking rather than clicking through the interface. A test about the
         claims table should not be able to fail because the *dashboard* link
-        broke — that is a different test's job, and coupling them turns one defect
+        broke - that is a different test's job, and coupling them turns one defect
         into a dozen red tests.
         """
         logger.info("Opening %s", self.url_for())
@@ -114,7 +114,7 @@ class BasePage:
         """Assert the browser ended up where it should have.
 
         ``expect(page).to_have_url`` retries, so it tolerates a redirect that is
-        still in flight — unlike reading ``page.url`` directly, which is the
+        still in flight - unlike reading ``page.url`` directly, which is the
         classic source of a redirect race.
         """
         expect(self._page).to_have_url(self.url_for(path))

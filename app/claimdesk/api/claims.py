@@ -1,4 +1,4 @@
-"""Claim endpoints — the core of the application under test."""
+"""Claim endpoints - the core of the application under test."""
 
 from __future__ import annotations
 

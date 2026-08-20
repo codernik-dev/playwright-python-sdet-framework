@@ -1,10 +1,10 @@
 """API-CLM negative and boundary coverage.
 
-Matrix: API-CLM-010 … API-CLM-021.
+Matrix: API-CLM-010 ... API-CLM-021.
 
 Boundary tests here follow one rule: for every limit, assert the value **at** the
 limit, **just inside** it and **just outside** it. Testing only "too big" proves
-the rejection works but says nothing about whether the accepted range is right —
+the rejection works but says nothing about whether the accepted range is right -
 and off-by-one on a monetary limit is a real financial defect, not a rounding
 detail.
 """
@@ -34,7 +34,7 @@ ARABIC_INDIC_123 = "".join(chr(code) for code in (0x0661, 0x0662, 0x0663))
 
 
 # --------------------------------------------------------------------------- #
-# amount — value rules
+# amount - value rules
 # --------------------------------------------------------------------------- #
 
 
@@ -83,7 +83,7 @@ def test_amounts_with_more_than_two_decimal_places_are_rejected_not_rounded(
 
     Silently rounding money is the defect being guarded against. If the API
     accepted 1.005 and stored 1.01, the customer's records and the insurer's would
-    disagree by a cent per claim — and nobody would notice until reconciliation.
+    disagree by a cent per claim - and nobody would notice until reconciliation.
     """
     customer_claims.create(claim_factory.payload(amount=amount)).expect_status(422)
 
@@ -142,7 +142,7 @@ def test_non_ascii_digits_are_normalised_rather_than_rejected(
 
 
 # --------------------------------------------------------------------------- #
-# amount — the coverage limit boundary
+# amount - the coverage limit boundary
 # --------------------------------------------------------------------------- #
 
 
@@ -150,7 +150,7 @@ def test_non_ascii_digits_are_normalised_rather_than_rejected(
 def test_an_amount_exactly_at_the_coverage_limit_is_accepted(
     customer_claims: ClaimsApi, low_coverage_policy: PolicyModel, claim_factory: ClaimFactory
 ) -> None:
-    """API-CLM-012 — the limit is inclusive.
+    """API-CLM-012 - the limit is inclusive.
 
     Uses the 2 500.00 policy deliberately: it sits *below* the adjuster approval
     limit, so this test cannot accidentally be measuring the wrong boundary.
@@ -212,7 +212,7 @@ def test_one_cent_under_the_coverage_limit_is_accepted(
 def test_description_length_boundaries(
     customer_claims: ClaimsApi, claim_factory: ClaimFactory, length: int, expected: int
 ) -> None:
-    """API-CLM-016 — all four edges of the accepted range."""
+    """API-CLM-016 - all four edges of the accepted range."""
     payload = claim_factory.payload(description=claim_factory.description(length=length))
 
     customer_claims.create(payload).expect_status(expected)
@@ -312,7 +312,7 @@ def test_an_unknown_field_does_not_change_the_claim(
 
     The behaviour is asserted rather than assumed. Whether unknown fields are
     ignored or rejected is a real API decision; what matters is that a client
-    cannot smuggle in a field the server silently honours — here, a status.
+    cannot smuggle in a field the server silently honours - here, a status.
     """
     payload = claim_factory.payload(status="PAID", is_admin=True)
 
@@ -353,7 +353,7 @@ def test_page_numbers_below_one_are_rejected(customer_claims: ClaimsApi, page: i
 
 
 def test_a_page_beyond_the_end_returns_an_empty_page(customer_claims: ClaimsApi) -> None:
-    """Past the last page is empty, not an error — clients paginate blindly."""
+    """Past the last page is empty, not an error - clients paginate blindly."""
     response = customer_claims.list(page=9999, size=10).expect_status(200)
 
     assert response.json()["items"] == []

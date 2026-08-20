@@ -2,9 +2,9 @@
 
 The application accepts the same JWT from two places:
 
-* ``Authorization: Bearer <token>`` — used by API clients and by the framework's
+* ``Authorization: Bearer <token>`` - used by API clients and by the framework's
   API layer;
-* a ``session`` cookie — set by the HTML login form.
+* a ``session`` cookie - set by the HTML login form.
 
 One token, two transports. That is what lets the UI tests authenticate once
 through the API and inject the resulting cookie into the browser instead of
@@ -52,7 +52,7 @@ def get_current_user(
     """Resolve the caller, or raise 401.
 
     A deactivated user is rejected here, which is what makes a token stop working
-    the moment an administrator disables the account — the behaviour asserted by
+    the moment an administrator disables the account - the behaviour asserted by
     API-AUTH-008 and E2E-USR-001.
     """
     token = _extract_token(request)

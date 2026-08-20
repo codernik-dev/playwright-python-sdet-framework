@@ -1,6 +1,6 @@
-"""E2E — journeys that cross the browser, the API and the database.
+"""E2E - journeys that cross the browser, the API and the database.
 
-Matrix: E2E-001 … E2E-004.
+Matrix: E2E-001 ... E2E-004.
 
 These are the fewest tests in the suite and the most expensive, which is exactly
 right. An end-to-end test earns its cost only when the thing it proves cannot be
@@ -8,7 +8,7 @@ proved anywhere else: that the three layers **agree**.
 
 A UI test can show a page said `PAID`. An API test can show the endpoint returned
 `PAID`. Only a journey can show that what the user saw in the browser is what the
-API reports and what the ledger actually recorded — and that is precisely where
+API reports and what the ledger actually recorded - and that is precisely where
 real systems come apart.
 """
 
@@ -40,12 +40,12 @@ def test_a_claim_filed_in_the_browser_is_visible_to_the_api_and_the_database(
     claims_db: ClaimQueries,
     events_db: ClaimEventQueries,
 ) -> None:
-    """E2E-001 — one action, three independent confirmations.
+    """E2E-001 - one action, three independent confirmations.
 
     The browser is the *only* thing that acts here. The API and the database are
-    then asked, independently, what happened. If any layer disagreed — a value
+    then asked, independently, what happened. If any layer disagreed - a value
     displayed but not sent, sent but not stored, stored under a different
-    reference — this is the test that would catch it.
+    reference - this is the test that would catch it.
     """
     description = claim_factory.description()
 
@@ -86,7 +86,7 @@ def test_a_claim_approved_in_the_browser_is_paid_correctly_in_the_ledger(
     payouts_db: PayoutQueries,
     users_db: UserQueries,
 ) -> None:
-    """E2E-002 — the money journey, from a click to the ledger.
+    """E2E-002 - the money journey, from a click to the ledger.
 
     Arranged through the API, decided in the browser, verified in the database.
     That split is the point: the expensive browser interaction covers only the
@@ -131,7 +131,7 @@ def test_deactivating_a_user_immediately_ends_their_browser_session(
     users_db: UserQueries,
     context_factory: ContextFactory,
 ) -> None:
-    """E2E-003 — an administrative action reaches into a live browser session.
+    """E2E-003 - an administrative action reaches into a live browser session.
 
     This is the journey that cannot be tested from one layer at all. An
     administrator deactivates an account through the **API**; a **browser** that
@@ -140,7 +140,7 @@ def test_deactivating_a_user_immediately_ends_their_browser_session(
 
     It also documents this application's real revocation story honestly. A bearer
     token cannot be withdrawn without server-side state, which ClaimDesk
-    deliberately does not keep — so deactivating the user *is* the revocation
+    deliberately does not keep - so deactivating the user *is* the revocation
     path, and it must therefore work immediately rather than at token expiry.
     """
     from claimdesk_qa.api import ApiClient, AuthApi
@@ -203,10 +203,10 @@ def test_a_claim_withdrawn_in_the_browser_survives_in_the_database(
     claims_db: ClaimQueries,
     events_db: ClaimEventQueries,
 ) -> None:
-    """E2E-004 — a delete in the interface is a soft delete in storage.
+    """E2E-004 - a delete in the interface is a soft delete in storage.
 
     The browser and the API both stop offering the claim as actionable. Only the
-    database can show the row is still there, with its history intact — which is
+    database can show the row is still there, with its history intact - which is
     what a regulator would ask for, and what a hard delete would have destroyed.
     """
     claim = customer_claims.create_claim(claim_factory.payload(amount="640.00"))

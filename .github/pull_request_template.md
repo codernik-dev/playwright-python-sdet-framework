@@ -30,7 +30,7 @@ checklist everybody ticks without reading.
 - [ ] The full suite passes, or the failures are explained above
 - [ ] New behaviour has a test **named after the failure it prevents**
 - [ ] Nothing measured is claimed without the command that measured it
-- [ ] No secret, token or password in the diff — including in test data and artefacts
+- [ ] No secret, token or password in the diff - including in test data and artefacts
 
 ## For a new or changed test
 

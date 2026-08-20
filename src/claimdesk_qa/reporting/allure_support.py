@@ -6,7 +6,7 @@ files decide whether the report answers questions or merely lists them:
 ``environment.properties``
     Which environment produced this result. Without it, a report is a list of
     outcomes with no idea what they were outcomes *of*, and the first question
-    anyone asks about a red build — "against what?" — has no answer.
+    anyone asks about a red build - "against what?" - has no answer.
 
 ``categories.json``
     How a failure is classified. This is the one that changes behaviour rather
@@ -214,10 +214,10 @@ def severity_for_markers(marker_names: Iterable[str]) -> str:
     values, because a scale nobody can apply consistently is worse than a coarse
     one everybody can:
 
-    * ``critical`` — smoke. If these fail the build is not worth looking at further.
-    * ``minor`` — quarantined. Known-flaky, excluded from the gate, must not
+    * ``critical`` - smoke. If these fail the build is not worth looking at further.
+    * ``minor`` - quarantined. Known-flaky, excluded from the gate, must not
       compete for attention with a real failure.
-    * ``normal`` — everything else.
+    * ``normal`` - everything else.
     """
     names = set(marker_names)
     if "quarantine" in names:

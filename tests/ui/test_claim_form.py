@@ -1,6 +1,6 @@
-"""UI-FORM — the new-claim form.
+"""UI-FORM - the new-claim form.
 
-Matrix: UI-FORM-001 … UI-FORM-006.
+Matrix: UI-FORM-001 ... UI-FORM-006.
 
 The form is rendered with ``novalidate``, so the **server's** validation stays
 reachable from the browser. That is deliberate: browser-native validation is a
@@ -32,7 +32,7 @@ def form(customer_page: Page, settings: Settings) -> ClaimFormPage:
 def test_submitting_a_valid_claim_creates_it(
     form: ClaimFormPage, customer_page: Page, settings: Settings, claim_factory: ClaimFactory
 ) -> None:
-    """UI-FORM-001 — the full create journey through the interface.
+    """UI-FORM-001 - the full create journey through the interface.
 
     This is one of the few tests that genuinely *needs* a browser: it proves a
     person can complete the workflow, which no API test can tell you.
@@ -85,7 +85,7 @@ def test_invalid_amounts_are_rejected_with_a_visible_message(
 def test_a_description_below_the_minimum_length_is_rejected(
     form: ClaimFormPage, claim_factory: ClaimFactory
 ) -> None:
-    """UI-FORM-003 — the outside edge of the length rule."""
+    """UI-FORM-003 - the outside edge of the length rule."""
     form.fill_in(
         amount="100.00",
         description="x" * (DESCRIPTION_MIN_LENGTH - 1),
@@ -118,7 +118,7 @@ def test_a_future_incident_date_is_rejected(
 def test_an_amount_over_the_policy_coverage_limit_is_rejected(
     form: ClaimFormPage, claim_factory: ClaimFactory
 ) -> None:
-    """UI-FORM-005 — a business rule surfaced in the interface.
+    """UI-FORM-005 - a business rule surfaced in the interface.
 
     Uses the 2 500.00 policy and exceeds it by one cent, so the failure can only
     be the coverage limit and not the adjuster approval limit, which sits higher.
@@ -140,7 +140,7 @@ def test_an_amount_over_the_policy_coverage_limit_is_rejected(
 def test_a_rejected_submission_keeps_what_the_user_typed(
     form: ClaimFormPage, claim_factory: ClaimFactory
 ) -> None:
-    """UI-FORM-006 — small, and the difference between usable and infuriating.
+    """UI-FORM-006 - small, and the difference between usable and infuriating.
 
     Losing a 400-character description because the amount had a typo is the kind
     of defect users complain about loudly and test suites rarely check.
@@ -163,7 +163,7 @@ def test_the_form_only_offers_policies_the_customer_holds(
     """Authorisation expressed as an interface constraint.
 
     The customer holds POL-1001 and POL-1002; POL-2001 belongs to somebody else
-    and must not be selectable. The server enforces this too — the browser check
+    and must not be selectable. The server enforces this too - the browser check
     proves a user cannot even be led into the mistake.
     """
     options = form.policy_select.locator("option").all_inner_texts()

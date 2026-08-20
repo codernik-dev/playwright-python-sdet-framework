@@ -8,7 +8,7 @@ regression invisible: rename the serialised value ``APPROVED`` to ``Approved`` a
 both sides move together, so the tests stay green while every real API consumer
 breaks.
 
-The copy here is the **specification** — what the framework asserts the API
+The copy here is the **specification** - what the framework asserts the API
 promises. The application's copy is the **implementation**. When they disagree, a
 test fails, which is the entire point of the exercise.
 """
@@ -86,7 +86,7 @@ def illegal_transitions() -> tuple[tuple[ClaimAction, ClaimStatus], ...]:
     """Every ``(action, status)`` pair the API must reject with ``409``.
 
     Generated, not listed. A hand-written list silently fails to cover a status
-    added later — which is exactly how negative coverage rots without anyone
+    added later - which is exactly how negative coverage rots without anyone
     noticing.
     """
     return tuple(
@@ -101,7 +101,7 @@ def path_to(status: ClaimStatus) -> tuple[ClaimAction, ...]:
     """The actions needed to drive a fresh DRAFT claim to ``status``.
 
     Tests use this to reach a state through the real workflow rather than by
-    writing rows — which is enforced anyway, since the framework's database role
+    writing rows - which is enforced anyway, since the framework's database role
     holds SELECT and nothing else.
     """
     routes: dict[ClaimStatus, tuple[ClaimAction, ...]] = {

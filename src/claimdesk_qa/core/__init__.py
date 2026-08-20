@@ -1,7 +1,7 @@
 """Cross-cutting foundations: configuration plumbing, logging, artefacts, readiness.
 
 Nothing here knows anything about claims, HTTP endpoints or page objects. That is
-deliberate — this layer is what everything else depends on, so it must not depend
+deliberate - this layer is what everything else depends on, so it must not depend
 on anything else.
 """
 

@@ -1,4 +1,4 @@
-// ClaimDesk QA — declarative pipeline.
+// ClaimDesk QA - declarative pipeline.
 //
 // Jenkins is here because it is what most enterprise QA organisations actually
 // run, and because "we also have a Jenkinsfile" is a claim an interviewer will

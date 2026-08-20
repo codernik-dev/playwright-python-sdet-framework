@@ -110,7 +110,7 @@ class ClaimEventQueries:
 
         Ordered by ``occurred_at`` then ``id``: two events written inside the same
         transaction can share a timestamp, and without a tiebreaker the returned
-        order would be arbitrary — making a chain assertion flaky for reasons that
+        order would be arbitrary - making a chain assertion flaky for reasons that
         have nothing to do with the application.
         """
         return self._db.fetch_all(
@@ -219,7 +219,7 @@ class IntegrityQueries:
 
         A foreign key should make this impossible. The test asserts it anyway,
         because "there is a constraint" and "the constraint is enabled and valid"
-        are different statements — and a migration that dropped it would otherwise
+        are different statements - and a migration that dropped it would otherwise
         go unnoticed until the data was already wrong.
         """
         return int(
@@ -261,7 +261,7 @@ class IntegrityQueries:
         )
 
     def paid_claims_without_a_payout(self) -> list[CountRow]:
-        """Claims marked PAID with no payout row — money owed and never recorded."""
+        """Claims marked PAID with no payout row - money owed and never recorded."""
         return self._db.fetch_all(
             """
             SELECT c.reference AS label, 0 AS total
@@ -301,7 +301,7 @@ class IntegrityQueries:
 
         Asserted against the schema rather than the data. A column holding correct
         values today but declared ``double precision`` is a defect waiting for the
-        first value that cannot be represented exactly — and no amount of testing
+        first value that cannot be represented exactly - and no amount of testing
         the *rows* will find it.
         """
         return self._db.fetch_all(
@@ -363,7 +363,7 @@ class IntegrityQueries:
         """How many stored hashes equal the plaintext password.
 
         Must be zero. This is the check that catches hashing being disabled,
-        misconfigured, or quietly replaced with a no-op — and it costs one query.
+        misconfigured, or quietly replaced with a no-op - and it costs one query.
         """
         return int(
             self._db.scalar("SELECT count(*) FROM users WHERE password_hash = %s", (password,)) or 0

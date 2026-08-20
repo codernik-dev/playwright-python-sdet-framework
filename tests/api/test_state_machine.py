@@ -1,6 +1,6 @@
-"""API-STATE — the claim status machine.
+"""API-STATE - the claim status machine.
 
-Matrix: API-STATE-001 … API-STATE-006.
+Matrix: API-STATE-001 ... API-STATE-006.
 
 The negative coverage here is **generated from the published transition table**
 rather than hand-written. That is the whole design of this file: a hand-written
@@ -42,7 +42,7 @@ def staff(adjuster_claims: ClaimsApi) -> ClaimsApi:
 def test_a_claim_can_travel_the_full_lifecycle(
     customer_claims: ClaimsApi, staff: ClaimsApi, claim_factory: ClaimFactory
 ) -> None:
-    """API-STATE-002 — DRAFT through to PAID, one step at a time."""
+    """API-STATE-002 - DRAFT through to PAID, one step at a time."""
     claim = customer_claims.create_claim(claim_factory.payload(amount="750.00"))
     assert claim.status is ClaimStatus.DRAFT
 
@@ -68,7 +68,7 @@ def test_every_published_transition_is_accepted(
     claim_factory: ClaimFactory,
     transition: Transition,
 ) -> None:
-    """API-STATE-001 — each documented edge, exercised in isolation.
+    """API-STATE-001 - each documented edge, exercised in isolation.
 
     Driven from the same table that generates the negative matrix, so the positive
     and negative sets can never drift apart from each other.
@@ -108,7 +108,7 @@ def test_illegal_transitions_are_refused(
     action: ClaimAction,
     status: ClaimStatus,
 ) -> None:
-    """API-STATE-005 — every combination that is not a published edge.
+    """API-STATE-005 - every combination that is not a published edge.
 
     Uses the administrator-capable actor so a refusal can only be about the
     claim's *state*, never about the caller's role. Role restrictions are proved
@@ -129,7 +129,7 @@ def test_illegal_transitions_are_refused(
 def test_a_withdrawn_claim_accepts_no_transition(
     customer_claims: ClaimsApi, claim_factory: ClaimFactory, action: ClaimAction
 ) -> None:
-    """WITHDRAWN is terminal — reached by DELETE, and a dead end thereafter."""
+    """WITHDRAWN is terminal - reached by DELETE, and a dead end thereafter."""
     claim = customer_claims.create_claim(claim_factory.payload())
     customer_claims.withdraw(claim.id).expect_status(204)
 
@@ -181,7 +181,7 @@ def test_a_paid_claim_cannot_be_withdrawn(
 def test_paying_the_same_claim_twice_is_refused(
     customer_claims: ClaimsApi, staff: ClaimsApi, claim_factory: ClaimFactory
 ) -> None:
-    """API-STATE-004 — the double-payout guard, the highest-value check here.
+    """API-STATE-004 - the double-payout guard, the highest-value check here.
 
     Paying twice is the classic financial defect: money leaves the business
     twice for one claim. The storage layer also refuses it via a unique

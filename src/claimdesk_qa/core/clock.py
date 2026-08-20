@@ -3,7 +3,7 @@
 The bug this module exists to prevent
 -------------------------------------
 ClaimDesk refuses a claim whose incident date is in the future, and the suite
-asserts both sides of that boundary — a date of *today* is accepted, *tomorrow*
+asserts both sides of that boundary - a date of *today* is accepted, *tomorrow*
 is rejected.
 
 Both the application and the framework answered "what is today?" with
@@ -30,7 +30,7 @@ The fix is not "compute the offset". It is to make both sides answer the same
 question the same way: **UTC, explicitly, on both sides of the boundary.** Then
 they agree by construction, whatever timezone either machine is configured for.
 
-The application was changed too, and not to make a test pass — the tests passed
+The application was changed too, and not to make a test pass - the tests passed
 before. A claims system that decides "is this date in the future" from whichever
 timezone its server happens to be configured with is wrong on its own terms.
 """
@@ -46,7 +46,7 @@ def today_utc() -> date:
     """Today in UTC, independent of the machine's timezone.
 
     Deliberately not ``date.today()``. That reads the local zone, which makes a
-    date-boundary assertion depend on where the test runner happens to be — a
+    date-boundary assertion depend on where the test runner happens to be - a
     dependency nobody declares and everybody forgets.
     """
     return datetime.now(UTC).date()

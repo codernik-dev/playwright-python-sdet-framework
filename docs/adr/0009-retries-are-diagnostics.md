@@ -1,4 +1,4 @@
-# ADR 0009 — Retries are diagnostics, not a cure
+# ADR 0009 - Retries are diagnostics, not a cure
 
 **Status:** Accepted (Phase 9)
 
@@ -9,8 +9,8 @@ easiest way to destroy the value of a test suite.
 
 `--reruns 3` makes a red build green. Everyone involved is briefly happier and
 permanently worse off: the defect is still there, the suite takes up to three
-times as long to fail, and the most valuable signal a suite can produce — *this
-result is not deterministic* — has been deliberately deleted.
+times as long to fail, and the most valuable signal a suite can produce - *this
+result is not deterministic* - has been deliberately deleted.
 
 The pressure to do it is real and recurring. A flaky test blocks a release, it is
 5pm, and raising a number in a config file is a fifteen-second fix that appears
@@ -23,8 +23,8 @@ Retries exist, and are constrained so tightly they cannot be used as a cure.
 1. **UI and end-to-end tests only.** A browser genuinely shares a machine with a
    compositor, a renderer and a network stack, so a retry there answers a real
    question: does this reproduce? An **API or database test that fails
-   intermittently is not flaky, it is wrong** — a race, a shared-state
-   assumption, or a genuine product defect — and retrying it deletes the
+   intermittently is not flaky, it is wrong** - a race, a shared-state
+   assumption, or a genuine product defect - and retrying it deletes the
    evidence.
 2. **CI only.** Locally a flake should be reproduced, not papered over; the
    developer is right there and the trace is on disk.
@@ -33,8 +33,8 @@ Retries exist, and are constrained so tightly they cannot be used as a cure.
 4. **A test that passes on retry is reported as FLAKY, never as green.** The run
    prints a `FLAKY` block naming every test that needed a retry, plus the seed to
    reproduce it. Allure records the retry alongside the result.
-5. **The policy is applied in one place** — `pytest_collection_modifyitems`,
-   reading `claimdesk_qa.core.flakiness.reruns_for` — not by decorating
+5. **The policy is applied in one place** - `pytest_collection_modifyitems`,
+   reading `claimdesk_qa.core.flakiness.reruns_for` - not by decorating
    individual tests. A decorator is a decision made once by whoever was annoyed
    that day; a policy is a decision the whole suite obeys and a reviewer can read
    in one sitting.
@@ -59,6 +59,6 @@ Retries exist, and are constrained so tightly they cannot be used as a cure.
 | Alternative | Why not |
 |---|---|
 | `--reruns 2` globally | Hides real defects in the layers where intermittency is always a bug |
-| No retries at all | Defensible, and nearly right. Rejected because a real browser flake then blocks unrelated work with no diagnostic value — the retry is what tells you it is *not* reproducible |
+| No retries at all | Defensible, and nearly right. Rejected because a real browser flake then blocks unrelated work with no diagnostic value - the retry is what tells you it is *not* reproducible |
 | Retry only on specific exception types | More precise in theory; in practice the exception is usually a generic timeout, so it would approximate the layer rule with more code |
 | Let each author decorate their own tests | Guarantees drift. The one test that most needs the discipline is the one whose author is most tempted to relax it |

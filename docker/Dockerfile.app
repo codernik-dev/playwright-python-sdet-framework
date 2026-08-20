@@ -1,4 +1,4 @@
-# ClaimDesk — the application under test.
+# ClaimDesk - the application under test.
 #
 # A fixture, not the deliverable, and the image is built accordingly: small,
 # boring, and identical to what the framework talks to locally.

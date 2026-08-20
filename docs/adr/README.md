@@ -8,7 +8,7 @@ They exist for two reasons:
 1. **Interview defensibility.** Every question of the form *"why did you use X?"* has a written,
    considered answer rather than a rationalisation invented on the spot.
 2. **Reviewability.** A senior engineer reading this repository can see the reasoning, not just the
-   result — and can disagree with the reasoning specifically.
+   result - and can disagree with the reasoning specifically.
 
 | ADR | Decision |
 |---|---|
@@ -20,4 +20,4 @@ They exist for two reasons:
 | [0006](0006-opt-in-database-validation.md) | Database validation is opt-in and skips loudly |
 | [0007](0007-no-shared-cookie-jar.md) | The API client never shares a cookie jar between identities |
 | [0008](0008-docker-engine-in-wsl2.md) | Docker Engine inside WSL2 rather than Docker Desktop |
-| [0009](0009-retries-are-diagnostics.md) | Retries are diagnostics, not a cure — UI only, CI only, one, and reported |
+| [0009](0009-retries-are-diagnostics.md) | Retries are diagnostics, not a cure - UI only, CI only, one, and reported |

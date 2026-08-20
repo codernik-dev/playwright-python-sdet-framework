@@ -1,4 +1,4 @@
-# ADR 0003 — Database validation runs as a read-only PostgreSQL role
+# ADR 0003 - Database validation runs as a read-only PostgreSQL role
 
 **Status:** Accepted · **Date:** 2026-08-19 · **Phase:** 2
 
@@ -6,7 +6,7 @@
 
 The framework asserts on database state: that a claim was persisted with the right owner and amount,
 that the audit trail recorded the transition, that exactly one payout row exists. To do this it needs
-database credentials — and credentials in a test framework are a liability.
+database credentials - and credentials in a test framework are a liability.
 
 The dangerous version of database testing is a suite that also *writes* to the database: seeding a
 row directly, patching a status to reach a state quickly, deleting rows to clean up. Every one of
@@ -24,7 +24,7 @@ application, exactly as in production.
 ## Consequences
 
 * Reaching a specific state (`PAID`, say) requires driving the real workflow through the API. Slower
-  than an `UPDATE`, and correct — the transitions produce the audit rows we then assert on.
+  than an `UPDATE`, and correct - the transitions produce the audit rows we then assert on.
 * Cleanup cannot be done with `DELETE`. Tests instead use uniquely-keyed disposable data, and CI
   destroys the whole database between runs.
 * An accidental `INSERT` in a query object fails with a permission error at development time, not

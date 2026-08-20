@@ -1,7 +1,7 @@
-# Phase 11 — Jenkins
+# Phase 11 - Jenkins
 
-> Teaching document. A pipeline that was actually executed — ten builds, six of
-> them red — and what each failure taught. A Jenkinsfile nobody has run is a
+> Teaching document. A pipeline that was actually executed - ten builds, six of
+> them red - and what each failure taught. A Jenkinsfile nobody has run is a
 > Jenkinsfile that does not work; the only question is which of these six ways it
 > would have failed on first contact.
 
@@ -21,7 +21,7 @@
 Phase 1 said the Jenkinsfile must be *"runnable against a local Jenkins container,
 not decorative"*. Docker is unavailable on this machine (Phase 10), so the
 container route was closed. Jenkins also runs as a plain WAR under a JVM, which
-needs no Docker and no administrator rights — so that is how it was verified.
+needs no Docker and no administrator rights - so that is how it was verified.
 
 | Component | Version |
 |---|---|
@@ -31,7 +31,7 @@ needs no Docker and no administrator rights — so that is how it was verified.
 | Job | Pipeline from SCM, `Jenkinsfile` on `main` |
 
 **Ten builds. Six failures, then four successes.** Every failure is below,
-because they are the content of this phase — the pipeline was wrong in six
+because they are the content of this phase - the pipeline was wrong in six
 distinct ways that no amount of reading would have found.
 
 ---
@@ -41,7 +41,7 @@ distinct ways that no amount of reading would have found.
 ### 1. Java 17 was too old
 
 `Supported Java versions are: [21, 25]`. The machine had Corretto 17. Fixed by
-fetching a portable JDK 21 rather than by running an outdated Jenkins — the
+fetching a portable JDK 21 rather than by running an outdated Jenkins - the
 version that is easy to install is not automatically the version to standardise
 on.
 
@@ -51,7 +51,7 @@ on.
 Error: Could not find or load main class .install.runSetupWizard=false
 ```
 
-`java -Djenkins.install.runSetupWizard=false` — PowerShell parsed the argument as
+`java -Djenkins.install.runSetupWizard=false` - PowerShell parsed the argument as
 one of its own and split it. Quoting fixed it.
 
 This is the **third** time in this project that PowerShell argument handling has
@@ -86,7 +86,7 @@ rest. Fixed by moving `JENKINS_HOME` to a short path.
 Worth knowing because it is invisible on Linux and immediate on Windows, and the
 error names a `.git/hooks` directory rather than the real cause.
 
-### 5. A `steps` block is not free-form Groovy — twice
+### 5. A `steps` block is not free-form Groovy - twice
 
 The cross-platform helper failed validation *before the build started*, in two
 different ways:
@@ -97,7 +97,7 @@ run(unix: ..., windows: ...)       // Invalid parameter "unix", did you mean "na
 ```
 
 The first: declarative resolves every call inside `steps` as a **step**, and
-steps take named arguments. The second is the more interesting one — with named
+steps take named arguments. The second is the more interesting one - with named
 arguments it found a *real* step called `run` and validated against its schema.
 
 The fix is the documented escape hatch: call the helper inside `script { }`,
@@ -117,7 +117,7 @@ Jenkinsfile installed `.[dev]`; it needs `.[dev,app]`.
 
 This is the most valuable failure of the six, because it is a real property of
 the repository rather than a property of Jenkins. The coupling is invisible
-locally — every developer has both extras installed — and only an environment
+locally - every developer has both extras installed - and only an environment
 that installed the *minimum* could reveal it. That is exactly what a fresh CI
 environment is for.
 
@@ -142,14 +142,14 @@ there is.
 
 ---
 
-## Verification — the four green builds
+## Verification - the four green builds
 
 | Build | Parameters | Result |
 |---|---|---|
-| #7 | `SUITE=framework` | ✅ **SUCCESS** in 127 s — ruff, ruff-format, mypy (92 files), `121 passed` |
-| #8 | `SUITE=api or db`, `WORKERS=4` | ✅ **SUCCESS** in 158 s — quality gate, then `185 passed in 9.64s`, report generated |
-| #9 | `SUITE=all`, `WORKERS=4` | ✅ **SUCCESS** in 223 s — `342 passed in 25.30s`, both passes, report generated |
-| #10 | `SUITE=all`, `WORKERS=4`, re-run on the final commit | ✅ **SUCCESS** — **`351 passed in 23.86s`** |
+| #7 | `SUITE=framework` | ✅ **SUCCESS** in 127 s - ruff, ruff-format, mypy (92 files), `121 passed` |
+| #8 | `SUITE=api or db`, `WORKERS=4` | ✅ **SUCCESS** in 158 s - quality gate, then `185 passed in 9.64s`, report generated |
+| #9 | `SUITE=all`, `WORKERS=4` | ✅ **SUCCESS** in 223 s - `342 passed in 25.30s`, both passes, report generated |
+| #10 | `SUITE=all`, `WORKERS=4`, re-run on the final commit | ✅ **SUCCESS** - **`351 passed in 23.86s`** |
 
 Observed in build #9's console output, in order:
 
@@ -180,7 +180,7 @@ Verified in those runs: **parameters** (four, including a choice and a boolean),
 - **The Allure Jenkins plugin's own publisher.** It needs an "Allure
   Commandline" tool configured under *Manage Jenkins → Tools*, which was not
   done. The pipeline's fallback ran instead and archived the raw results, so this
-  is a verified *degradation path* rather than a verified publisher — and it is
+  is a verified *degradation path* rather than a verified publisher - and it is
   the behaviour that matters more: the build did not fail because a reporting
   plugin was not set up.
 - **`USE_DOCKER=true`.** Docker is unavailable here (Phase 10); the stage is
@@ -206,12 +206,12 @@ from SCM* job pointing at this repository with script path `Jenkinsfile`.
 
 Note that the first build of a declarative pipeline **registers** its parameters;
 until it has run once, `build -p SUITE=...` is rejected with *"is not
-parameterized"*. That is not a bug, it is how declarative parameters work — the
+parameterized"*. That is not a bug, it is how declarative parameters work - the
 pipeline is the source of truth, so Jenkins has to read it first.
 
 ---
 
-## Decision — the pipeline calls scripts, it does not reimplement them
+## Decision - the pipeline calls scripts, it does not reimplement them
 
 Every stage runs the same script a developer runs:
 
@@ -222,7 +222,7 @@ Every stage runs the same script a developer runs:
 | Report | `scripts/report.sh` / `.ps1` |
 
 A pipeline that spells the pytest invocation out in Groovy is a second source of
-truth. The two drift — a flag here, a marker there — until the day CI passes
+truth. The two drift - a flag here, a marker there - until the day CI passes
 something nobody can reproduce locally, and by then neither is trusted.
 
 It also made the cross-platform requirement nearly free: the repository already
@@ -244,20 +244,20 @@ run with them bound, which is a different claim from having written the syntax.
 
 **"Why `post { cleanup }` rather than `post { always }`?"**
 `cleanup` runs after every other condition, including when the build was
-**aborted**. A Jenkins agent is persistent — unlike a GitHub runner it is not
-thrown away — so a container or database left running is inherited by the next
+**aborted**. A Jenkins agent is persistent - unlike a GitHub runner it is not
+thrown away - so a container or database left running is inherited by the next
 build, and that is how yesterday's data silently decides today's result.
 
 **"What did Jenkins teach you that GitHub Actions did not?"**
 That a persistent agent is a completely different failure model. Path length,
 leaked processes, workspace state and tool configuration all matter on a machine
-that is not recreated between runs — and the pipeline has to clean up after
+that is not recreated between runs - and the pipeline has to clean up after
 itself because nothing else will.
 
 ---
 
 ## What Phase 13 builds on
 
-Three CI systems now run this suite — GitHub Actions, Docker, Jenkins — and each
+Three CI systems now run this suite - GitHub Actions, Docker, Jenkins - and each
 one found defects the others could not. Phase 13 is the pass that reads the whole
 framework as a single artefact and removes what these phases accumulated.

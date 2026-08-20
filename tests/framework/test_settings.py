@@ -1,6 +1,6 @@
 """Unit tests for the configuration layer.
 
-"Who tests the tests?" — this file. The framework is shared code that every other
+"Who tests the tests?" - this file. The framework is shared code that every other
 test depends on; a silent bug here (a URL built wrong, a secret leaked into a
 report, a value read from the wrong variable) corrupts every result in the suite.
 
@@ -40,7 +40,7 @@ def test_defaults_are_usable_without_any_environment_variables() -> None:
 
 
 def test_environment_is_read_from_the_test_env_alias(monkeypatch: pytest.MonkeyPatch) -> None:
-    """The variable is TEST_ENV, not ENV — ENV is far too generic to claim."""
+    """The variable is TEST_ENV, not ENV - ENV is far too generic to claim."""
     monkeypatch.setenv("TEST_ENV", "staging")
 
     assert load_settings(env_file=None).env is Environment.STAGING
@@ -174,7 +174,7 @@ def test_enabling_the_database_without_a_password_is_an_actionable_error(
 def test_database_may_be_disabled_entirely(monkeypatch: pytest.MonkeyPatch) -> None:
     """Real environments exist where an SDET has no database access at all.
 
-    The suite must still be runnable there — db-marked tests skip with a reason.
+    The suite must still be runnable there - db-marked tests skip with a reason.
     """
     monkeypatch.setenv("DB_ENABLED", "false")
     monkeypatch.setenv("DB_PASSWORD", "")
@@ -201,7 +201,7 @@ def test_dsn_is_built_correctly_and_url_encodes_the_password(
 
 
 # --------------------------------------------------------------------------- #
-# secret handling — a leak here would put credentials in a public CI log
+# secret handling - a leak here would put credentials in a public CI log
 # --------------------------------------------------------------------------- #
 
 
@@ -276,7 +276,7 @@ def test_the_shipped_env_example_actually_loads() -> None:
     """The file we tell people to copy must produce a valid configuration.
 
     Added after `.env.example` shipped `FAKER_SEED=` with an empty value, which
-    failed integer parsing — so the documented first step, `cp .env.example .env`,
+    failed integer parsing - so the documented first step, `cp .env.example .env`,
     produced a framework that could not start.
     """
     example = Path(__file__).resolve().parents[2] / ".env.example"

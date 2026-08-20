@@ -1,4 +1,4 @@
-# Presenting this project — CV, GitHub, LinkedIn
+# Presenting this project - CV, GitHub, LinkedIn
 
 > Every claim below is traceable to a command that was run. Anything that has not
 > been measured is absent rather than estimated. If a recruiter or an interviewer
@@ -17,27 +17,27 @@ that?"*
    installable package with strict typing, its own unit tests, and a lint rule
    that makes importing the application under test impossible.
 
-2. Implemented a layered architecture — Page Objects and Component Objects for
+2. Implemented a layered architecture - Page Objects and Component Objects for
    the browser, Service Objects for the API, parameterised Query Objects on a
-   **read-only** database role — delivering **351 automated tests: 157 API, 32
+   **read-only** database role - delivering **351 automated tests: 157 API, 32
    browser, 28 database, 4 cross-layer journeys and 130 framework unit tests.**
 
 3. Integrated the suite into **three** independent pipelines: GitHub Actions (PR
    gate plus a nightly Chromium/Firefox/WebKit matrix, all three green), Docker
    Compose, and a parameterised **Jenkins** declarative pipeline with credential
-   binding, JUnit and Allure publishing and workspace cleanup — verified by real
+   binding, JUnit and Allure publishing and workspace cleanup - verified by real
    builds, not by configuration alone.
 
 4. Diagnosed a **3.5× suite-wide slowdown** to a shared TLS-context defect by
-   observing that per-test overhead was *uniform* — which rules out the
-   application — reducing full-suite wall-clock from **107 s to 30 s** measured,
+   observing that per-test overhead was *uniform* - which rules out the
+   application - reducing full-suite wall-clock from **107 s to 30 s** measured,
    and pinning the fix with a regression test that fails if certificate
    verification is ever disabled to reclaim the time.
 
 5. Cut failure triage to a single artefact set by capturing Playwright traces,
    screenshots, page HTML, correlated request/response logs and executed SQL **on
    failure only**, published through Allure with failure categories derived from
-   the framework's own exception taxonomy — proved by pointing the database at a
+   the framework's own exception taxonomy - proved by pointing the database at a
    dead port and watching 13 failures file as *environment problems* rather than
    as product defects.
 
@@ -61,7 +61,7 @@ meaningful line coverage of the application), any load-testing claim, and any
 · `api-testing` · `database-testing` · `postgresql` · `allure-report` ·
 `github-actions` · `jenkins` · `docker` · `page-object-model` · `httpx`
 
-**What a reviewer sees in the first thirty seconds** — and what each is there to
+**What a reviewer sees in the first thirty seconds** - and what each is there to
 answer:
 
 | They see | It answers |
@@ -80,7 +80,7 @@ That last row does more work than any of the others.
 
 ### Featured project entry
 
-**ClaimDesk QA — End-to-End SDET Automation Framework**
+**ClaimDesk QA - End-to-End SDET Automation Framework**
 
 > A production-style test automation framework in Python that tests an insurance
 > claims application through three independent layers: the browser (Playwright),
@@ -100,12 +100,12 @@ That last row does more work than any of the others.
 > would build one on the job, and publishing the mistakes along with it.
 >
 > ClaimDesk QA tests an insurance-claims application through three independent
-> layers — browser, REST API, and a read-only PostgreSQL role — with 351 tests,
+> layers - browser, REST API, and a read-only PostgreSQL role - with 351 tests,
 > Allure reporting, and pipelines on GitHub Actions, Docker and Jenkins.
 >
 > The parts I would actually talk about in an interview are the failures:
 >
-> • A negative auth test that **passed for the wrong reason** — a leftover session
+> • A negative auth test that **passed for the wrong reason** - a leftover session
 >   cookie authenticated the "anonymous" request. It would have kept passing with
 >   authentication removed entirely.
 >
@@ -114,7 +114,7 @@ That last row does more work than any of the others.
 >   the product. It was an SSL context being rebuilt for every HTTP client.
 >
 > • A **timezone bug that had never failed**. The app and the tests both asked
->   "what is today?" using the local clock. Fine on one machine — until Docker
+>   "what is today?" using the local clock. Fine on one machine - until Docker
 >   made them two, and a boundary test would have failed for five and a half
 >   hours a day, in one environment, as "flakiness".
 >
@@ -124,7 +124,7 @@ That last row does more work than any of the others.
 >
 > Everything measured in the repository came from a command that was run, and
 > everything that was not run is labelled NOT VERIFIED with the reason. That
-> discipline is the part I am proudest of — it is much easier to write "10×
+> discipline is the part I am proudest of - it is much easier to write "10×
 > faster" than to write "1.39× on 16 cores, and here is why it is not 4×".
 >
 > Repository, build log and architecture decision records in the comments.
@@ -143,5 +143,5 @@ That last row does more work than any of the others.
 
 ## The interview version of the same content
 
-`docs/interview-preparation.md` — the questions that decide it, the answers, and
+`docs/interview-preparation.md` - the questions that decide it, the answers, and
 the five questions I would struggle with along with what I would honestly say.

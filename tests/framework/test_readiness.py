@@ -1,7 +1,7 @@
 """Unit tests for the readiness wait.
 
 The probe, clock and sleep are all injected, so these tests prove that a 60-second
-timeout times out — without spending 60 seconds doing it. A test suite that is
+timeout times out - without spending 60 seconds doing it. A test suite that is
 slow to test its own slowness stops being run.
 """
 
@@ -31,7 +31,7 @@ class FakeClock:
 
 
 def test_returns_immediately_when_already_ready() -> None:
-    """A service that is already up must cost nothing — the case that runs most."""
+    """A service that is already up must cost nothing - the case that runs most."""
     clock = FakeClock()
 
     elapsed = wait_until_ready(
@@ -113,7 +113,7 @@ def test_never_sleeps_past_the_deadline() -> None:
 
 @pytest.mark.boundary
 def test_a_zero_timeout_still_gives_the_probe_one_attempt() -> None:
-    """Probe first, then check the clock — otherwise an up service could still fail."""
+    """Probe first, then check the clock - otherwise an up service could still fail."""
     clock = FakeClock()
 
     elapsed = wait_until_ready(

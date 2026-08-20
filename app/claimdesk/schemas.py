@@ -75,7 +75,7 @@ class UserCreateRequest(BaseModel):
         """Reject rather than silently truncate.
 
         bcrypt ignores everything beyond 72 bytes, so a longer password would be
-        accepted with only its prefix ever checked — a real authentication bypass.
+        accepted with only its prefix ever checked - a real authentication bypass.
         """
         if len(value.encode("utf-8")) > MAX_PASSWORD_BYTES:
             msg = f"Password must be at most {MAX_PASSWORD_BYTES} bytes."

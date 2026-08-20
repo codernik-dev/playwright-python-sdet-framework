@@ -88,7 +88,7 @@ def context_factory(
 ) -> Iterator[ContextFactory]:
     """Build browser contexts, tracing each one, keeping evidence only on failure.
 
-    A context is an isolated browser session — its own cookies, storage and cache —
+    A context is an isolated browser session - its own cookies, storage and cache -
     inside one already-running browser process. Starting a *browser* per test costs
     hundreds of milliseconds each; starting a context costs almost nothing. That
     difference is what makes a parallel browser suite affordable.
@@ -173,5 +173,5 @@ other_customer_page = pytest.fixture(name="other_customer_page")(_page_for("othe
 
 @pytest.fixture
 def anonymous_page(context_factory: ContextFactory) -> Page:
-    """A browser with no session at all — used by the sign-in tests."""
+    """A browser with no session at all - used by the sign-in tests."""
     return context_factory(None).new_page()

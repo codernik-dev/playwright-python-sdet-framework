@@ -1,4 +1,4 @@
-# ADR 0004 — The framework is an installable package using a src layout
+# ADR 0004 - The framework is an installable package using a src layout
 
 **Status:** Accepted · **Date:** 2026-08-19 · **Phase:** 2
 
@@ -19,10 +19,10 @@ like any third-party library. Pytest runs with `--import-mode=importlib`.
 
 ## Consequences
 
-* One extra setup step (`pip install -e ".[dev]"`) — already required to get the dependencies.
+* One extra setup step (`pip install -e ".[dev]"`) - already required to get the dependencies.
 * Imports are identical everywhere: IDE, terminal, CI, Docker.
 * You cannot accidentally import a module that you forgot to include in the package.
-* The framework could be published to a private index and reused by another repository — which is
+* The framework could be published to a private index and reused by another repository - which is
   how shared test frameworks work in organisations with more than one product team.
 * The application under test (`app/claimdesk/`) is deliberately **not** installed by default; it is
   a separate `[app]` extra, so the dependency boundary is visible in the manifest itself.

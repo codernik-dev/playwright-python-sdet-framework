@@ -1,4 +1,4 @@
-# Phase 15 — Execution and measurement
+# Phase 15 - Execution and measurement
 
 > Teaching document. The phase where every number in this repository was allowed
 > to be written down for the first time, and the phase whose main output is a
@@ -101,7 +101,7 @@ serial   ███████████████████████�
 
 `-n auto` is the default people reach for, and on this suite it throws away nearly the
 entire benefit. That is the finding: **"use all your cores" is not a strategy, it is a
-guess** — and it is measurable in ten minutes.
+guess** - and it is measurable in ten minutes.
 
 ### Why more workers stop helping
 
@@ -114,7 +114,7 @@ is the most common wrong answer to a slow suite:
 2. **The application is a single process.** Every worker queues behind one
    uvicorn and one PostgreSQL. Past a point they contend rather than parallelise.
 3. **The suite is I/O-bound.** Parallelism helps least where the work is waiting
-   rather than computing — and a test suite is almost entirely waiting.
+   rather than computing - and a test suite is almost entirely waiting.
 
 ---
 
@@ -124,10 +124,10 @@ Ten consecutive full runs at `-n 4`, no code changes between them.
 
 | Run | Result |
 |---|---|
-| 1–10 | `351 passed` — 14.99 / 15.34 / 15.43 / 16.09 / 17.63 / 18.15 / 18.43 / 18.88 / 18.73 / 18.86 s |
+| 1-10 | `351 passed` - 14.99 / 15.34 / 15.43 / 16.09 / 17.63 / 18.15 / 18.43 / 18.88 / 18.73 / 18.86 s |
 | **Failures** | **0 / 10** |
 
-**Flake rate: 0 over 3,510 test executions.** Not "no known flakes" — ten consecutive
+**Flake rate: 0 over 3,510 test executions.** Not "no known flakes" - ten consecutive
 parallel runs with no code change between them, and every one of the 351 tests kept its
 outcome.
 
@@ -136,14 +136,14 @@ in three thousand; and this is one machine, with the application on the same hos
 claim is exactly what was measured and no more.
 
 Also visible in that column: the runs got **steadily slower**, 14.99 s to 18.86 s across
-ten identical runs. Nothing changed except the accumulated state — the seeded corpus grows
+ten identical runs. Nothing changed except the accumulated state - the seeded corpus grows
 as each run creates claims, so later runs query more rows. Worth noticing rather than
 averaging away: a suite that gets slower the more often you run it will eventually be a
 suite people stop running.
 
 Flake rate is defined here as *tests that changed outcome ÷ tests run*, which is
 the only definition that survives contact with a suite people trust. A run that
-"passed after a retry" is not a pass — and in this suite nothing has retried,
+"passed after a retry" is not a pass - and in this suite nothing has retried,
 because the retry policy is CI-only and nothing has flaked in CI.
 
 ---
@@ -157,8 +157,8 @@ Nothing about the suite got faster between those two measurements in any way tha
 explains the difference. Different session, different background load, a
 different application process with a differently-warmed database cache.
 
-That is a **24% swing on the same hardware, from nothing at all** — larger than the
-entire difference between two and four workers — and
+That is a **24% swing on the same hardware, from nothing at all** - larger than the
+entire difference between two and four workers - and
 it is exactly the trap this project already warned about in Phase 12, when a CI
 step took 249 s and then 13 s with identical configuration:
 
@@ -166,7 +166,7 @@ step took 249 s and then 13 s with identical configuration:
 > between identical runs.
 
 So the numbers above are published **with their spread**, as medians, with the
-machine attached — and the honest reading of the parallel speed-up is *"roughly
+machine attached - and the honest reading of the parallel speed-up is *"roughly
 this much, on this hardware, in this session"*, not a headline.
 
 The one performance claim this project makes without hedging is the TLS-context
@@ -191,7 +191,7 @@ explains the number is worth more than the number.
 | 0.71 s | call | `e2e/test_claim_lifecycle.py::test_deactivating_a_user_immediately_ends_their_browser_session` |
 
 Every one of them is **setup**, and the first is the browser starting. There is no
-slow *test* in this suite — there is fixture cost, which is why worker count stops
+slow *test* in this suite - there is fixture cost, which is why worker count stops
 paying off before the core count does.
 
 ---
@@ -201,7 +201,7 @@ paying off before the core count does.
 | Measured | How |
 |---|---|
 | Test counts per layer and per intent | `pytest -m <marker> --collect-only -q` |
-| Serial and parallel wall-clock | `scripts/benchmark.ps1` — warm-up discarded, medians, one session |
+| Serial and parallel wall-clock | `scripts/benchmark.ps1` - warm-up discarded, medians, one session |
 | Flake rate | Ten consecutive `-n 4` runs |
 | Slowest tests | `pytest --durations=12` |
 | Framework size | 2,914 lines excluding blanks and comments |

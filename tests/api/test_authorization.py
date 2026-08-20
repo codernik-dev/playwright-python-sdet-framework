@@ -1,11 +1,11 @@
-"""API-AUTHZ — role and ownership based access control.
+"""API-AUTHZ - role and ownership based access control.
 
-Matrix: API-AUTHZ-001 … API-AUTHZ-007.
+Matrix: API-AUTHZ-001 ... API-AUTHZ-007.
 
 Authorisation tests are the ones most likely to pass for the wrong reason, so two
 rules apply throughout:
 
-* every identity uses **its own client** — a shared client's leftover session
+* every identity uses **its own client** - a shared client's leftover session
   cookie once made an unauthenticated check pass (ADR 0007);
 * every "must be refused" test is paired with a "must be allowed" test. A test
   suite that only proves refusals also passes against an API that refuses
@@ -32,7 +32,7 @@ ClaimUnderReviewFactory = Callable[[str], "ClaimModel"]
 
 
 # --------------------------------------------------------------------------- #
-# ownership — a customer sees only their own claims
+# ownership - a customer sees only their own claims
 # --------------------------------------------------------------------------- #
 
 
@@ -42,7 +42,7 @@ def test_a_customer_cannot_read_another_customers_claim(
     other_customer_claims: ClaimsApi,
     claim_factory: ClaimFactory,
 ) -> None:
-    """API-AUTHZ-001 — and it must be 404, not 403.
+    """API-AUTHZ-001 - and it must be 404, not 403.
 
     403 confirms the resource exists. Repeated against a range of identifiers that
     turns into an enumeration oracle: an attacker learns which claims are real
@@ -99,20 +99,20 @@ def test_a_customers_list_never_includes_another_customers_claims(
 def test_staff_can_read_any_customers_claim(
     customer_claims: ClaimsApi, adjuster_claims: ClaimsApi, claim_factory: ClaimFactory
 ) -> None:
-    """Ownership restricts customers, not staff — adjusters must see every claim."""
+    """Ownership restricts customers, not staff - adjusters must see every claim."""
     claim = customer_claims.create_claim(claim_factory.payload())
 
     adjuster_claims.get(claim.id).expect_status(200)
 
 
 # --------------------------------------------------------------------------- #
-# role — administrator-only endpoints
+# role - administrator-only endpoints
 # --------------------------------------------------------------------------- #
 
 
 @pytest.mark.smoke
 def test_a_customer_cannot_list_users(customer_users: UsersApi) -> None:
-    """API-AUTHZ-003 — 403 here, not 404.
+    """API-AUTHZ-003 - 403 here, not 404.
 
     The distinction from the ownership case is deliberate: the endpoint's
     existence is not a secret, the caller simply lacks the role. Returning 404
@@ -148,7 +148,7 @@ def test_an_administrator_can_create_a_user(admin_users: UsersApi) -> None:
 
 
 # --------------------------------------------------------------------------- #
-# the adjuster approval limit — role and boundary in one rule
+# the adjuster approval limit - role and boundary in one rule
 # --------------------------------------------------------------------------- #
 
 
@@ -161,7 +161,7 @@ def claim_under_review(
 ) -> ClaimUnderReviewFactory:
     """A factory for claims parked in UNDER_REVIEW at a chosen amount.
 
-    Driven through the real workflow rather than written into the database — the
+    Driven through the real workflow rather than written into the database - the
     framework's database role holds SELECT only, and the transitions produce the
     audit rows the DB tests later assert on.
     """
@@ -187,7 +187,7 @@ def claim_under_review(
 def test_an_adjuster_may_approve_up_to_and_including_the_limit(
     adjuster_claims: ClaimsApi, claim_under_review: ClaimUnderReviewFactory, amount: str
 ) -> None:
-    """API-AUTHZ-004 — the limit is inclusive."""
+    """API-AUTHZ-004 - the limit is inclusive."""
     claim = claim_under_review(amount)
 
     approved = (
@@ -232,7 +232,7 @@ def test_an_adjuster_may_not_approve_above_the_limit(
 def test_an_administrator_may_approve_above_the_adjuster_limit(
     admin_claims: ClaimsApi, claim_under_review: ClaimUnderReviewFactory
 ) -> None:
-    """API-AUTHZ-006 — the escalation path exists and works.
+    """API-AUTHZ-006 - the escalation path exists and works.
 
     Without this, the previous test would be satisfied by an API that refuses
     large approvals to everybody, which is a different product entirely.
@@ -249,7 +249,7 @@ def test_an_administrator_may_approve_above_the_adjuster_limit(
 def test_a_customer_cannot_approve_their_own_claim(
     customer_claims: ClaimsApi, claim_under_review: ClaimUnderReviewFactory
 ) -> None:
-    """API-AUTHZ-002 — self-approval would be the most obvious fraud path there is."""
+    """API-AUTHZ-002 - self-approval would be the most obvious fraud path there is."""
     claim = claim_under_review("100.00")
 
     response = customer_claims.transition(claim.id, ClaimAction.APPROVE)

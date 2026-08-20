@@ -64,7 +64,7 @@ def test_run_id_can_be_folded_in_to_separate_concurrent_runs() -> None:
 
 
 def test_configure_logging_is_idempotent(tmp_path: Path) -> None:
-    """Calling it twice must not double every line — conftest can be imported twice."""
+    """Calling it twice must not double every line - conftest can be imported twice."""
     log_file = tmp_path / "worker-main.log"
 
     configure_logging(level="INFO", worker_log=log_file)
@@ -88,7 +88,7 @@ def test_a_record_from_a_child_logger_still_reaches_the_file(tmp_path: Path) -> 
 
     The formatter references %(request_id)s. When the filter lived on the logger
     instead of on the handlers, records emitted through a CHILD logger reached the
-    parent's handlers via callHandlers without ever passing the parent's filters —
+    parent's handlers via callHandlers without ever passing the parent's filters -
     so request_id was missing, the formatter raised KeyError, and the line
     vanished. Nothing failed loudly; the log was simply empty.
     """

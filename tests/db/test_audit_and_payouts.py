@@ -1,10 +1,10 @@
-"""DB-AUDIT and DB-PAY — the audit trail and the money.
+"""DB-AUDIT and DB-PAY - the audit trail and the money.
 
-Matrix: DB-AUDIT-001 … DB-AUDIT-004, DB-PAY-001 … DB-PAY-004.
+Matrix: DB-AUDIT-001 ... DB-AUDIT-004, DB-PAY-001 ... DB-PAY-004.
 
 These are the highest-value tests in the repository. An insurer that pays a claim
 twice has lost money; an insurer that cannot show who approved what has a
-regulatory problem. Neither defect is visible from the API — a duplicate payout
+regulatory problem. Neither defect is visible from the API - a duplicate payout
 returns a perfectly ordinary response.
 """
 
@@ -62,7 +62,7 @@ def test_the_audit_chain_has_no_gaps(
     claim_factory: ClaimFactory,
     events_db: ClaimEventQueries,
 ) -> None:
-    """DB-AUDIT-002 — each row's ``from_status`` matches the previous ``to_status``.
+    """DB-AUDIT-002 - each row's ``from_status`` matches the previous ``to_status``.
 
     A gap means a state change happened that nobody recorded. Asserting the list
     of statuses alone would not catch it: the endpoints could be right while a
@@ -87,10 +87,10 @@ def test_each_audit_row_names_the_actor_who_caused_it(
     events_db: ClaimEventQueries,
     users_db: UserQueries,
 ) -> None:
-    """DB-AUDIT-003 — attribution, resolved to real users.
+    """DB-AUDIT-003 - attribution, resolved to real users.
 
     The customer submits; the adjuster reviews and approves. Recording the wrong
-    actor would be worse than recording none — it implicates somebody who did not
+    actor would be worse than recording none - it implicates somebody who did not
     act.
     """
     customer = users_db.by_email(SeededAccounts.CUSTOMER)
@@ -116,7 +116,7 @@ def test_a_refused_transition_writes_no_audit_row(
     claim_factory: ClaimFactory,
     events_db: ClaimEventQueries,
 ) -> None:
-    """DB-AUDIT-004 — an attempt is not a transition.
+    """DB-AUDIT-004 - an attempt is not a transition.
 
     Recording refused attempts in the same table would falsify the history: a
     reader could no longer tell what happened from what was merely tried.
@@ -165,7 +165,7 @@ def test_a_second_payment_attempt_creates_no_second_payout(
     claim_factory: ClaimFactory,
     payouts_db: PayoutQueries,
 ) -> None:
-    """DB-PAY-002 — the double-payout guard, checked where the money lives.
+    """DB-PAY-002 - the double-payout guard, checked where the money lives.
 
     The API test proves the second attempt returns ``409``. That is not the same
     statement as "no second row was written": a handler could insert and then fail
@@ -189,7 +189,7 @@ def test_an_unpaid_claim_has_no_payout(
     claim_factory: ClaimFactory,
     payouts_db: PayoutQueries,
 ) -> None:
-    """DB-PAY-003 — approval is not payment.
+    """DB-PAY-003 - approval is not payment.
 
     A payout row created at approval time would mean money recorded as leaving
     before anyone authorised it to.
@@ -210,7 +210,7 @@ def test_a_rejected_claim_is_never_paid(
     payouts_db: PayoutQueries,
     claims_db: ClaimQueries,
 ) -> None:
-    """DB-PAY-004 — the most expensive defect this suite could catch."""
+    """DB-PAY-004 - the most expensive defect this suite could catch."""
     claim = customer_claims.create_claim(claim_factory.payload(amount="800.00"))
 
     customer_claims.drive_to(claim.id, ClaimStatus.REJECTED, staff=adjuster_claims)

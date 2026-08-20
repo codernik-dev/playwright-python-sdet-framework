@@ -5,7 +5,7 @@
 
 The whole framework is built so that **you should not need to reproduce the
 failure to understand it.** If you find yourself re-running the suite to find out
-what happened, that is a gap in the artefacts — file it as one.
+what happened, that is a gap in the artefacts - file it as one.
 
 ---
 
@@ -31,15 +31,15 @@ Open the Allure report and look at **Categories**, not at the failures.
 
 | Category | What it means | Who owns it |
 |---|---|---|
-| **Environment problem** | `ServiceNotReadyError`, `DatabaseError`, `ConnectError`, `InsufficientPrivilege` | Infrastructure. The application or database was not reachable — there is no product bug here |
+| **Environment problem** | `ServiceNotReadyError`, `DatabaseError`, `ConnectError`, `InsufficientPrivilege` | Infrastructure. The application or database was not reachable - there is no product bug here |
 | **Wrong HTTP status** | The API returned something else | Product, probably |
-| **Contract violation** | The response did not match its model | Product — a field changed shape |
+| **Contract violation** | The response did not match its model | Product - a field changed shape |
 | **Browser timeout** | An element never became actionable | Product or locator; go to the trace |
 | **Product defect** | An assertion failed, none of the above | Read on |
 | **Test defect** | The test itself raised | Ours |
 
 Thirteen failures under *Environment problem* is a five-second triage. The same
-thirteen under *Product defect* is a wasted morning — which is exactly why the
+thirteen under *Product defect* is a wasted morning - which is exactly why the
 categories key on exception **types** the framework raises deliberately, not on
 message wording.
 
@@ -69,10 +69,10 @@ to learn something the log said in one line.
 | Attachment | Answers |
 |---|---|
 | **test log** | What the framework did, in order, with the correlation id on every line |
-| **HTTP exchanges** | What was actually sent and returned — every client the test used, in one timeline |
+| **HTTP exchanges** | What was actually sent and returned - every client the test used, in one timeline |
 | **SQL executed** | What the database actually contained, and how many rows came back |
 | **screenshot** | What the user would have seen |
-| **page HTML** | Whether the element existed at all — this is what separates "wrong locator" from "page never rendered" |
+| **page HTML** | Whether the element existed at all - this is what separates "wrong locator" from "page never rendered" |
 | **playwright trace** | When it went wrong, step by step |
 
 ---
@@ -86,13 +86,13 @@ playwright show-trace artifacts/<run-id>/<test>/trace.zip
 The trace viewer is the best failure-debugging tool in browser automation and it
 is worth learning properly:
 
-- **Timeline with screenshots** — scrub to the moment it broke.
-- **Action list** — every click and assertion, with the locator used and how long
+- **Timeline with screenshots** - scrub to the moment it broke.
+- **Action list** - every click and assertion, with the locator used and how long
   it waited.
-- **DOM snapshot at each step** — inspect the page as it was, not as it is now.
-- **Network tab** — the request the page made, which frequently explains
+- **DOM snapshot at each step** - inspect the page as it was, not as it is now.
+- **Network tab** - the request the page made, which frequently explains
   everything.
-- **Console** — a JavaScript error the test could not see.
+- **Console** - a JavaScript error the test could not see.
 
 The usual outcome: the element was there but covered, or it appeared 50 ms after
 the assertion gave up, or the request behind it returned a 500.
@@ -106,13 +106,13 @@ The question to ask in each case:
 | Symptom | Ask | Usually |
 |---|---|---|
 | Fails everywhere, every time | Does the API do it too? Try `curl` | Product |
-| Fails only in parallel | Does it assert on data another worker can change? | **Test** — see the rule below |
+| Fails only in parallel | Does it assert on data another worker can change? | **Test** - see the rule below |
 | Fails only in CI | Timezone, locale, cold start, missing browser dependency | Environment |
 | Fails only in one browser | Is it in the trace's console? | Product, engine-specific |
 | Passes on rerun | Reported as FLAKY, never green | Investigate now, while the artefacts exist |
 
 **The rule this project learned twice, in two different layers:** a test may
-assert an **invariant** globally — something true no matter who else is writing —
+assert an **invariant** globally - something true no matter who else is writing -
 but never an **aggregate**. `count(*) WHERE status='DRAFT'` is a fact about a
 shared database, not about your test.
 

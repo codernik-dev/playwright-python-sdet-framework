@@ -13,7 +13,7 @@ This module makes configuration a first-class, validated object:
 * a missing or malformed value fails **immediately** with an actionable message;
 * secrets are :class:`~pydantic.SecretStr`, so they cannot be printed by accident;
 * :meth:`Settings.masked` produces the exact block that goes into the test report,
-  answering "which environment did this run actually target?" — the first question
+  answering "which environment did this run actually target?" - the first question
   anyone asks about a failed CI run.
 
 Precedence (highest wins): real environment variables > ``.env`` file > defaults.
@@ -55,7 +55,7 @@ class Environment(StrEnum):
     """Ephemeral CI runner: headless, artefacts uploaded, no interactive niceties."""
 
     STAGING = "staging"
-    """A real deployed URL — proves the framework is not hard-wired to Docker."""
+    """A real deployed URL - proves the framework is not hard-wired to Docker."""
 
 
 class Settings(BaseSettings):
@@ -217,7 +217,7 @@ class Settings(BaseSettings):
 
     @property
     def db_dsn(self) -> str:
-        """PostgreSQL connection string. **Contains the password — never log this.**
+        """PostgreSQL connection string. **Contains the password - never log this.**
 
         Use :attr:`db_dsn_safe` for anything human-visible.
         """
@@ -243,7 +243,7 @@ class Settings(BaseSettings):
 
         This is what gets attached to the Allure report and printed in the run
         header, so every result carries the environment that produced it.
-        Secrets are replaced, never truncated — a truncated secret is still a leak.
+        Secrets are replaced, never truncated - a truncated secret is still a leak.
         """
         return {
             "environment": self.env.value,
@@ -268,7 +268,7 @@ def load_settings(env_file: str | Path | None = ".env") -> Settings:
     Args:
         env_file: Path to a dotenv file, or ``None`` to read only real environment
             variables. Tests pass ``None`` so a developer's local ``.env`` can never
-            leak into — and silently change the outcome of — a unit test.
+            leak into - and silently change the outcome of - a unit test.
     """
     return Settings(_env_file=env_file)
 

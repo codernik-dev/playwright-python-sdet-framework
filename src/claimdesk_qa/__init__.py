@@ -1,4 +1,4 @@
-"""ClaimDesk QA — an end-to-end SDET automation framework.
+"""ClaimDesk QA - an end-to-end SDET automation framework.
 
 Layering (dependencies point downward only):
 

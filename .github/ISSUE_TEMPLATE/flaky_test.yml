@@ -44,7 +44,7 @@ body:
     attributes:
       label: Evidence
       description: |
-        From `artifacts/<run-id>/<test>/` — the assertion message, and whichever
+        From `artifacts/<run-id>/<test>/` - the assertion message, and whichever
         of test.log / http.log / sql.log explains it. Attach trace.zip for a
         browser failure.
     validations:
