@@ -1,7 +1,8 @@
 # The whole environment, from nothing, in one command.
 #
-#   docker compose -f docker/docker-compose.yml up -d db app
-#   docker compose -f docker/docker-compose.yml run --rm tests
+#   docker compose --profile test -f docker/docker-compose.yml build
+#   docker compose -f docker/docker-compose.yml up -d db sut
+#   docker compose -f docker/docker-compose.yml run --build --rm tests
 #
 # Three services, and the interesting part is how they are sequenced. Nothing
 # here sleeps: `depends_on: service_healthy` gates every start on a real health

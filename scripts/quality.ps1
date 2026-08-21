@@ -4,7 +4,7 @@
 .DESCRIPTION
     Runs exactly what the pull-request pipeline runs, in the same order, so a
     developer never discovers a lint failure only after pushing. Any deviation
-    between this script and .github/workflows/pr-checks.yml is a bug in one of them.
+    between this script and .github/workflows/tests.yml is a bug in one of them.
 .PARAMETER Fix
     Apply safe automatic fixes and formatting instead of only reporting.
 #>

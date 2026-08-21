@@ -63,5 +63,5 @@ repos:
       - id: no-co-author-trailers
         name: strip co-author trailers from the commit message
         entry: python scripts/strip_co_authors.py
-        language: system
+        language: python
         stages: [commit-msg]

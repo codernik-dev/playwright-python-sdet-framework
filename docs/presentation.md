@@ -125,7 +125,7 @@ That last row does more work than any of the others.
 > Everything measured in the repository came from a command that was run, and
 > everything that was not run is labelled NOT VERIFIED with the reason. That
 > discipline is the part I am proudest of - it is much easier to write "10×
-> faster" than to write "1.39× on 16 cores, and here is why it is not 4×".
+> faster" than to write "1.48× at four workers, and here is why it is not 4×".
 >
 > Repository, build log and architecture decision records in the comments.
 >

@@ -178,6 +178,21 @@ jobs:
           npm install -g allure-commandline
           ./scripts/report.sh --no-open
 
+      # Allure emits `<title>Allure Report</title>` and no viewport meta, so the
+      # published page is anonymous in a browser tab and renders at desktop width
+      # on a phone. Both are fixed here rather than in scripts/report.sh, because
+      # only the published copy needs it and the CLI rewrites index.html on every
+      # generate. The greps are assertions: if Allure changes its template, this
+      # step fails loudly instead of silently publishing an unpatched page.
+      - name: Make the published report titled and mobile-readable
+        run: |
+          set -euo pipefail
+          index=allure-report/index.html
+          sed -i 's|<title>Allure Report</title>|<title>ClaimDesk QA - test report</title>|' "$index"
+          sed -i 's|<head>|<head><meta name="viewport" content="width=device-width, initial-scale=1">|' "$index"
+          grep -q 'ClaimDesk QA - test report' "$index"
+          grep -q 'width=device-width' "$index"
+
       - name: Publish to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:

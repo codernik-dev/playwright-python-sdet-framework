@@ -256,6 +256,7 @@ PHASE 10 VERIFIED
 and now known to describe a working stack, but it has not been dispatched - that
 needs a push. It is kept because a clean runner is a better witness than a
 developer machine that has been iterated on all day.
+*(Superseded: `docker.yml` has since run green on a GitHub-hosted runner.)*
 
 ---
 

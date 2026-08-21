@@ -48,13 +48,19 @@ ways, none of which rely on good intentions:
 ```toml
 # pyproject.toml - the linter refuses the import
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
-"claimdesk".msg = "The test framework must NEVER import the application under test."
+"claimdesk".msg = "The test framework must NEVER import the application under test. Use the HTTP API, the browser, or read-only SQL instead. See docs/adr/0002-black-box-boundary.md"
 ```
 
 ```
-TID251 `claimdesk` is banned: The test framework must NEVER import the application under test.
+TID251 `claimdesk` is banned: The test framework must NEVER import the application
+under test. Use the HTTP API, the browser, or read-only SQL instead.
+See docs/adr/0002-black-box-boundary.md
  --> tests/api/_ban_probe.py:1:1
 ```
+
+`_ban_probe.py` is a throwaway: write `import claimdesk` anywhere under `tests/` and ruff
+prints this. The permanent proof lives in CI - `.github/workflows/docker.yml` asserts that
+`import claimdesk` **fails** inside the test image, against a positive control.
 
 - The **database role** holds `SELECT` and nothing else, so a test physically cannot manufacture
   state the application would never produce. An `INSERT` fails with `InsufficientPrivilege`.
@@ -83,8 +89,8 @@ flowchart TD
     Runner --> Art["Artefacts on failure only<br/>trace · screenshot · HTTP · SQL · logs"]
     Runner --> Rep["Reports<br/>Allure + JUnit XML"]
 
-    style App fill:#eef2f6,stroke:#5b6b7c
-    style PG fill:#eef2f6,stroke:#5b6b7c
+    style App fill:#eef2f6,stroke:#5b6b7c,color:#111827
+    style PG fill:#eef2f6,stroke:#5b6b7c,color:#111827
     style DB stroke-dasharray: 4 4
 ```
 
@@ -231,12 +237,25 @@ pytest -m e2e -q           # 4 browser -> API -> database journeys
 .\scripts\benchmark.ps1                       # serial vs parallel, measured honestly
 ```
 
+**On macOS or Linux**, use `python3.12 -m venv .venv` and `source .venv/bin/activate` in place
+of the first two lines, and `cp .env.example .env`. The suite has shell equivalents,
+parameterised by environment variable rather than by flag:
+
+```bash
+WORKERS=4 ALLURE=1 ./scripts/run_suite.sh
+./scripts/report.sh
+./scripts/quality.sh
+```
+
+The bootstrap, benchmark, Docker and disposable-cluster helpers are PowerShell only. On macOS
+or Linux, take the container route below - it needs nothing but Docker.
+
 Sign in at <http://127.0.0.1:8000/login> as `customer@example.com` / `Passw0rd!seed`.
 Interactive API docs: <http://127.0.0.1:8000/docs>.
 
 ### Everything in containers instead
 
-```powershell
+```bash
 docker compose --profile test -f docker/docker-compose.yml build
 docker compose -f docker/docker-compose.yml up -d db sut
 docker compose -f docker/docker-compose.yml run --build --rm tests
@@ -308,6 +327,8 @@ Jenkinsfile              parameterised declarative pipeline, executed on a real 
 | [docs/phase-15-measurement.md](docs/phase-15-measurement.md) | Every number, how it was produced, and how easily these numbers lie |
 | [docs/interview-preparation.md](docs/interview-preparation.md) | The questions that decide it - including the five I would struggle with |
 | [docs/adr/](docs/adr/) | Architecture Decision Records - the "why" behind each choice |
+| [docs/presentation.md](docs/presentation.md) | How this project is presented on a CV, on GitHub and on LinkedIn |
+| [ClaimDesk-QA-Explained.pdf](ClaimDesk-QA-Explained.pdf) | The whole project in plain English, including how to run it - start here if you are not an engineer |
 | Phase notes | [2](docs/phase-2-repository-and-configuration.md) · [3](docs/phase-3-application-under-test.md) · [4](docs/phase-4-pytest-foundation.md) · [5](docs/phase-5-api-automation.md) · [6](docs/phase-6-playwright-ui.md) · [7](docs/phase-7-database-validation.md) · [8](docs/phase-8-reporting.md) · [9](docs/phase-9-parallel-execution.md) · [10](docs/phase-10-docker.md) · [11](docs/phase-11-jenkins.md) · [12](docs/phase-12-github-actions.md) · [13](docs/phase-13-quality-pass.md) |
 
 ---
@@ -330,6 +351,11 @@ meaningful one, and quoting it would imply a relationship that does not exist.
 ## Author
 
 **Nikesh Walia** - QA / Test Automation Engineer moving toward SDET.
+
+[LinkedIn](https://www.linkedin.com/in/nikesh-walia/) · [GitHub](https://github.com/codernik-dev)
+
+Questions, corrections and "this is wrong because" are all welcome - open an issue or
+reach out. I would rather be told where this is wrong than told it is nice.
 
 ## Licence
 

@@ -49,3 +49,9 @@ playwright-report/
 *.swp
 Thumbs.db
 desktop.ini
+
+# --- personal study material -------------------------------------------------
+# A second-person walkthrough of this repository ("your repository", "you built
+# it"). Useful to the author, wrong to publish: a visitor who opens it is
+# reading someone else's revision notes. Kept on disk, out of the repository.
+ClaimDesk-QA-Understanding-Your-Project.pdf

@@ -12,7 +12,7 @@
 #>
 [CmdletBinding()]
 param(
-    [string]$PythonVersion = "3.11"
+    [string]$PythonVersion = "3.12"
 )
 
 $ErrorActionPreference = "Stop"
@@ -30,7 +30,7 @@ $python = Join-Path $repoRoot ".venv\Scripts\python.exe"
 
 Write-Host "==> Installing the framework in editable mode with dev tooling" -ForegroundColor Cyan
 & $python -m pip install --upgrade pip --quiet
-& $python -m pip install -e ".[dev]"
+& $python -m pip install -e ".[dev,app]"
 
 Write-Host "==> Configuring environment" -ForegroundColor Cyan
 if (-not (Test-Path ".env")) {

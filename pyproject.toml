@@ -40,6 +40,12 @@ dependencies = [
     "allure-pytest>=2.13,<3",
 ]
 
+[project.urls]
+Homepage      = "https://github.com/codernik-dev/playwright-python-sdet-framework"
+Repository    = "https://github.com/codernik-dev/playwright-python-sdet-framework"
+"Test report" = "https://codernik-dev.github.io/playwright-python-sdet-framework/"
+Documentation = "https://github.com/codernik-dev/playwright-python-sdet-framework/tree/main/docs"
+
 [project.optional-dependencies]
 # Developer tooling. Not needed to merely run the suite in CI.
 dev = [
