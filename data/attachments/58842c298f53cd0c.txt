@@ -1,0 +1,2 @@
+15:32:04 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_flakiness.py::test_a_mixed_marker_set_still_resolves
+15:32:04 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_flakiness.py::test_a_mixed_marker_set_still_resolves

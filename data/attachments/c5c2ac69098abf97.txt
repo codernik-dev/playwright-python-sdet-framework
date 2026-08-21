@@ -1,0 +1,2 @@
+03:32:04 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_settings.py::test_non_http_urls_are_rejected[  ]
+03:32:05 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_settings.py::test_non_http_urls_are_rejected[  ]

@@ -1,0 +1,21 @@
+03:31:49 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_authorization.py::test_an_administrator_may_approve_above_the_adjuster_limit
+03:31:49 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/policies "HTTP/1.1 200 OK"
+03:31:49 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/policies -> 200 (6 ms)
+  response: [{"id":"33059b0b-df07-4730-919a-1ba679c9ca45","policy_number":"POL-1001","holder_id":"a7d8d307-857f-4f9c-8874-d73698c23444","coverage_limit":"10000.00","is_active":true},{"id":"72843bcb-585e-49ad-b99f-b8870cb2ac12","policy_number":"POL-1002","holder_id":"a7d8d307-857f-4f9c-8874-d73698c23444","coverage_limit":"2500.00","is_active":true}]
+03:31:49 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+03:31:49 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (96 ms)
+  request : {'policy_id': '33059b0b-df07-4730-919a-1ba679c9ca45', 'amount': '5000.01', 'description': 'QA 4123d4e7 Only exist staff wall.', 'incident_date': '2026-08-14'}
+  response: {"id":"4eeede96-0da2-4469-83b0-72272dc3b014","reference":"CLM-473C355A","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"5000.01","description":"QA 4123d4e7 Only exist staff wall.","incident_date":"2026-08-14","status":"DRAFT","created_at":"2026-08-21T03:31:49.720287Z","updated_at":"2026-08-21T03:31:49.720287Z","withdrawn_at":null,"decided_by_id":null}
+03:31:49 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/4eeede96-0da2-4469-83b0-72272dc3b014/transitions "HTTP/1.1 200 OK"
+03:31:49 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/4eeede96-0da2-4469-83b0-72272dc3b014/transitions -> 200 (24 ms)
+  request : {'action': 'submit', 'note': None}
+  response: {"id":"4eeede96-0da2-4469-83b0-72272dc3b014","reference":"CLM-473C355A","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"5000.01","description":"QA 4123d4e7 Only exist staff wall.","incident_date":"2026-08-14","status":"SUBMITTED","created_at":"2026-08-21T03:31:49.720287Z","updated_at":"2026-08-21T03:31:49.817120Z","withdrawn_at":null,"decided_by_id":null}
+03:31:49 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/4eeede96-0da2-4469-83b0-72272dc3b014/transitions "HTTP/1.1 200 OK"
+03:31:49 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/4eeede96-0da2-4469-83b0-72272dc3b014/transitions -> 200 (11 ms)
+  request : {'action': 'start_review', 'note': None}
+  response: {"id":"4eeede96-0da2-4469-83b0-72272dc3b014","reference":"CLM-473C355A","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"5000.01","description":"QA 4123d4e7 Only exist staff wall.","incident_date":"2026-08-14","status":"UNDER_REVIEW","created_at":"2026-08-21T03:31:49.720287Z","updated_at":"2026-08-21T03:31:49.842036Z","withdrawn_at":null,"decided_by_id":null}
+03:31:49 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/4eeede96-0da2-4469-83b0-72272dc3b014/transitions "HTTP/1.1 200 OK"
+03:31:49 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/4eeede96-0da2-4469-83b0-72272dc3b014/transitions -> 200 (11 ms)
+  request : {'action': 'approve', 'note': None}
+  response: {"id":"4eeede96-0da2-4469-83b0-72272dc3b014","reference":"CLM-473C355A","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"5000.01","description":"QA 4123d4e7 Only exist staff wall.","incident_date":"2026-08-14","status":"APPROVED","created_at":"2026-08-21T03:31:49.720287Z","updated_at":"2026-08-21T03:31:49.854313Z","withdrawn_at":null,"decided_by_id":"95df6199-fa85-4dac-9e47-b636add086b2"}
+03:31:49 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_authorization.py::test_an_administrator_may_approve_above_the_adjuster_limit

@@ -1,0 +1,31 @@
+03:31:52 DEBUG    claimdesk_qa.tests.conftest start tests/db/test_audit_and_payouts.py::test_each_audit_row_names_the_actor_who_caused_it
+03:31:52 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/policies "HTTP/1.1 200 OK"
+03:31:52 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/policies -> 200 (5 ms)
+  response: [{"id":"33059b0b-df07-4730-919a-1ba679c9ca45","policy_number":"POL-1001","holder_id":"a7d8d307-857f-4f9c-8874-d73698c23444","coverage_limit":"10000.00","is_active":true},{"id":"72843bcb-585e-49ad-b99f-b8870cb2ac12","policy_number":"POL-1002","holder_id":"a7d8d307-857f-4f9c-8874-d73698c23444","coverage_limit":"2500.00","is_active":true}]
+03:31:52 DEBUG    claimdesk_qa.claimdesk_qa.db.connection Connected read-only to postgresql://claimdesk_qa_ro:***masked***@127.0.0.1:5432/claimdesk
+03:31:52 DEBUG    claimdesk_qa.claimdesk_qa.db.connection SQL: SELECT id, email, full_name, role, password_hash, is_active, created_at FROM users WHERE email = %s
+  params: ('customer@example.com',)
+  rows: 1
+03:31:52 DEBUG    claimdesk_qa.claimdesk_qa.db.connection SQL: SELECT id, email, full_name, role, password_hash, is_active, created_at FROM users WHERE email = %s
+  params: ('adjuster@example.com',)
+  rows: 1
+03:31:52 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+03:31:52 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (9 ms)
+  request : {'policy_id': '33059b0b-df07-4730-919a-1ba679c9ca45', 'amount': '700.00', 'description': 'QA 0070a91a Control heavy decide claim trade question heart.', 'incident_date': '2026-08-14'}
+  response: {"id":"71957dd5-f208-42de-927e-b730228e55f8","reference":"CLM-EAA18F9F","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"700.00","description":"QA 0070a91a Control heavy decide claim trade question heart.","incident_date":"2026-08-14","status":"DRAFT","created_at":"2026-08-21T03:31:52.162167Z","updated_at":"2026-08-21T03:31:52.162167Z","withdrawn_at":null,"decided_by_id":null}
+03:31:52 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/71957dd5-f208-42de-927e-b730228e55f8/transitions "HTTP/1.1 200 OK"
+03:31:52 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/71957dd5-f208-42de-927e-b730228e55f8/transitions -> 200 (9 ms)
+  request : {'action': 'submit', 'note': None}
+  response: {"id":"71957dd5-f208-42de-927e-b730228e55f8","reference":"CLM-EAA18F9F","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"700.00","description":"QA 0070a91a Control heavy decide claim trade question heart.","incident_date":"2026-08-14","status":"SUBMITTED","created_at":"2026-08-21T03:31:52.162167Z","updated_at":"2026-08-21T03:31:52.172428Z","withdrawn_at":null,"decided_by_id":null}
+03:31:52 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/71957dd5-f208-42de-927e-b730228e55f8/transitions "HTTP/1.1 200 OK"
+03:31:52 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/71957dd5-f208-42de-927e-b730228e55f8/transitions -> 200 (12 ms)
+  request : {'action': 'start_review', 'note': None}
+  response: {"id":"71957dd5-f208-42de-927e-b730228e55f8","reference":"CLM-EAA18F9F","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"700.00","description":"QA 0070a91a Control heavy decide claim trade question heart.","incident_date":"2026-08-14","status":"UNDER_REVIEW","created_at":"2026-08-21T03:31:52.162167Z","updated_at":"2026-08-21T03:31:52.183140Z","withdrawn_at":null,"decided_by_id":null}
+03:31:52 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/71957dd5-f208-42de-927e-b730228e55f8/transitions "HTTP/1.1 200 OK"
+03:31:52 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/71957dd5-f208-42de-927e-b730228e55f8/transitions -> 200 (13 ms)
+  request : {'action': 'approve', 'note': None}
+  response: {"id":"71957dd5-f208-42de-927e-b730228e55f8","reference":"CLM-EAA18F9F","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"700.00","description":"QA 0070a91a Control heavy decide claim trade question heart.","incident_date":"2026-08-14","status":"APPROVED","created_at":"2026-08-21T03:31:52.162167Z","updated_at":"2026-08-21T03:31:52.195983Z","withdrawn_at":null,"decided_by_id":"58f73a5b-bc43-47db-8dde-48f1e7e03539"}
+03:31:52 DEBUG    claimdesk_qa.claimdesk_qa.db.connection SQL: SELECT id, claim_id, actor_id, from_status, to_status, note, occurred_at FROM claim_events WHERE claim_id = %s ORDER BY occurred_at, id
+  params: ('71957dd5-f208-42de-927e-b730228e55f8',)
+  rows: 4
+03:31:52 DEBUG    claimdesk_qa.tests.conftest end tests/db/test_audit_and_payouts.py::test_each_audit_row_names_the_actor_who_caused_it

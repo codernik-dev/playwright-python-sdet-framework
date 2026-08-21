@@ -1,5 +1,0 @@
-09:42:22 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_claims_validation.py::test_page_size_boundaries[size-negative]
-09:42:22 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/claims?size=-1 "HTTP/1.1 422 Unprocessable Entity"
-09:42:22 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/claims?size=-1 -> 422 (5 ms)
-  response: {"detail":[{"type":"greater_than_equal","loc":["query","size"],"msg":"Input should be greater than or equal to 1","input":"-1","ctx":{"ge":1}}]}
-09:42:22 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_claims_validation.py::test_page_size_boundaries[size-negative]

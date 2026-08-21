@@ -1,2 +1,0 @@
-09:42:30 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_clock.py::test_today_is_utc_not_local
-09:42:30 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_clock.py::test_today_is_utc_not_local

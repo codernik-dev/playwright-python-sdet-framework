@@ -1,3 +1,0 @@
-09:42:29 DEBUG    claimdesk_qa.tests.conftest start tests/ui/test_login.py::test_signing_out_ends_the_session[chromium]
-09:42:30 INFO     claimdesk_qa.claimdesk_qa.ui.base_page Opening http://127.0.0.1:8000/dashboard
-09:42:30 DEBUG    claimdesk_qa.tests.conftest end tests/ui/test_login.py::test_signing_out_ends_the_session[chromium]

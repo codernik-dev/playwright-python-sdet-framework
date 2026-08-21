@@ -1,4 +1,0 @@
-21:42:30 INFO    [qa-0d83f6b339] claimdesk_qa.probe: before
-21:42:30 INFO    [qa-abc123] claimdesk_qa.probe: during
-21:42:30 INFO    [qa-0d83f6b339] claimdesk_qa.probe: after
-21:42:30 DEBUG   [qa-0d83f6b339] claimdesk_qa.tests.conftest: end tests/framework/test_logging_and_correlation.py::test_per_test_log_captures_only_its_own_window

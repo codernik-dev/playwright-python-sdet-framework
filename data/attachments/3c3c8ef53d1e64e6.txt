@@ -1,2 +1,0 @@
-21:42:30 DEBUG   [qa-0a93f39ed5] claimdesk_qa.tests.conftest: start tests/framework/test_settings.py::test_the_shipped_env_example_actually_loads
-21:42:30 DEBUG   [qa-0a93f39ed5] claimdesk_qa.tests.conftest: end tests/framework/test_settings.py::test_the_shipped_env_example_actually_loads

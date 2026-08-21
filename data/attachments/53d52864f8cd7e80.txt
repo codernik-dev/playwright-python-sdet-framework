@@ -1,0 +1,9 @@
+03:31:49 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_authorization.py::test_an_adjuster_cannot_administer_users
+03:31:49 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/users "HTTP/1.1 403 Forbidden"
+03:31:49 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/users -> 403 (5 ms)
+  response: {"detail":"Insufficient permissions for this operation"}
+03:31:49 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/users "HTTP/1.1 403 Forbidden"
+03:31:49 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/users -> 403 (6 ms)
+  request : {'email': 'qa+eeab50f3@example.com', 'full_name': 'Christie Gross', 'role': 'CUSTOMER', 'password': 'Passw0rd!generated'}
+  response: {"detail":"Insufficient permissions for this operation"}
+03:31:49 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_authorization.py::test_an_adjuster_cannot_administer_users

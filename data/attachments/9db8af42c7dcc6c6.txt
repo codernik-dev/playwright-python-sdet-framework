@@ -1,0 +1,2 @@
+15:32:04 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_settings.py::test_environment_variables_override_defaults
+15:32:04 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_settings.py::test_environment_variables_override_defaults

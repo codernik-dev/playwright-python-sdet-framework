@@ -1,0 +1,2 @@
+03:32:04 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_artifacts.py::test_each_worker_writes_its_own_log_file
+03:32:04 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_artifacts.py::test_each_worker_writes_its_own_log_file

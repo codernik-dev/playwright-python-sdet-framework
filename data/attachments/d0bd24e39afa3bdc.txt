@@ -1,3 +1,0 @@
-09:42:29 DEBUG    claimdesk_qa.tests.conftest start tests/ui/test_login.py::test_an_unknown_account_gives_the_same_message_as_a_wrong_password[chromium]
-09:42:29 INFO     claimdesk_qa.claimdesk_qa.ui.base_page Opening http://127.0.0.1:8000/login
-09:42:29 DEBUG    claimdesk_qa.tests.conftest end tests/ui/test_login.py::test_an_unknown_account_gives_the_same_message_as_a_wrong_password[chromium]

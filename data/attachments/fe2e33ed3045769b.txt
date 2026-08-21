@@ -1,0 +1,2 @@
+15:32:04 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_flakiness.py::test_a_configured_seed_of_zero_is_honoured
+15:32:04 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_flakiness.py::test_a_configured_seed_of_zero_is_honoured

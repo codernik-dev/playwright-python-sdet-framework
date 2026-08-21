@@ -1,0 +1,3 @@
+03:32:01 DEBUG    claimdesk_qa.tests.conftest start tests/ui/test_claim_workflow.py::test_an_administrator_can_see_the_user_list[chromium]
+03:32:01 INFO     claimdesk_qa.claimdesk_qa.ui.base_page Opening http://127.0.0.1:8000/admin/users
+03:32:01 DEBUG    claimdesk_qa.tests.conftest end tests/ui/test_claim_workflow.py::test_an_administrator_can_see_the_user_list[chromium]

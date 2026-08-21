@@ -1,0 +1,26 @@
+03:32:04 DEBUG    claimdesk_qa.tests.conftest start tests/ui/test_claim_workflow.py::test_the_audit_trail_is_visible_and_complete[chromium]
+03:32:04 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/policies "HTTP/1.1 200 OK"
+03:32:04 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/policies -> 200 (15 ms)
+  response: [{"id":"33059b0b-df07-4730-919a-1ba679c9ca45","policy_number":"POL-1001","holder_id":"a7d8d307-857f-4f9c-8874-d73698c23444","coverage_limit":"10000.00","is_active":true},{"id":"72843bcb-585e-49ad-b99f-b8870cb2ac12","policy_number":"POL-1002","holder_id":"a7d8d307-857f-4f9c-8874-d73698c23444","coverage_limit":"2500.00","is_active":true}]
+03:32:04 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+03:32:04 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (10 ms)
+  request : {'policy_id': '33059b0b-df07-4730-919a-1ba679c9ca45', 'amount': '410.00', 'description': 'QA 34a055f0 Week police modern how truth away mean.', 'incident_date': '2026-08-14'}
+  response: {"id":"e3f78564-2e68-459d-a205-7a92d46fcdac","reference":"CLM-930EDF31","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"410.00","description":"QA 34a055f0 Week police modern how truth away mean.","incident_date":"2026-08-14","status":"DRAFT","created_at":"2026-08-21T03:32:04.191550Z","updated_at":"2026-08-21T03:32:04.191550Z","withdrawn_at":null,"decided_by_id":null}
+03:32:04 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/e3f78564-2e68-459d-a205-7a92d46fcdac/transitions "HTTP/1.1 200 OK"
+03:32:04 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/e3f78564-2e68-459d-a205-7a92d46fcdac/transitions -> 200 (16 ms)
+  request : {'action': 'submit', 'note': None}
+  response: {"id":"e3f78564-2e68-459d-a205-7a92d46fcdac","reference":"CLM-930EDF31","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"410.00","description":"QA 34a055f0 Week police modern how truth away mean.","incident_date":"2026-08-14","status":"SUBMITTED","created_at":"2026-08-21T03:32:04.191550Z","updated_at":"2026-08-21T03:32:04.201929Z","withdrawn_at":null,"decided_by_id":null}
+03:32:04 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/e3f78564-2e68-459d-a205-7a92d46fcdac/transitions "HTTP/1.1 200 OK"
+03:32:04 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/e3f78564-2e68-459d-a205-7a92d46fcdac/transitions -> 200 (7 ms)
+  request : {'action': 'start_review', 'note': None}
+  response: {"id":"e3f78564-2e68-459d-a205-7a92d46fcdac","reference":"CLM-930EDF31","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"410.00","description":"QA 34a055f0 Week police modern how truth away mean.","incident_date":"2026-08-14","status":"UNDER_REVIEW","created_at":"2026-08-21T03:32:04.191550Z","updated_at":"2026-08-21T03:32:04.218007Z","withdrawn_at":null,"decided_by_id":null}
+03:32:04 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/e3f78564-2e68-459d-a205-7a92d46fcdac/transitions "HTTP/1.1 200 OK"
+03:32:04 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/e3f78564-2e68-459d-a205-7a92d46fcdac/transitions -> 200 (6 ms)
+  request : {'action': 'approve', 'note': None}
+  response: {"id":"e3f78564-2e68-459d-a205-7a92d46fcdac","reference":"CLM-930EDF31","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"410.00","description":"QA 34a055f0 Week police modern how truth away mean.","incident_date":"2026-08-14","status":"APPROVED","created_at":"2026-08-21T03:32:04.191550Z","updated_at":"2026-08-21T03:32:04.224787Z","withdrawn_at":null,"decided_by_id":"58f73a5b-bc43-47db-8dde-48f1e7e03539"}
+03:32:04 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/e3f78564-2e68-459d-a205-7a92d46fcdac/transitions "HTTP/1.1 200 OK"
+03:32:04 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/e3f78564-2e68-459d-a205-7a92d46fcdac/transitions -> 200 (13 ms)
+  request : {'action': 'pay', 'note': None}
+  response: {"id":"e3f78564-2e68-459d-a205-7a92d46fcdac","reference":"CLM-930EDF31","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"410.00","description":"QA 34a055f0 Week police modern how truth away mean.","incident_date":"2026-08-14","status":"PAID","created_at":"2026-08-21T03:32:04.191550Z","updated_at":"2026-08-21T03:32:04.231497Z","withdrawn_at":null,"decided_by_id":"58f73a5b-bc43-47db-8dde-48f1e7e03539"}
+03:32:04 INFO     claimdesk_qa.claimdesk_qa.ui.base_page Opening http://127.0.0.1:8000/claims/e3f78564-2e68-459d-a205-7a92d46fcdac
+03:32:04 DEBUG    claimdesk_qa.tests.conftest end tests/ui/test_claim_workflow.py::test_the_audit_trail_is_visible_and_complete[chromium]

@@ -1,2 +1,0 @@
-09:42:30 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_settings.py::test_dotenv_file_is_read_when_provided
-09:42:30 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_settings.py::test_dotenv_file_is_read_when_provided

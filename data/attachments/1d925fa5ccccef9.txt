@@ -1,3 +1,0 @@
-09:42:29 DEBUG    claimdesk_qa.tests.conftest start tests/ui/test_claim_form.py::test_the_form_only_offers_policies_the_customer_holds[chromium]
-09:42:29 INFO     claimdesk_qa.claimdesk_qa.ui.base_page Opening http://127.0.0.1:8000/claims/new
-09:42:29 DEBUG    claimdesk_qa.tests.conftest end tests/ui/test_claim_form.py::test_the_form_only_offers_policies_the_customer_holds[chromium]

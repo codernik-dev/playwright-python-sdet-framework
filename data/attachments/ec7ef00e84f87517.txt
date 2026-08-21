@@ -1,0 +1,28 @@
+03:31:52 DEBUG    claimdesk_qa.tests.conftest start tests/db/test_audit_and_payouts.py::test_a_refused_transition_writes_no_audit_row
+03:31:52 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/policies "HTTP/1.1 200 OK"
+03:31:52 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/policies -> 200 (5 ms)
+  response: [{"id":"33059b0b-df07-4730-919a-1ba679c9ca45","policy_number":"POL-1001","holder_id":"a7d8d307-857f-4f9c-8874-d73698c23444","coverage_limit":"10000.00","is_active":true},{"id":"72843bcb-585e-49ad-b99f-b8870cb2ac12","policy_number":"POL-1002","holder_id":"a7d8d307-857f-4f9c-8874-d73698c23444","coverage_limit":"2500.00","is_active":true}]
+03:31:52 DEBUG    claimdesk_qa.claimdesk_qa.db.connection Connected read-only to postgresql://claimdesk_qa_ro:***masked***@127.0.0.1:5432/claimdesk
+03:31:52 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+03:31:52 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (344 ms)
+  request : {'policy_id': '33059b0b-df07-4730-919a-1ba679c9ca45', 'amount': '700.00', 'description': 'QA 1883c4bd Major baby drop lead tonight visit especially.', 'incident_date': '2026-08-14'}
+  response: {"id":"a9c6415c-0cef-4177-b475-c96b1da3bf28","reference":"CLM-E6F926BD","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"700.00","description":"QA 1883c4bd Major baby drop lead tonight visit especially.","incident_date":"2026-08-14","status":"DRAFT","created_at":"2026-08-21T03:31:52.233653Z","updated_at":"2026-08-21T03:31:52.233653Z","withdrawn_at":null,"decided_by_id":null}
+03:31:52 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/a9c6415c-0cef-4177-b475-c96b1da3bf28/transitions "HTTP/1.1 200 OK"
+03:31:52 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/a9c6415c-0cef-4177-b475-c96b1da3bf28/transitions -> 200 (231 ms)
+  request : {'action': 'submit', 'note': None}
+  response: {"id":"a9c6415c-0cef-4177-b475-c96b1da3bf28","reference":"CLM-E6F926BD","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"700.00","description":"QA 1883c4bd Major baby drop lead tonight visit especially.","incident_date":"2026-08-14","status":"SUBMITTED","created_at":"2026-08-21T03:31:52.233653Z","updated_at":"2026-08-21T03:31:52.577838Z","withdrawn_at":null,"decided_by_id":null}
+03:31:52 DEBUG    claimdesk_qa.claimdesk_qa.db.connection SQL: SELECT count(*) FROM claim_events WHERE claim_id = %s
+  params: ('a9c6415c-0cef-4177-b475-c96b1da3bf28',)
+  rows: 1
+03:31:52 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/a9c6415c-0cef-4177-b475-c96b1da3bf28/transitions "HTTP/1.1 409 Conflict"
+03:31:52 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/a9c6415c-0cef-4177-b475-c96b1da3bf28/transitions -> 409 (7 ms)
+  request : {'action': 'pay', 'note': None}
+  response: {"detail":"Cannot pay a claim in status SUBMITTED; it must be APPROVED."}
+03:31:52 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/a9c6415c-0cef-4177-b475-c96b1da3bf28/transitions "HTTP/1.1 409 Conflict"
+03:31:52 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/a9c6415c-0cef-4177-b475-c96b1da3bf28/transitions -> 409 (7 ms)
+  request : {'action': 'approve', 'note': None}
+  response: {"detail":"Cannot approve a claim in status SUBMITTED; it must be UNDER_REVIEW."}
+03:31:52 DEBUG    claimdesk_qa.claimdesk_qa.db.connection SQL: SELECT count(*) FROM claim_events WHERE claim_id = %s
+  params: ('a9c6415c-0cef-4177-b475-c96b1da3bf28',)
+  rows: 1
+03:31:52 DEBUG    claimdesk_qa.tests.conftest end tests/db/test_audit_and_payouts.py::test_a_refused_transition_writes_no_audit_row

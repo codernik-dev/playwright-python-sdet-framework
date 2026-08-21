@@ -1,2 +1,0 @@
-21:42:30 DEBUG   [qa-dac580c989] claimdesk_qa.tests.conftest: start tests/framework/test_settings.py::test_api_url_is_derived_from_base_url
-21:42:30 DEBUG   [qa-dac580c989] claimdesk_qa.tests.conftest: end tests/framework/test_settings.py::test_api_url_is_derived_from_base_url

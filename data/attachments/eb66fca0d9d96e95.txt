@@ -1,5 +1,0 @@
-09:42:21 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_claims_validation.py::test_a_malformed_identifier_is_a_validation_error[numeric]
-09:42:21 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/claims/12345 "HTTP/1.1 422 Unprocessable Entity"
-09:42:21 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/claims/12345 -> 422 (5 ms)
-  response: {"detail":[{"type":"uuid_parsing","loc":["path","claim_id"],"msg":"Input should be a valid UUID, invalid length: expected length 32 for simple format, found 5","input":"12345","ctx":{"error":"invalid length: expected length 32 for simple format, found 5"}}]}
-09:42:21 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_claims_validation.py::test_a_malformed_identifier_is_a_validation_error[numeric]

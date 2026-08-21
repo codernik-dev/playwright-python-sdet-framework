@@ -1,0 +1,6 @@
+03:31:49 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_authorization.py::test_a_customer_cannot_create_a_user
+03:31:49 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/users "HTTP/1.1 403 Forbidden"
+03:31:49 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/users -> 403 (4 ms)
+  request : {'email': 'qa+4325c248@example.com', 'full_name': 'Yvonne Hill', 'role': 'ADMIN', 'password': 'Passw0rd!generated'}
+  response: {"detail":"Insufficient permissions for this operation"}
+03:31:49 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_authorization.py::test_a_customer_cannot_create_a_user

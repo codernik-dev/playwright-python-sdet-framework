@@ -1,2 +1,0 @@
-21:42:30 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_flakiness.py::test_an_unset_seed_still_produces_one
-21:42:30 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_flakiness.py::test_an_unset_seed_still_produces_one

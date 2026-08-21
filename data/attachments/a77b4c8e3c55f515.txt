@@ -1,0 +1,28 @@
+03:31:53 DEBUG    claimdesk_qa.tests.conftest start tests/db/test_audit_and_payouts.py::test_an_unpaid_claim_has_no_payout
+03:31:53 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/policies "HTTP/1.1 200 OK"
+03:31:53 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/policies -> 200 (5 ms)
+  response: [{"id":"33059b0b-df07-4730-919a-1ba679c9ca45","policy_number":"POL-1001","holder_id":"a7d8d307-857f-4f9c-8874-d73698c23444","coverage_limit":"10000.00","is_active":true},{"id":"72843bcb-585e-49ad-b99f-b8870cb2ac12","policy_number":"POL-1002","holder_id":"a7d8d307-857f-4f9c-8874-d73698c23444","coverage_limit":"2500.00","is_active":true}]
+03:31:53 DEBUG    claimdesk_qa.claimdesk_qa.db.connection Connected read-only to postgresql://claimdesk_qa_ro:***masked***@127.0.0.1:5432/claimdesk
+03:31:53 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+03:31:53 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (11 ms)
+  request : {'policy_id': '33059b0b-df07-4730-919a-1ba679c9ca45', 'amount': '800.00', 'description': 'QA ca426c20 Agree partner change sister catch soldier.', 'incident_date': '2026-08-14'}
+  response: {"id":"70212adb-3b2d-4081-8e52-51f8e1a98ad2","reference":"CLM-045EB687","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"800.00","description":"QA ca426c20 Agree partner change sister catch soldier.","incident_date":"2026-08-14","status":"DRAFT","created_at":"2026-08-21T03:31:53.418328Z","updated_at":"2026-08-21T03:31:53.418328Z","withdrawn_at":null,"decided_by_id":null}
+03:31:53 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/70212adb-3b2d-4081-8e52-51f8e1a98ad2/transitions "HTTP/1.1 200 OK"
+03:31:53 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/70212adb-3b2d-4081-8e52-51f8e1a98ad2/transitions -> 200 (9 ms)
+  request : {'action': 'submit', 'note': None}
+  response: {"id":"70212adb-3b2d-4081-8e52-51f8e1a98ad2","reference":"CLM-045EB687","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"800.00","description":"QA ca426c20 Agree partner change sister catch soldier.","incident_date":"2026-08-14","status":"SUBMITTED","created_at":"2026-08-21T03:31:53.418328Z","updated_at":"2026-08-21T03:31:53.428706Z","withdrawn_at":null,"decided_by_id":null}
+03:31:53 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/70212adb-3b2d-4081-8e52-51f8e1a98ad2/transitions "HTTP/1.1 200 OK"
+03:31:53 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/70212adb-3b2d-4081-8e52-51f8e1a98ad2/transitions -> 200 (11 ms)
+  request : {'action': 'start_review', 'note': None}
+  response: {"id":"70212adb-3b2d-4081-8e52-51f8e1a98ad2","reference":"CLM-045EB687","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"800.00","description":"QA ca426c20 Agree partner change sister catch soldier.","incident_date":"2026-08-14","status":"UNDER_REVIEW","created_at":"2026-08-21T03:31:53.418328Z","updated_at":"2026-08-21T03:31:53.439055Z","withdrawn_at":null,"decided_by_id":null}
+03:31:53 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/70212adb-3b2d-4081-8e52-51f8e1a98ad2/transitions "HTTP/1.1 200 OK"
+03:31:53 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/70212adb-3b2d-4081-8e52-51f8e1a98ad2/transitions -> 200 (8 ms)
+  request : {'action': 'approve', 'note': None}
+  response: {"id":"70212adb-3b2d-4081-8e52-51f8e1a98ad2","reference":"CLM-045EB687","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"800.00","description":"QA ca426c20 Agree partner change sister catch soldier.","incident_date":"2026-08-14","status":"APPROVED","created_at":"2026-08-21T03:31:53.418328Z","updated_at":"2026-08-21T03:31:53.449011Z","withdrawn_at":null,"decided_by_id":"58f73a5b-bc43-47db-8dde-48f1e7e03539"}
+03:31:53 DEBUG    claimdesk_qa.claimdesk_qa.db.connection SQL: SELECT id, claim_id, amount, paid_by_id, paid_at FROM payouts WHERE claim_id = %s
+  params: ('70212adb-3b2d-4081-8e52-51f8e1a98ad2',)
+  rows: 0
+03:31:53 DEBUG    claimdesk_qa.claimdesk_qa.db.connection SQL: SELECT count(*) FROM payouts WHERE claim_id = %s
+  params: ('70212adb-3b2d-4081-8e52-51f8e1a98ad2',)
+  rows: 1
+03:31:53 DEBUG    claimdesk_qa.tests.conftest end tests/db/test_audit_and_payouts.py::test_an_unpaid_claim_has_no_payout

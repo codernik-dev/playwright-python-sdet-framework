@@ -1,0 +1,10 @@
+03:32:01 DEBUG    claimdesk_qa.tests.conftest start tests/ui/test_claims_list.py::test_searching_narrows_the_table_to_one_claim[chromium]
+03:32:01 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/policies "HTTP/1.1 200 OK"
+03:32:01 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/policies -> 200 (7 ms)
+  response: [{"id":"33059b0b-df07-4730-919a-1ba679c9ca45","policy_number":"POL-1001","holder_id":"a7d8d307-857f-4f9c-8874-d73698c23444","coverage_limit":"10000.00","is_active":true},{"id":"72843bcb-585e-49ad-b99f-b8870cb2ac12","policy_number":"POL-1002","holder_id":"a7d8d307-857f-4f9c-8874-d73698c23444","coverage_limit":"2500.00","is_active":true}]
+03:32:01 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+03:32:01 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (12 ms)
+  request : {'policy_id': '33059b0b-df07-4730-919a-1ba679c9ca45', 'amount': '250.00', 'description': 'QA b2763e03 Artist more house show language.', 'incident_date': '2026-08-14'}
+  response: {"id":"1d2b2f85-397b-41ea-8b23-1cd81889e375","reference":"CLM-A7E37C67","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"250.00","description":"QA b2763e03 Artist more house show language.","incident_date":"2026-08-14","status":"DRAFT","created_at":"2026-08-21T03:32:01.758126Z","updated_at":"2026-08-21T03:32:01.758126Z","withdrawn_at":null,"decided_by_id":null}
+03:32:01 INFO     claimdesk_qa.claimdesk_qa.ui.base_page Opening http://127.0.0.1:8000/claims
+03:32:02 DEBUG    claimdesk_qa.tests.conftest end tests/ui/test_claims_list.py::test_searching_narrows_the_table_to_one_claim[chromium]

@@ -1,2 +1,0 @@
-09:42:30 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_artifacts.py::test_pruning_keeps_a_directory_that_gained_evidence_mid_sweep
-09:42:30 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_artifacts.py::test_pruning_keeps_a_directory_that_gained_evidence_mid_sweep

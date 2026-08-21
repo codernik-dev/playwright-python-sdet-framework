@@ -1,2 +1,0 @@
-09:42:30 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_artifacts.py::test_run_id_is_taken_from_the_environment_when_present
-09:42:30 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_artifacts.py::test_run_id_is_taken_from_the_environment_when_present

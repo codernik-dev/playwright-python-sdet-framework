@@ -1,0 +1,5 @@
+03:31:49 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_claims_validation.py::test_a_malformed_identifier_is_a_validation_error[not-a-uuid]
+03:31:49 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/claims/not-a-uuid "HTTP/1.1 422 Unprocessable Entity"
+03:31:49 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/claims/not-a-uuid -> 422 (3 ms)
+  response: {"detail":[{"type":"uuid_parsing","loc":["path","claim_id"],"msg":"Input should be a valid UUID, invalid character: found `n` at 1","input":"not-a-uuid","ctx":{"error":"invalid character: found `n` at 1"}}]}
+03:31:49 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_claims_validation.py::test_a_malformed_identifier_is_a_validation_error[not-a-uuid]

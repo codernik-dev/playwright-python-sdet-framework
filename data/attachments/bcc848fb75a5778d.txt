@@ -1,0 +1,20 @@
+03:31:53 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_state_machine.py::test_illegal_transitions_are_refused[SUBMITTED-cannot-reject]
+03:31:53 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/policies "HTTP/1.1 200 OK"
+03:31:53 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/policies -> 200 (4 ms)
+  response: [{"id":"33059b0b-df07-4730-919a-1ba679c9ca45","policy_number":"POL-1001","holder_id":"a7d8d307-857f-4f9c-8874-d73698c23444","coverage_limit":"10000.00","is_active":true},{"id":"72843bcb-585e-49ad-b99f-b8870cb2ac12","policy_number":"POL-1002","holder_id":"a7d8d307-857f-4f9c-8874-d73698c23444","coverage_limit":"2500.00","is_active":true}]
+03:31:53 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+03:31:53 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (9 ms)
+  request : {'policy_id': '33059b0b-df07-4730-919a-1ba679c9ca45', 'amount': '100.00', 'description': 'QA 70108f42 Person cold group remain born sort.', 'incident_date': '2026-08-14'}
+  response: {"id":"870642d6-0c8d-4fd8-8d7a-0a70966be250","reference":"CLM-FC4FB351","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"100.00","description":"QA 70108f42 Person cold group remain born sort.","incident_date":"2026-08-14","status":"DRAFT","created_at":"2026-08-21T03:31:53.418512Z","updated_at":"2026-08-21T03:31:53.418512Z","withdrawn_at":null,"decided_by_id":null}
+03:31:53 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/870642d6-0c8d-4fd8-8d7a-0a70966be250/transitions "HTTP/1.1 200 OK"
+03:31:53 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/870642d6-0c8d-4fd8-8d7a-0a70966be250/transitions -> 200 (10 ms)
+  request : {'action': 'submit', 'note': None}
+  response: {"id":"870642d6-0c8d-4fd8-8d7a-0a70966be250","reference":"CLM-FC4FB351","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"100.00","description":"QA 70108f42 Person cold group remain born sort.","incident_date":"2026-08-14","status":"SUBMITTED","created_at":"2026-08-21T03:31:53.418512Z","updated_at":"2026-08-21T03:31:53.428882Z","withdrawn_at":null,"decided_by_id":null}
+03:31:53 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/870642d6-0c8d-4fd8-8d7a-0a70966be250/transitions "HTTP/1.1 409 Conflict"
+03:31:53 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/870642d6-0c8d-4fd8-8d7a-0a70966be250/transitions -> 409 (7 ms)
+  request : {'action': 'reject', 'note': None}
+  response: {"detail":"Cannot reject a claim in status SUBMITTED; it must be UNDER_REVIEW."}
+03:31:53 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/claims/870642d6-0c8d-4fd8-8d7a-0a70966be250 "HTTP/1.1 200 OK"
+03:31:53 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/claims/870642d6-0c8d-4fd8-8d7a-0a70966be250 -> 200 (6 ms)
+  response: {"id":"870642d6-0c8d-4fd8-8d7a-0a70966be250","reference":"CLM-FC4FB351","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"100.00","description":"QA 70108f42 Person cold group remain born sort.","incident_date":"2026-08-14","status":"SUBMITTED","created_at":"2026-08-21T03:31:53.418512Z","updated_at":"2026-08-21T03:31:53.428882Z","withdrawn_at":null,"decided_by_id":null}
+03:31:53 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_state_machine.py::test_illegal_transitions_are_refused[SUBMITTED-cannot-reject]

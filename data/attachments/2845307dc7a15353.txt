@@ -1,0 +1,2 @@
+15:32:05 DEBUG   [qa-20a41f457e] claimdesk_qa.tests.conftest: start tests/framework/test_settings.py::test_trailing_slash_is_stripped_from_urls
+15:32:05 DEBUG   [qa-20a41f457e] claimdesk_qa.tests.conftest: end tests/framework/test_settings.py::test_trailing_slash_is_stripped_from_urls

@@ -1,0 +1,2 @@
+15:32:05 DEBUG   [qa-4a1d6467f5] claimdesk_qa.tests.conftest: start tests/framework/test_settings.py::test_safe_dsn_masks_the_password
+15:32:05 DEBUG   [qa-4a1d6467f5] claimdesk_qa.tests.conftest: end tests/framework/test_settings.py::test_safe_dsn_masks_the_password

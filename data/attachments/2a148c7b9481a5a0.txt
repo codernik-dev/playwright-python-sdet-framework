@@ -1,2 +1,0 @@
-21:42:30 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_clock.py::test_utc_and_local_can_genuinely_disagree
-21:42:30 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_clock.py::test_utc_and_local_can_genuinely_disagree

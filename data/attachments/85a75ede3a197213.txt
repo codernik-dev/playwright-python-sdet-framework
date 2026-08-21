@@ -1,5 +1,0 @@
-09:42:22 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_claims_validation.py::test_sorting_by_an_unpermitted_field_is_rejected[sql-injection-attempt]
-09:42:22 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/claims?sort=amount%3B+DROP+TABLE+claims "HTTP/1.1 422 Unprocessable Entity"
-09:42:22 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/claims?sort=amount%3B+DROP+TABLE+claims -> 422 (6 ms)
-  response: {"detail":"Cannot sort by 'amount; DROP TABLE claims'; allowed: ['amount', 'created_at', 'incident_date', 'reference']"}
-09:42:22 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_claims_validation.py::test_sorting_by_an_unpermitted_field_is_rejected[sql-injection-attempt]

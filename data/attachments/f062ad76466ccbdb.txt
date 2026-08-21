@@ -1,2 +1,0 @@
-21:42:30 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_flakiness.py::test_the_derived_seed_is_stable_for_a_given_run
-21:42:30 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_flakiness.py::test_the_derived_seed_is_stable_for_a_given_run

@@ -1,2 +1,0 @@
-09:42:30 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_artifacts.py::test_node_id_becomes_a_safe_directory_name
-09:42:30 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_artifacts.py::test_node_id_becomes_a_safe_directory_name

@@ -1,0 +1,21 @@
+03:31:50 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_state_machine.py::test_every_published_transition_is_accepted[UNDER_REVIEW-approve-APPROVED]
+03:31:50 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/policies "HTTP/1.1 200 OK"
+03:31:50 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/policies -> 200 (5 ms)
+  response: [{"id":"33059b0b-df07-4730-919a-1ba679c9ca45","policy_number":"POL-1001","holder_id":"a7d8d307-857f-4f9c-8874-d73698c23444","coverage_limit":"10000.00","is_active":true},{"id":"72843bcb-585e-49ad-b99f-b8870cb2ac12","policy_number":"POL-1002","holder_id":"a7d8d307-857f-4f9c-8874-d73698c23444","coverage_limit":"2500.00","is_active":true}]
+03:31:50 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+03:31:50 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (46 ms)
+  request : {'policy_id': '33059b0b-df07-4730-919a-1ba679c9ca45', 'amount': '100.00', 'description': 'QA 77670d34 Generation rock which concern blue ahead.', 'incident_date': '2026-08-14'}
+  response: {"id":"774150d3-046f-4221-8ad6-d958c22447ec","reference":"CLM-2C740C2D","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"100.00","description":"QA 77670d34 Generation rock which concern blue ahead.","incident_date":"2026-08-14","status":"DRAFT","created_at":"2026-08-21T03:31:50.318674Z","updated_at":"2026-08-21T03:31:50.318674Z","withdrawn_at":null,"decided_by_id":null}
+03:31:50 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/774150d3-046f-4221-8ad6-d958c22447ec/transitions "HTTP/1.1 200 OK"
+03:31:50 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/774150d3-046f-4221-8ad6-d958c22447ec/transitions -> 200 (167 ms)
+  request : {'action': 'submit', 'note': None}
+  response: {"id":"774150d3-046f-4221-8ad6-d958c22447ec","reference":"CLM-2C740C2D","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"100.00","description":"QA 77670d34 Generation rock which concern blue ahead.","incident_date":"2026-08-14","status":"SUBMITTED","created_at":"2026-08-21T03:31:50.318674Z","updated_at":"2026-08-21T03:31:50.363539Z","withdrawn_at":null,"decided_by_id":null}
+03:31:50 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/774150d3-046f-4221-8ad6-d958c22447ec/transitions "HTTP/1.1 200 OK"
+03:31:50 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/774150d3-046f-4221-8ad6-d958c22447ec/transitions -> 200 (34 ms)
+  request : {'action': 'start_review', 'note': None}
+  response: {"id":"774150d3-046f-4221-8ad6-d958c22447ec","reference":"CLM-2C740C2D","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"100.00","description":"QA 77670d34 Generation rock which concern blue ahead.","incident_date":"2026-08-14","status":"UNDER_REVIEW","created_at":"2026-08-21T03:31:50.318674Z","updated_at":"2026-08-21T03:31:50.532241Z","withdrawn_at":null,"decided_by_id":null}
+03:31:50 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/774150d3-046f-4221-8ad6-d958c22447ec/transitions "HTTP/1.1 200 OK"
+03:31:50 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/774150d3-046f-4221-8ad6-d958c22447ec/transitions -> 200 (8 ms)
+  request : {'action': 'approve', 'note': None}
+  response: {"id":"774150d3-046f-4221-8ad6-d958c22447ec","reference":"CLM-2C740C2D","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"100.00","description":"QA 77670d34 Generation rock which concern blue ahead.","incident_date":"2026-08-14","status":"APPROVED","created_at":"2026-08-21T03:31:50.318674Z","updated_at":"2026-08-21T03:31:50.565109Z","withdrawn_at":null,"decided_by_id":"58f73a5b-bc43-47db-8dde-48f1e7e03539"}
+03:31:50 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_state_machine.py::test_every_published_transition_is_accepted[UNDER_REVIEW-approve-APPROVED]

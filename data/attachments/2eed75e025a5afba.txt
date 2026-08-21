@@ -1,2 +1,0 @@
-09:42:30 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_artifacts.py::test_characters_illegal_in_a_windows_path_are_removed[tests/ui/test_x.py::test_quote["value"]]
-09:42:30 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_artifacts.py::test_characters_illegal_in_a_windows_path_are_removed[tests/ui/test_x.py::test_quote["value"]]

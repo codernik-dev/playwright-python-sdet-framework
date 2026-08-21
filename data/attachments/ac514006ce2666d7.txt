@@ -1,2 +1,0 @@
-09:42:30 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_artifacts.py::test_long_node_ids_are_truncated_but_stay_unique
-09:42:30 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_artifacts.py::test_long_node_ids_are_truncated_but_stay_unique

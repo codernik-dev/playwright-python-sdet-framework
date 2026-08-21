@@ -1,6 +1,0 @@
-09:42:21 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_auth.py::test_malformed_login_payloads_are_rejected_by_field[email-empty]
-09:42:21 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/auth/login "HTTP/1.1 422 Unprocessable Entity"
-09:42:21 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/auth/login -> 422 (3 ms)
-  request : {'email': '', 'password': 'x'}
-  response: {"detail":[{"type":"value_error","loc":["body","email"],"msg":"value is not a valid email address: An email address must have an @-sign.","input":"","ctx":{"reason":"An email address must have an @-sign."}}]}
-09:42:21 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_auth.py::test_malformed_login_payloads_are_rejected_by_field[email-empty]

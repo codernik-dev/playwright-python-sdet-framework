@@ -1,5 +1,0 @@
-09:42:21 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_claims_crud.py::test_a_search_matching_nothing_returns_an_empty_page_not_an_error
-09:42:21 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/claims?q=no-claim-will-ever-contain-this-string "HTTP/1.1 200 OK"
-09:42:21 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/claims?q=no-claim-will-ever-contain-this-string -> 200 (7 ms)
-  response: {"items":[],"page":1,"size":20,"total":0}
-09:42:21 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_claims_crud.py::test_a_search_matching_nothing_returns_an_empty_page_not_an_error

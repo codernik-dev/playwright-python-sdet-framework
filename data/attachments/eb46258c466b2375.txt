@@ -1,3 +1,0 @@
-09:42:27 DEBUG    claimdesk_qa.tests.conftest start tests/ui/test_claims_list.py::test_sorting_by_amount_orders_the_visible_rows[chromium]
-09:42:27 INFO     claimdesk_qa.claimdesk_qa.ui.base_page Opening http://127.0.0.1:8000/claims
-09:42:28 DEBUG    claimdesk_qa.tests.conftest end tests/ui/test_claims_list.py::test_sorting_by_amount_orders_the_visible_rows[chromium]

@@ -1,0 +1,2 @@
+15:32:04 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_logging_and_correlation.py::test_run_id_can_be_folded_in_to_separate_concurrent_runs
+15:32:04 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_logging_and_correlation.py::test_run_id_can_be_folded_in_to_separate_concurrent_runs

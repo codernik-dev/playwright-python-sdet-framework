@@ -1,0 +1,2 @@
+15:32:04 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_logging_and_correlation.py::test_debug_detail_reaches_the_files_even_when_the_console_is_quiet
+15:32:04 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_logging_and_correlation.py::test_debug_detail_reaches_the_files_even_when_the_console_is_quiet

@@ -1,2 +1,0 @@
-09:42:30 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_settings.py::test_dsn_is_built_correctly_and_url_encodes_the_password
-09:42:30 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_settings.py::test_dsn_is_built_correctly_and_url_encodes_the_password

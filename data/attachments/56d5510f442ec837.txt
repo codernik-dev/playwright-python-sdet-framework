@@ -1,0 +1,17 @@
+03:31:48 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/health/ready "HTTP/1.1 200 OK"
+03:31:48 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/auth/login "HTTP/1.1 200 OK"
+03:31:48 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/auth/login "HTTP/1.1 200 OK"
+03:31:48 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/auth/login "HTTP/1.1 200 OK"
+03:31:48 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/auth/login "HTTP/1.1 200 OK"
+03:31:48 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/policies "HTTP/1.1 200 OK"
+03:31:48 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+03:31:48 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (10 ms)
+  request : {'policy_id': '33059b0b-df07-4730-919a-1ba679c9ca45', 'amount': '250.00', 'description': 'QA bd5088b9 Yes couple stuff investment.', 'incident_date': '2026-08-14'}
+  response: {"id":"4465e8d9-2c26-4f16-a9de-42dbf9758f83","reference":"CLM-D7764389","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"250.00","description":"QA bd5088b9 Yes couple stuff investment.","incident_date":"2026-08-14","status":"DRAFT","created_at":"2026-08-21T03:31:48.451382Z","updated_at":"2026-08-21T03:31:48.451382Z","withdrawn_at":null,"decided_by_id":null}
+03:31:48 INFO     httpx HTTP Request: DELETE http://127.0.0.1:8000/api/v1/claims/4465e8d9-2c26-4f16-a9de-42dbf9758f83 "HTTP/1.1 204 No Content"
+03:31:48 DEBUG    claimdesk_qa.claimdesk_qa.api.client DELETE http://127.0.0.1:8000/api/v1/claims/4465e8d9-2c26-4f16-a9de-42dbf9758f83 -> 204 (7 ms)
+  response: 
+03:31:48 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/claims/4465e8d9-2c26-4f16-a9de-42dbf9758f83/events "HTTP/1.1 200 OK"
+03:31:48 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/claims/4465e8d9-2c26-4f16-a9de-42dbf9758f83/events -> 200 (7 ms)
+  response: [{"id":"5814c0ae-f084-4a2c-a02d-27be231619b2","claim_id":"4465e8d9-2c26-4f16-a9de-42dbf9758f83","actor_id":"a7d8d307-857f-4f9c-8874-d73698c23444","from_status":null,"to_status":"DRAFT","note":null,"occurred_at":"2026-08-21T03:31:48.451382Z"},{"id":"67bfba7c-67d4-4b80-bf6d-1ca17e7e831a","claim_id":"4465e8d9-2c26-4f16-a9de-42dbf9758f83","actor_id":"a7d8d307-857f-4f9c-8874-d73698c23444","from_status":"DRAFT","to_status":"WITHDRAWN","note":null,"occurred_at":"2026-08-21T03:31:48.460822Z"}]
+03:31:48 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_claims_crud.py::test_withdrawal_is_recorded_in_the_audit_trail

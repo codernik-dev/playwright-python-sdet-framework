@@ -1,5 +1,0 @@
-09:42:21 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_claims_validation.py::test_a_malformed_identifier_is_a_validation_error[uuid-one-char-short]
-09:42:21 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/claims/00000000-0000-0000-0000-00000000000 "HTTP/1.1 422 Unprocessable Entity"
-09:42:21 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/claims/00000000-0000-0000-0000-00000000000 -> 422 (4 ms)
-  response: {"detail":[{"type":"uuid_parsing","loc":["path","claim_id"],"msg":"Input should be a valid UUID, invalid group length in group 4: expected 12, found 11","input":"00000000-0000-0000-0000-00000000000","ctx":{"error":"invalid group length in group 4: expected 12, found 11"}}]}
-09:42:21 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_claims_validation.py::test_a_malformed_identifier_is_a_validation_error[uuid-one-char-short]

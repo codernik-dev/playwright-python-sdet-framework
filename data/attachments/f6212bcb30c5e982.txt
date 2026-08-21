@@ -1,0 +1,24 @@
+03:31:49 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_authorization.py::test_an_adjuster_may_not_approve_above_the_limit[one-cent-above-limit]
+03:31:49 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/policies "HTTP/1.1 200 OK"
+03:31:49 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/policies -> 200 (4 ms)
+  response: [{"id":"33059b0b-df07-4730-919a-1ba679c9ca45","policy_number":"POL-1001","holder_id":"a7d8d307-857f-4f9c-8874-d73698c23444","coverage_limit":"10000.00","is_active":true},{"id":"72843bcb-585e-49ad-b99f-b8870cb2ac12","policy_number":"POL-1002","holder_id":"a7d8d307-857f-4f9c-8874-d73698c23444","coverage_limit":"2500.00","is_active":true}]
+03:31:49 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+03:31:49 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (20 ms)
+  request : {'policy_id': '33059b0b-df07-4730-919a-1ba679c9ca45', 'amount': '5000.01', 'description': 'QA 3345995e Nature none his their region head interesting.', 'incident_date': '2026-08-14'}
+  response: {"id":"7e9eee18-7ccc-433f-b1e4-58606ea5d9bc","reference":"CLM-631C47C1","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"5000.01","description":"QA 3345995e Nature none his their region head interesting.","incident_date":"2026-08-14","status":"DRAFT","created_at":"2026-08-21T03:31:49.598794Z","updated_at":"2026-08-21T03:31:49.598794Z","withdrawn_at":null,"decided_by_id":null}
+03:31:49 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/7e9eee18-7ccc-433f-b1e4-58606ea5d9bc/transitions "HTTP/1.1 200 OK"
+03:31:49 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/7e9eee18-7ccc-433f-b1e4-58606ea5d9bc/transitions -> 200 (9 ms)
+  request : {'action': 'submit', 'note': None}
+  response: {"id":"7e9eee18-7ccc-433f-b1e4-58606ea5d9bc","reference":"CLM-631C47C1","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"5000.01","description":"QA 3345995e Nature none his their region head interesting.","incident_date":"2026-08-14","status":"SUBMITTED","created_at":"2026-08-21T03:31:49.598794Z","updated_at":"2026-08-21T03:31:49.617765Z","withdrawn_at":null,"decided_by_id":null}
+03:31:49 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/7e9eee18-7ccc-433f-b1e4-58606ea5d9bc/transitions "HTTP/1.1 200 OK"
+03:31:49 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/7e9eee18-7ccc-433f-b1e4-58606ea5d9bc/transitions -> 200 (9 ms)
+  request : {'action': 'start_review', 'note': None}
+  response: {"id":"7e9eee18-7ccc-433f-b1e4-58606ea5d9bc","reference":"CLM-631C47C1","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"5000.01","description":"QA 3345995e Nature none his their region head interesting.","incident_date":"2026-08-14","status":"UNDER_REVIEW","created_at":"2026-08-21T03:31:49.598794Z","updated_at":"2026-08-21T03:31:49.627284Z","withdrawn_at":null,"decided_by_id":null}
+03:31:49 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/7e9eee18-7ccc-433f-b1e4-58606ea5d9bc/transitions "HTTP/1.1 403 Forbidden"
+03:31:49 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/7e9eee18-7ccc-433f-b1e4-58606ea5d9bc/transitions -> 403 (5 ms)
+  request : {'action': 'approve', 'note': None}
+  response: {"detail":"Amount 5000.01 exceeds the adjuster approval limit of 5000.00; an administrator must approve it."}
+03:31:49 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/claims/7e9eee18-7ccc-433f-b1e4-58606ea5d9bc "HTTP/1.1 200 OK"
+03:31:49 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/claims/7e9eee18-7ccc-433f-b1e4-58606ea5d9bc -> 200 (5 ms)
+  response: {"id":"7e9eee18-7ccc-433f-b1e4-58606ea5d9bc","reference":"CLM-631C47C1","policy_id":"33059b0b-df07-4730-919a-1ba679c9ca45","claimant_id":"a7d8d307-857f-4f9c-8874-d73698c23444","amount":"5000.01","description":"QA 3345995e Nature none his their region head interesting.","incident_date":"2026-08-14","status":"UNDER_REVIEW","created_at":"2026-08-21T03:31:49.598794Z","updated_at":"2026-08-21T03:31:49.627284Z","withdrawn_at":null,"decided_by_id":null}
+03:31:49 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_authorization.py::test_an_adjuster_may_not_approve_above_the_limit[one-cent-above-limit]

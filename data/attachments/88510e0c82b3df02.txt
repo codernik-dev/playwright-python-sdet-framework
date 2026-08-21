@@ -1,0 +1,6 @@
+03:31:48 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_auth.py::test_malformed_login_payloads_are_rejected_by_field[password-missing]
+03:31:48 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/auth/login "HTTP/1.1 422 Unprocessable Entity"
+03:31:48 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/auth/login -> 422 (2 ms)
+  request : {'email': 'customer@example.com'}
+  response: {"detail":[{"type":"missing","loc":["body","password"],"msg":"Field required","input":{"email":"customer@example.com"}}]}
+03:31:48 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_auth.py::test_malformed_login_payloads_are_rejected_by_field[password-missing]
