@@ -1,2 +1,0 @@
-03:32:05 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_settings.py::test_out_of_range_values_fail_fast[DB_PORT-70000]
-03:32:05 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_settings.py::test_out_of_range_values_fail_fast[DB_PORT-70000]

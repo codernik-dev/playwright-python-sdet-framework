@@ -1,0 +1,40 @@
+03:22:27 DEBUG    claimdesk_qa.tests.conftest start tests/db/test_audit_and_payouts.py::test_a_second_payment_attempt_creates_no_second_payout
+03:22:27 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/policies "HTTP/1.1 200 OK"
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/policies -> 200 (4 ms)
+  response: [{"id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","policy_number":"POL-1001","holder_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","coverage_limit":"10000.00","is_active":true},{"id":"bb56a965-87b3-4d33-b037-0c5e1819a676","policy_number":"POL-1002","holder_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","coverage_limit":"2500.00","is_active":true}]
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.db.connection Connected read-only to postgresql://claimdesk_qa_ro:***masked***@127.0.0.1:5432/claimdesk
+03:22:27 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (10 ms)
+  request : {'policy_id': 'acd742ca-8cb8-4d42-9eca-3df7c6f19e69', 'amount': '800.00', 'description': 'QA 706e89e5 Including necessary final firm process.', 'incident_date': '2026-08-15'}
+  response: {"id":"02635026-2553-43aa-bad5-0db931818cf3","reference":"CLM-20E95AB3","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"800.00","description":"QA 706e89e5 Including necessary final firm process.","incident_date":"2026-08-15","status":"DRAFT","created_at":"2026-08-22T03:22:27.424109Z","updated_at":"2026-08-22T03:22:27.424109Z","withdrawn_at":null,"decided_by_id":null}
+03:22:27 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/02635026-2553-43aa-bad5-0db931818cf3/transitions "HTTP/1.1 200 OK"
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/02635026-2553-43aa-bad5-0db931818cf3/transitions -> 200 (10 ms)
+  request : {'action': 'submit', 'note': None}
+  response: {"id":"02635026-2553-43aa-bad5-0db931818cf3","reference":"CLM-20E95AB3","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"800.00","description":"QA 706e89e5 Including necessary final firm process.","incident_date":"2026-08-15","status":"SUBMITTED","created_at":"2026-08-22T03:22:27.424109Z","updated_at":"2026-08-22T03:22:27.434780Z","withdrawn_at":null,"decided_by_id":null}
+03:22:27 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/02635026-2553-43aa-bad5-0db931818cf3/transitions "HTTP/1.1 200 OK"
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/02635026-2553-43aa-bad5-0db931818cf3/transitions -> 200 (9 ms)
+  request : {'action': 'start_review', 'note': None}
+  response: {"id":"02635026-2553-43aa-bad5-0db931818cf3","reference":"CLM-20E95AB3","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"800.00","description":"QA 706e89e5 Including necessary final firm process.","incident_date":"2026-08-15","status":"UNDER_REVIEW","created_at":"2026-08-22T03:22:27.424109Z","updated_at":"2026-08-22T03:22:27.445002Z","withdrawn_at":null,"decided_by_id":null}
+03:22:27 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/02635026-2553-43aa-bad5-0db931818cf3/transitions "HTTP/1.1 200 OK"
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/02635026-2553-43aa-bad5-0db931818cf3/transitions -> 200 (10 ms)
+  request : {'action': 'approve', 'note': None}
+  response: {"id":"02635026-2553-43aa-bad5-0db931818cf3","reference":"CLM-20E95AB3","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"800.00","description":"QA 706e89e5 Including necessary final firm process.","incident_date":"2026-08-15","status":"APPROVED","created_at":"2026-08-22T03:22:27.424109Z","updated_at":"2026-08-22T03:22:27.455373Z","withdrawn_at":null,"decided_by_id":"0d3e0b3d-57d9-400c-9d30-0c5729ffa08b"}
+03:22:27 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/02635026-2553-43aa-bad5-0db931818cf3/transitions "HTTP/1.1 200 OK"
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/02635026-2553-43aa-bad5-0db931818cf3/transitions -> 200 (12 ms)
+  request : {'action': 'pay', 'note': None}
+  response: {"id":"02635026-2553-43aa-bad5-0db931818cf3","reference":"CLM-20E95AB3","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"800.00","description":"QA 706e89e5 Including necessary final firm process.","incident_date":"2026-08-15","status":"PAID","created_at":"2026-08-22T03:22:27.424109Z","updated_at":"2026-08-22T03:22:27.465712Z","withdrawn_at":null,"decided_by_id":"0d3e0b3d-57d9-400c-9d30-0c5729ffa08b"}
+03:22:27 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/02635026-2553-43aa-bad5-0db931818cf3/transitions "HTTP/1.1 409 Conflict"
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/02635026-2553-43aa-bad5-0db931818cf3/transitions -> 409 (6 ms)
+  request : {'action': 'pay', 'note': None}
+  response: {"detail":"Cannot pay a claim in status PAID; it must be APPROVED."}
+03:22:27 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/02635026-2553-43aa-bad5-0db931818cf3/transitions "HTTP/1.1 409 Conflict"
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/02635026-2553-43aa-bad5-0db931818cf3/transitions -> 409 (6 ms)
+  request : {'action': 'pay', 'note': None}
+  response: {"detail":"Cannot pay a claim in status PAID; it must be APPROVED."}
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.db.connection SQL: SELECT count(*) FROM payouts WHERE claim_id = %s
+  params: ('02635026-2553-43aa-bad5-0db931818cf3',)
+  rows: 1
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.db.connection SQL: SELECT coalesce(sum(amount), 0) FROM payouts WHERE claim_id = %s
+  params: ('02635026-2553-43aa-bad5-0db931818cf3',)
+  rows: 1
+03:22:27 DEBUG    claimdesk_qa.tests.conftest end tests/db/test_audit_and_payouts.py::test_a_second_payment_attempt_creates_no_second_payout

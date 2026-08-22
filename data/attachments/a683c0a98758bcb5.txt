@@ -1,0 +1,2 @@
+03:22:34 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_allure_support.py::test_github_actions_produces_a_link_back_to_the_run
+03:22:34 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_allure_support.py::test_github_actions_produces_a_link_back_to_the_run

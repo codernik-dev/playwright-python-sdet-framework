@@ -1,9 +1,0 @@
-03:31:49 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_claims_validation.py::test_description_length_boundaries[one-below-minimum]
-03:31:49 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/policies "HTTP/1.1 200 OK"
-03:31:49 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/policies -> 200 (4 ms)
-  response: [{"id":"33059b0b-df07-4730-919a-1ba679c9ca45","policy_number":"POL-1001","holder_id":"a7d8d307-857f-4f9c-8874-d73698c23444","coverage_limit":"10000.00","is_active":true},{"id":"72843bcb-585e-49ad-b99f-b8870cb2ac12","policy_number":"POL-1002","holder_id":"a7d8d307-857f-4f9c-8874-d73698c23444","coverage_limit":"2500.00","is_active":true}]
-03:31:49 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 422 Unprocessable Entity"
-03:31:49 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 422 (3 ms)
-  request : {'policy_id': '33059b0b-df07-4730-919a-1ba679c9ca45', 'amount': '250.00', 'description': 'xxxx', 'incident_date': '2026-08-14'}
-  response: {"detail":[{"type":"string_too_short","loc":["body","description"],"msg":"String should have at least 5 characters","input":"xxxx","ctx":{"min_length":5}}]}
-03:31:49 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_claims_validation.py::test_description_length_boundaries[one-below-minimum]

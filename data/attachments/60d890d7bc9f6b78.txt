@@ -1,6 +1,0 @@
-03:31:53 DEBUG    claimdesk_qa.tests.conftest start tests/db/test_integrity.py::test_a_claim_can_only_be_paid_once_at_the_storage_layer
-03:31:53 DEBUG    claimdesk_qa.claimdesk_qa.db.connection Connected read-only to postgresql://claimdesk_qa_ro:***masked***@127.0.0.1:5432/claimdesk
-03:31:53 DEBUG    claimdesk_qa.claimdesk_qa.db.connection SQL: SELECT con.conname AS constraint_name, CASE con.contype WHEN 'p' THEN 'PRIMARY KEY' WHEN 'u' THEN 'UNIQUE' WHEN 'f' THEN 'FOREIGN KEY' WHEN 'c' THEN 'CHECK' ELSE con.contype::text END AS constraint_type, rel.relname AS table_name FROM pg_catalog.pg_constraint con JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid JOIN pg_catalog.pg_namespace nsp ON nsp.oid = rel.relnamespace WHERE nsp.nspname = 'public' AND rel.relname = %s ORDER BY 2, 1
-  params: ('payouts',)
-  rows: 10
-03:31:53 DEBUG    claimdesk_qa.tests.conftest end tests/db/test_integrity.py::test_a_claim_can_only_be_paid_once_at_the_storage_layer

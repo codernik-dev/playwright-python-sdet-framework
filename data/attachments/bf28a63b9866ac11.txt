@@ -1,2 +1,0 @@
-15:32:04 DEBUG   [qa-706183fb3f] claimdesk_qa.tests.conftest: start tests/framework/test_readiness.py::test_times_out_with_a_message_that_blames_the_environment
-15:32:04 DEBUG   [qa-706183fb3f] claimdesk_qa.tests.conftest: end tests/framework/test_readiness.py::test_times_out_with_a_message_that_blames_the_environment

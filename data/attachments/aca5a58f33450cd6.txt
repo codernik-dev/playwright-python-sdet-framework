@@ -1,0 +1,2 @@
+03:22:35 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_settings.py::test_repr_of_settings_does_not_leak_secrets
+03:22:35 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_settings.py::test_repr_of_settings_does_not_leak_secrets

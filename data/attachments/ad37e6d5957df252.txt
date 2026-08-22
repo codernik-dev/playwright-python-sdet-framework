@@ -1,0 +1,25 @@
+03:22:25 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_claims_crud.py::test_each_claim_receives_a_distinct_reference
+03:22:25 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/policies "HTTP/1.1 200 OK"
+03:22:25 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/policies -> 200 (5 ms)
+  response: [{"id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","policy_number":"POL-1001","holder_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","coverage_limit":"10000.00","is_active":true},{"id":"bb56a965-87b3-4d33-b037-0c5e1819a676","policy_number":"POL-1002","holder_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","coverage_limit":"2500.00","is_active":true}]
+03:22:25 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+03:22:25 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (8 ms)
+  request : {'policy_id': 'acd742ca-8cb8-4d42-9eca-3df7c6f19e69', 'amount': '250.00', 'description': 'QA c5f2171d Might that race billion film paper attorney nothing.', 'incident_date': '2026-08-15'}
+  response: {"id":"507f13de-5b3c-4001-8d6d-2a7aa9b7eed1","reference":"CLM-E2A4FC62","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"250.00","description":"QA c5f2171d Might that race billion film paper attorney nothing.","incident_date":"2026-08-15","status":"DRAFT","created_at":"2026-08-22T03:22:25.921243Z","updated_at":"2026-08-22T03:22:25.921243Z","withdrawn_at":null,"decided_by_id":null}
+03:22:25 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+03:22:25 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (9 ms)
+  request : {'policy_id': 'acd742ca-8cb8-4d42-9eca-3df7c6f19e69', 'amount': '250.00', 'description': 'QA a995d683 Sport move so require treatment.', 'incident_date': '2026-08-15'}
+  response: {"id":"34a1056b-a4b5-4eff-9df1-361d5113ec52","reference":"CLM-264C57A4","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"250.00","description":"QA a995d683 Sport move so require treatment.","incident_date":"2026-08-15","status":"DRAFT","created_at":"2026-08-22T03:22:25.930127Z","updated_at":"2026-08-22T03:22:25.930127Z","withdrawn_at":null,"decided_by_id":null}
+03:22:25 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+03:22:25 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (10 ms)
+  request : {'policy_id': 'acd742ca-8cb8-4d42-9eca-3df7c6f19e69', 'amount': '250.00', 'description': 'QA a33cc204 Democrat soldier may pretty.', 'incident_date': '2026-08-15'}
+  response: {"id":"ac14221d-c1c0-439e-bf70-40552041e86a","reference":"CLM-4D0B795D","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"250.00","description":"QA a33cc204 Democrat soldier may pretty.","incident_date":"2026-08-15","status":"DRAFT","created_at":"2026-08-22T03:22:25.939523Z","updated_at":"2026-08-22T03:22:25.939523Z","withdrawn_at":null,"decided_by_id":null}
+03:22:25 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+03:22:25 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (10 ms)
+  request : {'policy_id': 'acd742ca-8cb8-4d42-9eca-3df7c6f19e69', 'amount': '250.00', 'description': 'QA fb9f87e4 Finish some name table town example me same.', 'incident_date': '2026-08-15'}
+  response: {"id":"860d0395-c82b-4a32-a1c4-3e752f719c40","reference":"CLM-7400586D","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"250.00","description":"QA fb9f87e4 Finish some name table town example me same.","incident_date":"2026-08-15","status":"DRAFT","created_at":"2026-08-22T03:22:25.950369Z","updated_at":"2026-08-22T03:22:25.950369Z","withdrawn_at":null,"decided_by_id":null}
+03:22:25 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+03:22:25 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (8 ms)
+  request : {'policy_id': 'acd742ca-8cb8-4d42-9eca-3df7c6f19e69', 'amount': '250.00', 'description': 'QA 645ac375 Day get walk middle know cold.', 'incident_date': '2026-08-15'}
+  response: {"id":"74410378-32b3-4e1a-beaf-dd939d4cb5fa","reference":"CLM-08D28806","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"250.00","description":"QA 645ac375 Day get walk middle know cold.","incident_date":"2026-08-15","status":"DRAFT","created_at":"2026-08-22T03:22:25.960831Z","updated_at":"2026-08-22T03:22:25.960831Z","withdrawn_at":null,"decided_by_id":null}
+03:22:25 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_claims_crud.py::test_each_claim_receives_a_distinct_reference

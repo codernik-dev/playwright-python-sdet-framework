@@ -1,2 +1,0 @@
-15:32:04 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_recording.py::test_the_recorder_is_reset_even_when_the_test_raises
-15:32:04 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_recording.py::test_the_recorder_is_reset_even_when_the_test_raises

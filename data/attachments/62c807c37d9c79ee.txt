@@ -1,0 +1,21 @@
+03:22:26 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_state_machine.py::test_every_published_transition_is_accepted[UNDER_REVIEW-approve-APPROVED]
+03:22:26 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/policies "HTTP/1.1 200 OK"
+03:22:26 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/policies -> 200 (5 ms)
+  response: [{"id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","policy_number":"POL-1001","holder_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","coverage_limit":"10000.00","is_active":true},{"id":"bb56a965-87b3-4d33-b037-0c5e1819a676","policy_number":"POL-1002","holder_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","coverage_limit":"2500.00","is_active":true}]
+03:22:26 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+03:22:26 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (10 ms)
+  request : {'policy_id': 'acd742ca-8cb8-4d42-9eca-3df7c6f19e69', 'amount': '100.00', 'description': 'QA e82d8ff4 Mission face out decade camera candidate.', 'incident_date': '2026-08-15'}
+  response: {"id":"b37d6828-80e2-406b-9173-97fc5ecb64eb","reference":"CLM-36537160","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"100.00","description":"QA e82d8ff4 Mission face out decade camera candidate.","incident_date":"2026-08-15","status":"DRAFT","created_at":"2026-08-22T03:22:26.176233Z","updated_at":"2026-08-22T03:22:26.176233Z","withdrawn_at":null,"decided_by_id":null}
+03:22:26 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/b37d6828-80e2-406b-9173-97fc5ecb64eb/transitions "HTTP/1.1 200 OK"
+03:22:26 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/b37d6828-80e2-406b-9173-97fc5ecb64eb/transitions -> 200 (9 ms)
+  request : {'action': 'submit', 'note': None}
+  response: {"id":"b37d6828-80e2-406b-9173-97fc5ecb64eb","reference":"CLM-36537160","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"100.00","description":"QA e82d8ff4 Mission face out decade camera candidate.","incident_date":"2026-08-15","status":"SUBMITTED","created_at":"2026-08-22T03:22:26.176233Z","updated_at":"2026-08-22T03:22:26.186455Z","withdrawn_at":null,"decided_by_id":null}
+03:22:26 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/b37d6828-80e2-406b-9173-97fc5ecb64eb/transitions "HTTP/1.1 200 OK"
+03:22:26 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/b37d6828-80e2-406b-9173-97fc5ecb64eb/transitions -> 200 (10 ms)
+  request : {'action': 'start_review', 'note': None}
+  response: {"id":"b37d6828-80e2-406b-9173-97fc5ecb64eb","reference":"CLM-36537160","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"100.00","description":"QA e82d8ff4 Mission face out decade camera candidate.","incident_date":"2026-08-15","status":"UNDER_REVIEW","created_at":"2026-08-22T03:22:26.176233Z","updated_at":"2026-08-22T03:22:26.196140Z","withdrawn_at":null,"decided_by_id":null}
+03:22:26 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/b37d6828-80e2-406b-9173-97fc5ecb64eb/transitions "HTTP/1.1 200 OK"
+03:22:26 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/b37d6828-80e2-406b-9173-97fc5ecb64eb/transitions -> 200 (10 ms)
+  request : {'action': 'approve', 'note': None}
+  response: {"id":"b37d6828-80e2-406b-9173-97fc5ecb64eb","reference":"CLM-36537160","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"100.00","description":"QA e82d8ff4 Mission face out decade camera candidate.","incident_date":"2026-08-15","status":"APPROVED","created_at":"2026-08-22T03:22:26.176233Z","updated_at":"2026-08-22T03:22:26.206489Z","withdrawn_at":null,"decided_by_id":"0d3e0b3d-57d9-400c-9d30-0c5729ffa08b"}
+03:22:26 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_state_machine.py::test_every_published_transition_is_accepted[UNDER_REVIEW-approve-APPROVED]

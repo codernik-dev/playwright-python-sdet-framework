@@ -1,4 +1,0 @@
-03:32:01 DEBUG    claimdesk_qa.tests.conftest start tests/ui/test_claim_workflow.py::test_the_admin_link_is_hidden_from_a_customer_and_shown_to_an_administrator[chromium]
-03:32:01 INFO     claimdesk_qa.claimdesk_qa.ui.base_page Opening http://127.0.0.1:8000/claims
-03:32:01 INFO     claimdesk_qa.claimdesk_qa.ui.base_page Opening http://127.0.0.1:8000/claims
-03:32:01 DEBUG    claimdesk_qa.tests.conftest end tests/ui/test_claim_workflow.py::test_the_admin_link_is_hidden_from_a_customer_and_shown_to_an_administrator[chromium]

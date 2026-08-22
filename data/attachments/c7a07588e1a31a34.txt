@@ -1,0 +1,28 @@
+03:22:27 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_state_machine.py::test_illegal_transitions_are_refused[REJECTED-cannot-pay]
+03:22:27 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/policies "HTTP/1.1 200 OK"
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/policies -> 200 (5 ms)
+  response: [{"id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","policy_number":"POL-1001","holder_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","coverage_limit":"10000.00","is_active":true},{"id":"bb56a965-87b3-4d33-b037-0c5e1819a676","policy_number":"POL-1002","holder_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","coverage_limit":"2500.00","is_active":true}]
+03:22:27 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (9 ms)
+  request : {'policy_id': 'acd742ca-8cb8-4d42-9eca-3df7c6f19e69', 'amount': '100.00', 'description': 'QA 4ee325f3 Music describe put energy.', 'incident_date': '2026-08-15'}
+  response: {"id":"fab5c958-11a7-4305-8996-fa430214f116","reference":"CLM-9F42F69B","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"100.00","description":"QA 4ee325f3 Music describe put energy.","incident_date":"2026-08-15","status":"DRAFT","created_at":"2026-08-22T03:22:27.668529Z","updated_at":"2026-08-22T03:22:27.668529Z","withdrawn_at":null,"decided_by_id":null}
+03:22:27 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/fab5c958-11a7-4305-8996-fa430214f116/transitions "HTTP/1.1 200 OK"
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/fab5c958-11a7-4305-8996-fa430214f116/transitions -> 200 (9 ms)
+  request : {'action': 'submit', 'note': None}
+  response: {"id":"fab5c958-11a7-4305-8996-fa430214f116","reference":"CLM-9F42F69B","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"100.00","description":"QA 4ee325f3 Music describe put energy.","incident_date":"2026-08-15","status":"SUBMITTED","created_at":"2026-08-22T03:22:27.668529Z","updated_at":"2026-08-22T03:22:27.679162Z","withdrawn_at":null,"decided_by_id":null}
+03:22:27 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/fab5c958-11a7-4305-8996-fa430214f116/transitions "HTTP/1.1 200 OK"
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/fab5c958-11a7-4305-8996-fa430214f116/transitions -> 200 (10 ms)
+  request : {'action': 'start_review', 'note': None}
+  response: {"id":"fab5c958-11a7-4305-8996-fa430214f116","reference":"CLM-9F42F69B","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"100.00","description":"QA 4ee325f3 Music describe put energy.","incident_date":"2026-08-15","status":"UNDER_REVIEW","created_at":"2026-08-22T03:22:27.668529Z","updated_at":"2026-08-22T03:22:27.690384Z","withdrawn_at":null,"decided_by_id":null}
+03:22:27 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/fab5c958-11a7-4305-8996-fa430214f116/transitions "HTTP/1.1 200 OK"
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/fab5c958-11a7-4305-8996-fa430214f116/transitions -> 200 (10 ms)
+  request : {'action': 'reject', 'note': None}
+  response: {"id":"fab5c958-11a7-4305-8996-fa430214f116","reference":"CLM-9F42F69B","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"100.00","description":"QA 4ee325f3 Music describe put energy.","incident_date":"2026-08-15","status":"REJECTED","created_at":"2026-08-22T03:22:27.668529Z","updated_at":"2026-08-22T03:22:27.699564Z","withdrawn_at":null,"decided_by_id":"0d3e0b3d-57d9-400c-9d30-0c5729ffa08b"}
+03:22:27 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/fab5c958-11a7-4305-8996-fa430214f116/transitions "HTTP/1.1 409 Conflict"
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/fab5c958-11a7-4305-8996-fa430214f116/transitions -> 409 (4 ms)
+  request : {'action': 'pay', 'note': None}
+  response: {"detail":"Cannot pay a claim in status REJECTED; it must be APPROVED."}
+03:22:27 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/claims/fab5c958-11a7-4305-8996-fa430214f116 "HTTP/1.1 200 OK"
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/claims/fab5c958-11a7-4305-8996-fa430214f116 -> 200 (5 ms)
+  response: {"id":"fab5c958-11a7-4305-8996-fa430214f116","reference":"CLM-9F42F69B","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"100.00","description":"QA 4ee325f3 Music describe put energy.","incident_date":"2026-08-15","status":"REJECTED","created_at":"2026-08-22T03:22:27.668529Z","updated_at":"2026-08-22T03:22:27.699564Z","withdrawn_at":null,"decided_by_id":"0d3e0b3d-57d9-400c-9d30-0c5729ffa08b"}
+03:22:27 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_state_machine.py::test_illegal_transitions_are_refused[REJECTED-cannot-pay]

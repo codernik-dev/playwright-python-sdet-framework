@@ -1,0 +1,24 @@
+03:22:25 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_authorization.py::test_an_adjuster_may_not_approve_above_the_limit[far-above-limit]
+03:22:25 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/policies "HTTP/1.1 200 OK"
+03:22:25 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/policies -> 200 (6 ms)
+  response: [{"id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","policy_number":"POL-1001","holder_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","coverage_limit":"10000.00","is_active":true},{"id":"bb56a965-87b3-4d33-b037-0c5e1819a676","policy_number":"POL-1002","holder_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","coverage_limit":"2500.00","is_active":true}]
+03:22:25 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+03:22:25 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (9 ms)
+  request : {'policy_id': 'acd742ca-8cb8-4d42-9eca-3df7c6f19e69', 'amount': '9999.99', 'description': 'QA 028f8a41 Difficult over clear yard benefit professional.', 'incident_date': '2026-08-15'}
+  response: {"id":"76d5999a-61d5-445e-997c-b19b3202a2df","reference":"CLM-9DECC46F","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"9999.99","description":"QA 028f8a41 Difficult over clear yard benefit professional.","incident_date":"2026-08-15","status":"DRAFT","created_at":"2026-08-22T03:22:25.703110Z","updated_at":"2026-08-22T03:22:25.703110Z","withdrawn_at":null,"decided_by_id":null}
+03:22:25 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/76d5999a-61d5-445e-997c-b19b3202a2df/transitions "HTTP/1.1 200 OK"
+03:22:25 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/76d5999a-61d5-445e-997c-b19b3202a2df/transitions -> 200 (10 ms)
+  request : {'action': 'submit', 'note': None}
+  response: {"id":"76d5999a-61d5-445e-997c-b19b3202a2df","reference":"CLM-9DECC46F","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"9999.99","description":"QA 028f8a41 Difficult over clear yard benefit professional.","incident_date":"2026-08-15","status":"SUBMITTED","created_at":"2026-08-22T03:22:25.703110Z","updated_at":"2026-08-22T03:22:25.711787Z","withdrawn_at":null,"decided_by_id":null}
+03:22:25 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/76d5999a-61d5-445e-997c-b19b3202a2df/transitions "HTTP/1.1 200 OK"
+03:22:25 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/76d5999a-61d5-445e-997c-b19b3202a2df/transitions -> 200 (9 ms)
+  request : {'action': 'start_review', 'note': None}
+  response: {"id":"76d5999a-61d5-445e-997c-b19b3202a2df","reference":"CLM-9DECC46F","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"9999.99","description":"QA 028f8a41 Difficult over clear yard benefit professional.","incident_date":"2026-08-15","status":"UNDER_REVIEW","created_at":"2026-08-22T03:22:25.703110Z","updated_at":"2026-08-22T03:22:25.722129Z","withdrawn_at":null,"decided_by_id":null}
+03:22:25 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/76d5999a-61d5-445e-997c-b19b3202a2df/transitions "HTTP/1.1 403 Forbidden"
+03:22:25 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/76d5999a-61d5-445e-997c-b19b3202a2df/transitions -> 403 (5 ms)
+  request : {'action': 'approve', 'note': None}
+  response: {"detail":"Amount 9999.99 exceeds the adjuster approval limit of 5000.00; an administrator must approve it."}
+03:22:25 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/claims/76d5999a-61d5-445e-997c-b19b3202a2df "HTTP/1.1 200 OK"
+03:22:25 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/claims/76d5999a-61d5-445e-997c-b19b3202a2df -> 200 (4 ms)
+  response: {"id":"76d5999a-61d5-445e-997c-b19b3202a2df","reference":"CLM-9DECC46F","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"9999.99","description":"QA 028f8a41 Difficult over clear yard benefit professional.","incident_date":"2026-08-15","status":"UNDER_REVIEW","created_at":"2026-08-22T03:22:25.703110Z","updated_at":"2026-08-22T03:22:25.722129Z","withdrawn_at":null,"decided_by_id":null}
+03:22:25 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_authorization.py::test_an_adjuster_may_not_approve_above_the_limit[far-above-limit]

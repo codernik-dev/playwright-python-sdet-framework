@@ -1,0 +1,35 @@
+03:22:27 DEBUG    claimdesk_qa.tests.conftest start tests/db/test_audit_and_payouts.py::test_paying_a_claim_writes_exactly_one_payout_for_the_right_amount
+03:22:27 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/policies "HTTP/1.1 200 OK"
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/policies -> 200 (6 ms)
+  response: [{"id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","policy_number":"POL-1001","holder_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","coverage_limit":"10000.00","is_active":true},{"id":"bb56a965-87b3-4d33-b037-0c5e1819a676","policy_number":"POL-1002","holder_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","coverage_limit":"2500.00","is_active":true}]
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.db.connection Connected read-only to postgresql://claimdesk_qa_ro:***masked***@127.0.0.1:5432/claimdesk
+03:22:27 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (9 ms)
+  request : {'policy_id': 'acd742ca-8cb8-4d42-9eca-3df7c6f19e69', 'amount': '2345.67', 'description': 'QA 529c75d2 Hard letter across perform task practice.', 'incident_date': '2026-08-15'}
+  response: {"id":"fe10a0f2-ba58-4f17-b286-56a2d27e83d6","reference":"CLM-7A21A7D7","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"2345.67","description":"QA 529c75d2 Hard letter across perform task practice.","incident_date":"2026-08-15","status":"DRAFT","created_at":"2026-08-22T03:22:27.334395Z","updated_at":"2026-08-22T03:22:27.334395Z","withdrawn_at":null,"decided_by_id":null}
+03:22:27 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/fe10a0f2-ba58-4f17-b286-56a2d27e83d6/transitions "HTTP/1.1 200 OK"
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/fe10a0f2-ba58-4f17-b286-56a2d27e83d6/transitions -> 200 (9 ms)
+  request : {'action': 'submit', 'note': None}
+  response: {"id":"fe10a0f2-ba58-4f17-b286-56a2d27e83d6","reference":"CLM-7A21A7D7","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"2345.67","description":"QA 529c75d2 Hard letter across perform task practice.","incident_date":"2026-08-15","status":"SUBMITTED","created_at":"2026-08-22T03:22:27.334395Z","updated_at":"2026-08-22T03:22:27.342681Z","withdrawn_at":null,"decided_by_id":null}
+03:22:27 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/fe10a0f2-ba58-4f17-b286-56a2d27e83d6/transitions "HTTP/1.1 200 OK"
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/fe10a0f2-ba58-4f17-b286-56a2d27e83d6/transitions -> 200 (10 ms)
+  request : {'action': 'start_review', 'note': None}
+  response: {"id":"fe10a0f2-ba58-4f17-b286-56a2d27e83d6","reference":"CLM-7A21A7D7","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"2345.67","description":"QA 529c75d2 Hard letter across perform task practice.","incident_date":"2026-08-15","status":"UNDER_REVIEW","created_at":"2026-08-22T03:22:27.334395Z","updated_at":"2026-08-22T03:22:27.352475Z","withdrawn_at":null,"decided_by_id":null}
+03:22:27 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/fe10a0f2-ba58-4f17-b286-56a2d27e83d6/transitions "HTTP/1.1 200 OK"
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/fe10a0f2-ba58-4f17-b286-56a2d27e83d6/transitions -> 200 (15 ms)
+  request : {'action': 'approve', 'note': None}
+  response: {"id":"fe10a0f2-ba58-4f17-b286-56a2d27e83d6","reference":"CLM-7A21A7D7","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"2345.67","description":"QA 529c75d2 Hard letter across perform task practice.","incident_date":"2026-08-15","status":"APPROVED","created_at":"2026-08-22T03:22:27.334395Z","updated_at":"2026-08-22T03:22:27.363917Z","withdrawn_at":null,"decided_by_id":"0d3e0b3d-57d9-400c-9d30-0c5729ffa08b"}
+03:22:27 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/fe10a0f2-ba58-4f17-b286-56a2d27e83d6/transitions "HTTP/1.1 200 OK"
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/fe10a0f2-ba58-4f17-b286-56a2d27e83d6/transitions -> 200 (11 ms)
+  request : {'action': 'pay', 'note': None}
+  response: {"id":"fe10a0f2-ba58-4f17-b286-56a2d27e83d6","reference":"CLM-7A21A7D7","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"2345.67","description":"QA 529c75d2 Hard letter across perform task practice.","incident_date":"2026-08-15","status":"PAID","created_at":"2026-08-22T03:22:27.334395Z","updated_at":"2026-08-22T03:22:27.379998Z","withdrawn_at":null,"decided_by_id":"0d3e0b3d-57d9-400c-9d30-0c5729ffa08b"}
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.db.connection SQL: SELECT id, claim_id, amount, paid_by_id, paid_at FROM payouts WHERE claim_id = %s
+  params: ('fe10a0f2-ba58-4f17-b286-56a2d27e83d6',)
+  rows: 1
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.db.connection SQL: SELECT id, email, full_name, role, password_hash, is_active, created_at FROM users WHERE email = %s
+  params: ('adjuster@example.com',)
+  rows: 1
+03:22:27 DEBUG    claimdesk_qa.claimdesk_qa.db.connection SQL: SELECT count(*) FROM payouts WHERE claim_id = %s
+  params: ('fe10a0f2-ba58-4f17-b286-56a2d27e83d6',)
+  rows: 1
+03:22:27 DEBUG    claimdesk_qa.tests.conftest end tests/db/test_audit_and_payouts.py::test_paying_a_claim_writes_exactly_one_payout_for_the_right_amount

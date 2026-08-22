@@ -1,2 +1,0 @@
-15:32:04 DEBUG   [qa-f4bcbb2289] claimdesk_qa.tests.conftest: start tests/framework/test_recording.py::test_the_recorder_does_not_leak_into_the_next_test
-15:32:04 DEBUG   [qa-f4bcbb2289] claimdesk_qa.tests.conftest: end tests/framework/test_recording.py::test_the_recorder_does_not_leak_into_the_next_test

@@ -1,0 +1,2 @@
+15:22:35 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_settings.py::test_masked_report_block_contains_no_secrets
+15:22:35 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_settings.py::test_masked_report_block_contains_no_secrets

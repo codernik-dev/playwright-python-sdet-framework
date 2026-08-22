@@ -1,2 +1,0 @@
-03:32:04 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_allure_support.py::test_every_pattern_can_match_across_a_multi_line_value[Skipped by configuration]
-03:32:04 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_allure_support.py::test_every_pattern_can_match_across_a_multi_line_value[Skipped by configuration]

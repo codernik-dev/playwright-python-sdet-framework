@@ -1,0 +1,3 @@
+03:22:33 DEBUG    claimdesk_qa.tests.conftest start tests/ui/test_login.py::test_signing_in_with_a_wrong_password_shows_an_error[chromium]
+03:22:33 INFO     claimdesk_qa.claimdesk_qa.ui.base_page Opening http://127.0.0.1:8000/login
+03:22:34 DEBUG    claimdesk_qa.tests.conftest end tests/ui/test_login.py::test_signing_in_with_a_wrong_password_shows_an_error[chromium]

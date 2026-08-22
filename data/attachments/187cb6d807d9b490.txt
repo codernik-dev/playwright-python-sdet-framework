@@ -1,0 +1,5 @@
+03:22:28 DEBUG    claimdesk_qa.tests.conftest start tests/db/test_integrity.py::test_every_paid_claim_has_a_payout
+03:22:28 DEBUG    claimdesk_qa.claimdesk_qa.db.connection Connected read-only to postgresql://claimdesk_qa_ro:***masked***@127.0.0.1:5432/claimdesk
+03:22:28 DEBUG    claimdesk_qa.claimdesk_qa.db.connection SQL: SELECT c.reference AS label, 0 AS total FROM claims c LEFT JOIN payouts p ON p.claim_id = c.id WHERE c.status = 'PAID' AND p.id IS NULL
+  rows: 0
+03:22:28 DEBUG    claimdesk_qa.tests.conftest end tests/db/test_integrity.py::test_every_paid_claim_has_a_payout

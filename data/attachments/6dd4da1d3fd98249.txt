@@ -1,0 +1,2 @@
+15:22:35 DEBUG   [qa-2946344c01] claimdesk_qa.tests.conftest: start tests/framework/test_settings.py::test_out_of_range_values_fail_fast[HTTP_TIMEOUT_SECONDS--1]
+15:22:35 DEBUG   [qa-2946344c01] claimdesk_qa.tests.conftest: end tests/framework/test_settings.py::test_out_of_range_values_fail_fast[HTTP_TIMEOUT_SECONDS--1]

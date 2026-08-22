@@ -1,2 +1,0 @@
-15:32:04 DEBUG   [qa-d902eb089b] claimdesk_qa.tests.conftest: start tests/framework/test_settings.py::test_defaults_are_usable_without_any_environment_variables
-15:32:04 DEBUG   [qa-d902eb089b] claimdesk_qa.tests.conftest: end tests/framework/test_settings.py::test_defaults_are_usable_without_any_environment_variables

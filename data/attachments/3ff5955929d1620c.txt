@@ -1,0 +1,2 @@
+15:22:35 DEBUG   [qa-82c37d2a98] claimdesk_qa.tests.conftest: start tests/framework/test_settings.py::test_unknown_environment_is_rejected
+15:22:35 DEBUG   [qa-82c37d2a98] claimdesk_qa.tests.conftest: end tests/framework/test_settings.py::test_unknown_environment_is_rejected

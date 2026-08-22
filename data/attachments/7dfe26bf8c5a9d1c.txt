@@ -1,2 +1,0 @@
-15:32:04 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_logging_and_correlation.py::test_request_id_is_safe_as_an_http_header_value
-15:32:04 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_logging_and_correlation.py::test_request_id_is_safe_as_an_http_header_value

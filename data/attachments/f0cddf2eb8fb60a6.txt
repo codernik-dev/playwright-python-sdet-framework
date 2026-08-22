@@ -1,0 +1,2 @@
+15:22:35 DEBUG   [qa-132b1f01b7] claimdesk_qa.tests.conftest: start tests/framework/test_tls.py::test_the_shared_context_still_verifies_certificates
+15:22:35 DEBUG   [qa-132b1f01b7] claimdesk_qa.tests.conftest: end tests/framework/test_tls.py::test_the_shared_context_still_verifies_certificates

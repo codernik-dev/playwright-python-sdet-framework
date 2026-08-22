@@ -1,0 +1,2 @@
+15:22:35 DEBUG   [qa-ec273680f9] claimdesk_qa.tests.conftest: start tests/framework/test_settings.py::test_ci_forces_headless_even_if_asked_otherwise
+15:22:35 DEBUG   [qa-ec273680f9] claimdesk_qa.tests.conftest: end tests/framework/test_settings.py::test_ci_forces_headless_even_if_asked_otherwise

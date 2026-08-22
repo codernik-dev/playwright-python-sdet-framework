@@ -1,2 +1,0 @@
-03:32:04 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_allure_support.py::test_booleans_render_the_way_a_reader_expects
-03:32:04 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_allure_support.py::test_booleans_render_the_way_a_reader_expects

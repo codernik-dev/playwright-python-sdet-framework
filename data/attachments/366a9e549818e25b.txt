@@ -1,0 +1,32 @@
+03:22:26 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_state_machine.py::test_paying_the_same_claim_twice_is_refused
+03:22:26 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/policies "HTTP/1.1 200 OK"
+03:22:26 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/policies -> 200 (4 ms)
+  response: [{"id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","policy_number":"POL-1001","holder_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","coverage_limit":"10000.00","is_active":true},{"id":"bb56a965-87b3-4d33-b037-0c5e1819a676","policy_number":"POL-1002","holder_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","coverage_limit":"2500.00","is_active":true}]
+03:22:26 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims "HTTP/1.1 201 Created"
+03:22:26 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims -> 201 (10 ms)
+  request : {'policy_id': 'acd742ca-8cb8-4d42-9eca-3df7c6f19e69', 'amount': '300.00', 'description': 'QA de053f1a Business environmental manage system week use.', 'incident_date': '2026-08-15'}
+  response: {"id":"5a83ecee-843d-4c5c-86dc-d0891c23bd84","reference":"CLM-BB613A72","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"300.00","description":"QA de053f1a Business environmental manage system week use.","incident_date":"2026-08-15","status":"DRAFT","created_at":"2026-08-22T03:22:26.579279Z","updated_at":"2026-08-22T03:22:26.579279Z","withdrawn_at":null,"decided_by_id":null}
+03:22:26 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/5a83ecee-843d-4c5c-86dc-d0891c23bd84/transitions "HTTP/1.1 200 OK"
+03:22:26 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/5a83ecee-843d-4c5c-86dc-d0891c23bd84/transitions -> 200 (10 ms)
+  request : {'action': 'submit', 'note': None}
+  response: {"id":"5a83ecee-843d-4c5c-86dc-d0891c23bd84","reference":"CLM-BB613A72","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"300.00","description":"QA de053f1a Business environmental manage system week use.","incident_date":"2026-08-15","status":"SUBMITTED","created_at":"2026-08-22T03:22:26.579279Z","updated_at":"2026-08-22T03:22:26.589522Z","withdrawn_at":null,"decided_by_id":null}
+03:22:26 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/5a83ecee-843d-4c5c-86dc-d0891c23bd84/transitions "HTTP/1.1 200 OK"
+03:22:26 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/5a83ecee-843d-4c5c-86dc-d0891c23bd84/transitions -> 200 (11 ms)
+  request : {'action': 'start_review', 'note': None}
+  response: {"id":"5a83ecee-843d-4c5c-86dc-d0891c23bd84","reference":"CLM-BB613A72","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"300.00","description":"QA de053f1a Business environmental manage system week use.","incident_date":"2026-08-15","status":"UNDER_REVIEW","created_at":"2026-08-22T03:22:26.579279Z","updated_at":"2026-08-22T03:22:26.599945Z","withdrawn_at":null,"decided_by_id":null}
+03:22:26 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/5a83ecee-843d-4c5c-86dc-d0891c23bd84/transitions "HTTP/1.1 200 OK"
+03:22:26 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/5a83ecee-843d-4c5c-86dc-d0891c23bd84/transitions -> 200 (10 ms)
+  request : {'action': 'approve', 'note': None}
+  response: {"id":"5a83ecee-843d-4c5c-86dc-d0891c23bd84","reference":"CLM-BB613A72","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"300.00","description":"QA de053f1a Business environmental manage system week use.","incident_date":"2026-08-15","status":"APPROVED","created_at":"2026-08-22T03:22:26.579279Z","updated_at":"2026-08-22T03:22:26.611219Z","withdrawn_at":null,"decided_by_id":"0d3e0b3d-57d9-400c-9d30-0c5729ffa08b"}
+03:22:26 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/5a83ecee-843d-4c5c-86dc-d0891c23bd84/transitions "HTTP/1.1 200 OK"
+03:22:26 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/5a83ecee-843d-4c5c-86dc-d0891c23bd84/transitions -> 200 (52 ms)
+  request : {'action': 'pay', 'note': None}
+  response: {"id":"5a83ecee-843d-4c5c-86dc-d0891c23bd84","reference":"CLM-BB613A72","policy_id":"acd742ca-8cb8-4d42-9eca-3df7c6f19e69","claimant_id":"0318a17a-5c50-41e5-96a8-36d0f9676847","amount":"300.00","description":"QA de053f1a Business environmental manage system week use.","incident_date":"2026-08-15","status":"PAID","created_at":"2026-08-22T03:22:26.579279Z","updated_at":"2026-08-22T03:22:26.662580Z","withdrawn_at":null,"decided_by_id":"0d3e0b3d-57d9-400c-9d30-0c5729ffa08b"}
+03:22:26 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/claims/5a83ecee-843d-4c5c-86dc-d0891c23bd84/transitions "HTTP/1.1 409 Conflict"
+03:22:26 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/claims/5a83ecee-843d-4c5c-86dc-d0891c23bd84/transitions -> 409 (5 ms)
+  request : {'action': 'pay', 'note': None}
+  response: {"detail":"Cannot pay a claim in status PAID; it must be APPROVED."}
+03:22:26 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/claims/5a83ecee-843d-4c5c-86dc-d0891c23bd84/payout "HTTP/1.1 200 OK"
+03:22:26 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/claims/5a83ecee-843d-4c5c-86dc-d0891c23bd84/payout -> 200 (5 ms)
+  response: {"id":"6e4c6dbb-6060-416a-9e06-e7091b950e8f","claim_id":"5a83ecee-843d-4c5c-86dc-d0891c23bd84","amount":"300.00","paid_by_id":"0d3e0b3d-57d9-400c-9d30-0c5729ffa08b","paid_at":"2026-08-22T03:22:26.662580Z"}
+03:22:26 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_state_machine.py::test_paying_the_same_claim_twice_is_refused

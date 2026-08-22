@@ -1,0 +1,2 @@
+03:22:35 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_tls.py::test_the_context_is_built_once_and_reused
+03:22:35 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_tls.py::test_the_context_is_built_once_and_reused

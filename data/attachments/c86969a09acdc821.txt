@@ -1,5 +1,0 @@
-03:31:49 DEBUG    claimdesk_qa.tests.conftest start tests/api/test_claims_validation.py::test_a_page_beyond_the_end_returns_an_empty_page
-03:31:49 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/api/v1/claims?page=9999&size=10 "HTTP/1.1 200 OK"
-03:31:49 DEBUG    claimdesk_qa.claimdesk_qa.api.client GET http://127.0.0.1:8000/api/v1/claims?page=9999&size=10 -> 200 (4 ms)
-  response: {"items":[],"page":9999,"size":10,"total":47}
-03:31:49 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_claims_validation.py::test_a_page_beyond_the_end_returns_an_empty_page

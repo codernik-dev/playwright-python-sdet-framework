@@ -1,2 +1,0 @@
-03:32:04 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_artifacts.py::test_pruning_survives_another_worker_removing_a_directory_first
-03:32:04 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_artifacts.py::test_pruning_survives_another_worker_removing_a_directory_first

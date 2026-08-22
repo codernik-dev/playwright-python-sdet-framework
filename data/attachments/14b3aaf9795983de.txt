@@ -1,1 +1,0 @@
-03:32:04 INFO    [qa-334e5cf6c0] claimdesk_qa.claimdesk_qa.ui.base_page: Opening http://127.0.0.1:8000/dashboard

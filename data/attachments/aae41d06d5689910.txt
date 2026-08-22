@@ -1,0 +1,2 @@
+15:22:35 INFO    [qa-shared] claimdesk_qa.probe: correlated line
+15:22:35 DEBUG   [qa-e03a8a2670] claimdesk_qa.tests.conftest: end tests/framework/test_logging_and_correlation.py::test_the_correlation_id_reaches_every_destination_not_just_the_test_file

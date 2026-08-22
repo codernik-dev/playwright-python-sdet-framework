@@ -1,0 +1,2 @@
+03:22:35 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_allure_support.py::test_the_categories_file_is_valid_json_and_every_regex_compiles
+03:22:35 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_allure_support.py::test_the_categories_file_is_valid_json_and_every_regex_compiles

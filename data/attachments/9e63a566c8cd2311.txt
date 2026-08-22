@@ -1,2 +1,0 @@
-15:32:04 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_flakiness.py::test_the_retry_budget_is_one
-15:32:04 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_flakiness.py::test_the_retry_budget_is_one

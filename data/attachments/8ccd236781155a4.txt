@@ -1,2 +1,0 @@
-15:32:04 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_logging_and_correlation.py::test_messages_reach_the_worker_log_file
-15:32:04 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_logging_and_correlation.py::test_messages_reach_the_worker_log_file

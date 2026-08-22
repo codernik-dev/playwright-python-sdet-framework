@@ -1,0 +1,2 @@
+03:22:35 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_artifacts.py::test_empty_directories_are_pruned_but_evidence_is_kept
+03:22:35 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_artifacts.py::test_empty_directories_are_pruned_but_evidence_is_kept

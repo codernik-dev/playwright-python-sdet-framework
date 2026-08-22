@@ -1,0 +1,6 @@
+03:22:24 INFO     httpx HTTP Request: GET http://127.0.0.1:8000/health/ready "HTTP/1.1 200 OK"
+03:22:24 INFO     httpx HTTP Request: POST http://127.0.0.1:8000/api/v1/auth/login "HTTP/1.1 200 OK"
+03:22:24 DEBUG    claimdesk_qa.claimdesk_qa.api.client POST http://127.0.0.1:8000/api/v1/auth/login -> 200 (82 ms)
+  request : {'email': 'customer@example.com', 'password': 'Passw0rd!seed'}
+  response: {"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMzE4YTE3YS01YzUwLTQxZTUtOTZhOC0zNmQwZjk2NzY4NDciLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODczNjg5NDQsImV4cCI6MTc4NzM3MjU0NH0.0Efa0aIEss6qbtBZkGdHnyTpfemgR3DGuFtsCQ_itn4","token_type":"bearer","expires_in":3600}
+03:22:24 DEBUG    claimdesk_qa.tests.conftest end tests/api/test_auth.py::test_login_with_valid_credentials_returns_a_bearer_token

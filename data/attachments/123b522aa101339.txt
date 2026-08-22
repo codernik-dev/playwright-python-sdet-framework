@@ -1,5 +1,0 @@
-03:31:53 DEBUG    claimdesk_qa.tests.conftest start tests/db/test_integrity.py::test_money_is_stored_as_exact_numeric_not_floating_point
-03:31:53 DEBUG    claimdesk_qa.claimdesk_qa.db.connection Connected read-only to postgresql://claimdesk_qa_ro:***masked***@127.0.0.1:5432/claimdesk
-03:31:53 DEBUG    claimdesk_qa.claimdesk_qa.db.connection SQL: SELECT table_name, column_name, data_type, numeric_precision, numeric_scale FROM information_schema.columns WHERE table_schema = 'public' AND column_name IN ('amount', 'coverage_limit') ORDER BY table_name, column_name
-  rows: 3
-03:31:53 DEBUG    claimdesk_qa.tests.conftest end tests/db/test_integrity.py::test_money_is_stored_as_exact_numeric_not_floating_point

@@ -1,3 +1,0 @@
-03:31:54 DEBUG    claimdesk_qa.tests.conftest start tests/db/test_integrity.py::test_the_qa_role_cannot_modify_anything[truncate]
-03:31:54 DEBUG    claimdesk_qa.claimdesk_qa.db.connection Connected read-only to postgresql://claimdesk_qa_ro:***masked***@127.0.0.1:5432/claimdesk
-03:31:54 DEBUG    claimdesk_qa.tests.conftest end tests/db/test_integrity.py::test_the_qa_role_cannot_modify_anything[truncate]

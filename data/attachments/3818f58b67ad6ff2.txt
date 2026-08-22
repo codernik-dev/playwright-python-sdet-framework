@@ -1,0 +1,2 @@
+03:22:35 DEBUG    claimdesk_qa.tests.conftest start tests/framework/test_clock.py::test_the_answer_does_not_move_with_the_process_timezone[UTC]
+03:22:35 DEBUG    claimdesk_qa.tests.conftest end tests/framework/test_clock.py::test_the_answer_does_not_move_with_the_process_timezone[UTC]
